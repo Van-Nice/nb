@@ -1,24 +1,32 @@
-import logo from './logo.svg';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
+import Login from "./components/Login";
+import CreateAccount from "./components/CreateAccount";
 import './App.css';
+
+// Done: Create a Login, Create Account, and Home page components
+// TODO: 2. Create the routes for the above components
+// TODO: 3. Create a navigation bar that will allow the user to navigate between the pages
+// TODO: 4. Create a footer that will display the current year and the company name
+// TODO: 5. Create a form that will allow the user to create an account
+// TODO: 6. Create a form that will allow the user to login
+// TODO: 7. Create a form that will allow the user to create a post via the text editor
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        <Routes>
+          <Route path="/login" element={<Login/>}/>
+          <Route path="/create-account" element={<CreateAccount/>}/>
+          <Route path="/" element={<Navigate to="/login"/>}/>
+        </Routes>
+        <footer>
+          <p>&copy; 2024 Bungo</p>
+        </footer>
+      </div>
+    </Router>
   );
 }
 
