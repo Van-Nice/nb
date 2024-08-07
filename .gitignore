@@ -1,0 +1,10 @@
+.idea
+react-client/node_modules
+react-client/build
+react-client/dist
+php-server/db.php
+.env
+*.log
+.DS_Store
+Thumbs.db
+/vendor
