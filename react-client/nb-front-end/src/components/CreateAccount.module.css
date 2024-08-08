@@ -1,0 +1,55 @@
+h1 {
+    text-align: center; /* Center the h1 text */
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px; /* Add some space between labels */
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%; /* Make the input fields take up the full width of their container */
+    padding: 10px; /* Add padding for better appearance */
+    font-size: 16px; /* Increase the font size */
+    box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}
+
+.link {
+    text-align: center;
+    display: block; /* Ensure the link is treated as a block element */
+    margin-top: 20px; /* Add some space above the link */
+    color: grey;
+    text-decoration: none; /* Remove the underline */
+
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    grid-gap: 15px;
+    padding: 0 20px;
+    max-width: 400px;
+    margin: auto;
+}
+
+.name {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    grid-column-gap: 20px;
+}
+
+.createAccountButton {
+    width: auto; /* Prevent the button from stretching */
+    align-self: center; /* Center the button */
+    padding: 10px 20px; /* Add padding for better appearance */
+    background-color: mediumpurple; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* Remove border */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 8px;
+}

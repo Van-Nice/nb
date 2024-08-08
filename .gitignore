@@ -8,3 +8,5 @@ php-server/db.php
 .DS_Store
 Thumbs.db
 /vendor
+php-server/.env
+php-server/vendor/

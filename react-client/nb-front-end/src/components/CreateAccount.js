@@ -1,25 +1,83 @@
 'use client';
-import React from 'react';
-import { Link } from 'react-router-dom';
-
-// TODO have a link to the login page
+import React, {useState} from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import styles from './CreateAccount.module.css';
 
 export default function CreateAccount() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError('');
+
+    // Basic validation
+    if (email === '') {
+      setError('Email is required');
+      return;
+    }
+
+    if (password === '') {
+      setError('Password is required');
+      return;
+    }
+
+    try {
+      // TODO: send create account form to php server
+      const reponse = await fetch('http://localhost:8000/create-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({email, password}),
+      });
+
+      if (!reponse.ok) {
+        throw new Error('Failed to create account');
+      }
+
+      const data = await reponse.json();
+      console.log('Account created with ID: ', data.userId);
+      navigate('/home');
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   return (
+    // TODO: add first/last name and date of birth form input sections
     <div>
       <h1>Create Account</h1>
-      <form>
-        <label>
-          Email:
-          <input type="text" name="email" />
-        </label>
-        <label>
-          Password:
-          <input type="password" name="password" />
-        </label>
-        <button type="submit">Create Account</button>
+      <form onSubmit={handleSubmit}>
+        <div className={styles.container}>
+          <div className={styles.name}>
+            <label>
+              First:
+              <input type='text' name='firstName' value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            </label>
+            <label>
+              Last:
+              <input type='text' name='lastName' value={lastName} onChange={(e) => setLastName(e.target.value)}/>
+            </label>
+          </div>
+          <label>
+            Email:
+            <input type="text" name="email" value={email} onChange={(e) => setEmail((e.target.value))} />
+          </label>
+          <label>
+            Password:
+            <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </label>
+          <button className={styles.createAccountButton} type="submit">Create Account</button>
+        </div>
       </form>
-      <Link to="/login">Login</Link>
+      {error && <p>{error}</p>}
+      <Link to="/login" className={styles.link}>Login</Link>
     </div>
   );
 }
