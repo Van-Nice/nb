@@ -10,11 +10,20 @@ label {
 }
 
 input[type="text"],
-input[type="password"] {
+input[type="password"]
+ {
     width: 100%; /* Make the input fields take up the full width of their container */
     padding: 10px; /* Add padding for better appearance */
     font-size: 16px; /* Increase the font size */
     box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}
+
+input[type="date"] {
+    display: block; /* Make the input a block element */
+    padding: 10px; /* Add padding for better appearance */
+    font-size: 16px; /* Increase the font size */
+    box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+    width: fit-content; /* Adjust the width to fit the content */
 }
 
 .link {

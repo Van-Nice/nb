@@ -12,6 +12,17 @@ export default function CreateAccount() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const isValidBirthDate = (date) => {
+    const today = new Date();
+    const birthDate = new Date(date);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 13;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
@@ -27,6 +38,11 @@ export default function CreateAccount() {
       return;
     }
 
+    if (!isValidBirthDate(birthDate)) {
+      setError('You must be at least 13 years old');
+      return;
+    }
+
     try {
       // TODO: send create account form to php server
       const reponse = await fetch('http://localhost:8000/create-account', {
@@ -34,7 +50,7 @@ export default function CreateAccount() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({firstName, lastName, email, password, birthDate}),
       });
 
       if (!reponse.ok) {
@@ -58,7 +74,7 @@ export default function CreateAccount() {
           <div className={styles.name}>
             <label>
               First:
-              <input type='text' name='firstName' value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+              <input type='text' name='firstName' value={firstName} onChange={(e) => setFirstName(e.target.value)}/>
             </label>
             <label>
               Last:
@@ -67,11 +83,15 @@ export default function CreateAccount() {
           </div>
           <label>
             Email:
-            <input type="text" name="email" value={email} onChange={(e) => setEmail((e.target.value))} />
+            <input type="text" name="email" value={email} onChange={(e) => setEmail((e.target.value))}/>
           </label>
           <label>
             Password:
-            <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+          </label>
+          <label>
+            Date of Birth:
+            <input type="date" name="birthDate" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}/>
           </label>
           <button className={styles.createAccountButton} type="submit">Create Account</button>
         </div>
