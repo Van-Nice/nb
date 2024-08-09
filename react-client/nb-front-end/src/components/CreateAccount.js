@@ -45,7 +45,7 @@ export default function CreateAccount() {
 
     try {
       // TODO: send create account form to php server
-      const reponse = await fetch('http://localhost:8000/create-account', {
+      const response = await fetch('http://localhost:8000/create-account', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,11 +53,11 @@ export default function CreateAccount() {
         body: JSON.stringify({firstName, lastName, email, password, birthDate}),
       });
 
-      if (!reponse.ok) {
+      if (!response.ok) {
         throw new Error('Failed to create account');
       }
 
-      const data = await reponse.json();
+      const data = await response.json();
       console.log('Account created with ID: ', data.userId);
       navigate('/home');
     } catch (error) {
