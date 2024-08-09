@@ -26,7 +26,11 @@ $usersCollection = $database->selectCollection('users');
 
 // Routing based on the request URI
 $requestUri = $_SERVER['REQUEST_URI'];
-
+// Done: 1. When user creates account get the current time and date then add it to that users object
+// TODO: 2. Make sure that when creating a new account the email address is not already in the users collection
+// TODO: 3. send confirmation email to users email address
+// TODO: 4. When user logs in route them to login instead and don't let them log in until their email has been confirmed
+// TODO: 5. Add a
 // Handle the /create-account endpoint
 if ($requestUri === '/create-account') {
     // Ensure only POST requests are allowed
@@ -37,16 +41,23 @@ if ($requestUri === '/create-account') {
         if (isset($input['firstName']) && isset($input['lastName']) && isset($input['email']) &&
             isset($input['password']) && isset($input['birthDate'])) {
 
+            // Get the current date and time in UTC
+            $date = new DateTime('now', new DateTimeZone('UTC'));
+
+            // Format the date and time
+            $formattedDate = $date->format('Y-m-d\TH:i:s.v\Z');
+
             // Hash the password using password_hash()
             $hashedPassword = password_hash($input['password'], PASSWORD_DEFAULT);
 
             // Insert user data into db
             $result = $usersCollection->insertOne([
+                'createdAt' => $formattedDate,
                 'firstName' => $input['firstName'],
                 'lastName' => $input['lastName'],
                 'email' => $input['email'],
                 'passwordHash' => $hashedPassword,
-                'birthDate' => $input['birthDate']
+                'birthDate' => $input['birthDate'],
             ]);
 
             $response = [
