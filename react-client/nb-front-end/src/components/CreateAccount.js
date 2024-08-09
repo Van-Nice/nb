@@ -44,7 +44,7 @@ export default function CreateAccount() {
       return;
     }
 
-    try {
+    try { // Attempt POST request to /create-account endpoint
       // TODO: send create account form to php server
       const response = await fetch('http://localhost:8000/create-account', {
         method: 'POST',
@@ -54,13 +54,14 @@ export default function CreateAccount() {
         body: JSON.stringify({firstName, lastName, email, password, birthDate}),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create account');
-      }
-
       const data = await response.json();
-      console.log('Account created with ID: ', data.userId);
-      navigate('/home');
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create account');
+
+      } else {
+        console.log('Account created!');
+        navigate('/login');
+      }
     } catch (error) {
       setError(error.message);
     }

@@ -26,20 +26,37 @@ $usersCollection = $database->selectCollection('users');
 
 // Routing based on the request URI
 $requestUri = $_SERVER['REQUEST_URI'];
+
 // Done: 1. When user creates account get the current time and date then add it to that users object
-// TODO: 2. Make sure that when creating a new account the email address is not already in the users collection
+// Done: 2. Make sure that when creating a new account the email address is not already in the users collection
 // TODO: 3. send confirmation email to users email address
 // TODO: 4. When user logs in route them to login instead and don't let them log in until their email has been confirmed
 // TODO: 5. Add a
+
 // Handle the /create-account endpoint
 if ($requestUri === '/create-account') {
+
     // Ensure only POST requests are allowed
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
         // Process account creation
+        // read the raw POST data from the HTTP request body and decoding it from JSON format into a PHP associative array
         $input = json_decode(file_get_contents('php://input'), true);
 
+        // Check if all required fields are present in the input data before proceeding
         if (isset($input['firstName']) && isset($input['lastName']) && isset($input['email']) &&
             isset($input['password']) && isset($input['birthDate'])) {
+
+            // Check if the email already exists
+            $existingUser = $usersCollection->findOne(['email' => $input['email']]);
+            if ($existingUser) {
+                http_response_code(400);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Email already exists'
+                ]);
+                exit();
+            }
 
             // Get the current date and time in UTC
             $date = new DateTime('now', new DateTimeZone('UTC'));
