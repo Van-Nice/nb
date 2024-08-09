@@ -15,5 +15,8 @@
             "name": "Van-Nice",
             "email": "wilsonwalter808@gmail.com"
         }
-    ]
+    ],
+    "scripts": {
+        "start": "php -S localhost:8000 public/index.php"
+    }
 }

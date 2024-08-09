@@ -2,11 +2,12 @@
 react-client/node_modules
 react-client/build
 react-client/dist
-php-server/db.php
-.env
+php-server/config/db.php
+php-server/.env
 *.log
 .DS_Store
 Thumbs.db
 /vendor
 php-server/.env
 php-server/vendor/
+php-server/public/requests.http
