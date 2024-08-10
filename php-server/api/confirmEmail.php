@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../config/db.php';
-
 $database = require_once __DIR__ . '/../config/db.php';
 $usersCollection = $database->selectCollection('users');
 

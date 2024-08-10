@@ -45,7 +45,6 @@ export default function CreateAccount() {
     }
 
     try { // Attempt POST request to /create-account endpoint
-      // TODO: send create account form to php server
       const response = await fetch('http://localhost:8000/create-account', {
         method: 'POST',
         headers: {
@@ -68,7 +67,6 @@ export default function CreateAccount() {
   };
 
   return (
-    // TODO: add first/last name and date of birth form input sections
     <div>
       <h1>Create Account</h1>
       <form onSubmit={handleSubmit}>

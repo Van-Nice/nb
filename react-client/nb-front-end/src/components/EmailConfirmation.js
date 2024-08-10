@@ -30,13 +30,14 @@ export default function EmailConfirmation() {
     confirmEmail();
   }, []);
 
- const handleResendConfirmation = async () => {
+ const handleResendConfirmation = async (token) => {
    try {
      const response = await fetch('http://localhost:8000/resend-confirmation', {
        method: 'POST',
        headers: {
          'Content-Type': 'application/json',
        },
+       body: JSON.stringify({token}),
      });
 
      if (!response.ok) {
@@ -50,11 +51,11 @@ export default function EmailConfirmation() {
  };
 
   // TODO: Invalidate the token once link is visited and only allow for email validation within 24hrs of link creation
- // TODO: Create php /resend-confirmation endpoint
+  // TODO: Create php /resend-confirmation endpoint
 
   return (
     <div>
-      {confirmationStatus === 'sucess' ? (
+      {confirmationStatus === 'success' ? (
         <>
           <h1>Your email has been confirmed!</h1>
           <Link to="/login">Go to Login</Link>
