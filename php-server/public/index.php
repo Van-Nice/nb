@@ -23,11 +23,9 @@ header('Content-Type: application/json');
 // Routing based on the request URI
 $requestUri = $_SERVER['REQUEST_URI'];
 
-// Done: 1. When user creates account get the current time and date then add it to that users object
-// Done: 2. Make sure that when creating a new account the email address is not already in the users collection
-// TODO: 3. send confirmation email to users email address
-// TODO: 4. When user logs in route them to login instead and don't let them log in until their email has been confirmed
-
+// TODO: (bug) getting error when trying to react /confirm-email endpoint
+// TODO: (FIX) set the link url to be frontend /email-confirmation instead of backend /email-confirmation
+// TODO:  When user logs in route them to login instead and don't let them log in until their email has been confirmed
 
 if ($requestUri === '/create-account') {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -47,6 +45,16 @@ if ($requestUri === '/create-account') {
         echo json_encode([
             'status' => 'error',
             'message' => 'Only POST requests are allowed'
+        ]);
+    }
+} elseif ($requestUri === '/confirm-email') {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        require_once __DIR__ . '/../api/confirmEmail.php';
+    } else {
+        http_response_code(405);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Only GET requests are allowed'
         ]);
     }
 } else {

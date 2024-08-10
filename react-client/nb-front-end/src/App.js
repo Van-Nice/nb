@@ -3,10 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-ro
 import Login from "./components/Login";
 import CreateAccount from "./components/CreateAccount";
 import Home from "./components/Home";
+import EmailConfirmation from "./components/EmailConfirmation";
 import './App.css';
 
-// Done: Create a Login, Create Account, and Home page components
-// Done: 2. Create the routes for the above components
 // TODO: 3. Create a navigation bar that will allow the user to navigate between the pages
 // TODO: 4. Create a footer that will display the current year and the company name
 // TODO: 5. Create a form that will allow the user to create an account
@@ -19,6 +18,7 @@ function App() {
     <Router>
       <div>
         <Routes>
+          <Route path="/email-confirmation" element={<EmailConfirmation/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/create-account" element={<CreateAccount/>}/>
           <Route path="/home" element={<Home/>}/>

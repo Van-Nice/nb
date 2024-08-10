@@ -1,4 +1,3 @@
-'use client';
 import React, {useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './CreateAccount.module.css';
@@ -18,6 +17,7 @@ export default function CreateAccount() {
     const birthDate = new Date(date);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
