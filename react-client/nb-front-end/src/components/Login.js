@@ -22,7 +22,6 @@ export default function Login() {
     }
 
     try {
-      // TODO: send login details to php server for validation
       const response = await fetch('http://localhost:8000/auth', {
         method: 'POST',
         headers: {

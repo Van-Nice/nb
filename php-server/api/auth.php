@@ -11,18 +11,38 @@ if (isset($input['email']) && isset($input['password'])) {
     $email = $input['email'];
     $password = $input['password'];
 
-    $storedHashedPassword = '$2y$10$e0NRBkjLrI1IxV0gRbLZxevPUMOHTzkJkLsE.yDpChisK5uDqUHSa'; // Example hash
+    // Fetch user from the database using email
+    $user = $usersCollection->findOne(['email' => $email]);
 
-    if ($email === 'example@example.com' && $password === 'SecurePassword123') {
-        $response = [
-            'status' => 'success',
-            'message' => 'Authentication successful!',
-            'data' => [
-                'email' => $email,
-            ]
-        ];
+    if ($user) {
+        $storedHashedPassword = $user['passwordHash'];
+        // Verify the password
+        if (password_verify($password, $storedHashedPassword)) {
+            // Check if the email is confirmed
+            if (isset($user['emailConfirmed']) && $user['emailConfirmed'] === true) {
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Authentication successful!',
+                    'data' => [
+                        'email' => $email,
+                    ]
+                ];
 
-        echo json_encode($response);
+                echo json_encode($response);
+            } else {
+                http_response_code(403);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Email not confirmed'
+                ]);
+            }
+        } else {
+            http_response_code(401);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid email or password'
+            ]);
+        }
     } else {
         http_response_code(401);
         echo json_encode([

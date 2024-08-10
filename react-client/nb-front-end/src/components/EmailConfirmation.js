@@ -50,9 +50,6 @@ export default function EmailConfirmation() {
    }
  };
 
-  // TODO: Invalidate the token once link is visited and only allow for email validation within 24hrs of link creation
-  // TODO: Create php /resend-confirmation endpoint
-
   return (
     <div>
       {confirmationStatus === 'success' ? (

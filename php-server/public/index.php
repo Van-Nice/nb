@@ -23,10 +23,6 @@ header('Content-Type: application/json');
 // Routing based on the request URI
 $requestUri = $_SERVER['REQUEST_URI'];
 
-// TODO: (bug) getting error when trying to react /confirm-email endpoint
-// TODO: (FIX) set the link url to be frontend /email-confirmation instead of backend /email-confirmation
-// TODO:  When user logs in route them to login instead and don't let them log in until their email has been confirmed
-
 if ($requestUri === '/create-account') {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         require_once __DIR__ . '/../api/createAccount.php';
