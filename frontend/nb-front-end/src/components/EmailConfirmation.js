@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Link, useNavigation} from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
 export default function EmailConfirmation() {
   const [confirmationStatus, setConfirmationStatus] = useState(null);
   const [error, setError] = useState('');
@@ -68,4 +67,3 @@ export default function EmailConfirmation() {
 )
 }
 
-import {Link, useNavigate} from "react-router-dom";

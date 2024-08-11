@@ -6,10 +6,6 @@ import Home from "./components/Home";
 import EmailConfirmation from "./components/EmailConfirmation";
 import './App.css';
 
-// TODO:  Create a navigation bar that will allow the user to navigate between the pages
-// TODO:  Create a form that will allow the user to create a post via the text editor
-
-
 function App() {
   return (
     <Router>
