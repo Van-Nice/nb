@@ -68,3 +68,7 @@ input[type="date"] {
     padding: 0;
   }
 
+.inactiveButton {
+    background-color: grey;
+    cursor: not-allowed;
+}
