@@ -62,3 +62,9 @@ input[type="date"] {
     cursor: pointer; /* Pointer cursor on hover */
     border-radius: 8px;
 }
+
+.passwordRequirements {
+    list-style-type: none;
+    padding: 0;
+  }
+
