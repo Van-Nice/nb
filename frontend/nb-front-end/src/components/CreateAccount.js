@@ -8,7 +8,7 @@ export default function CreateAccount() {
   // Name
   const validateName = (name) => {
     const minLength = name.length > 1;
-    const isAlphabetic = /^[A-Za-z]+$/.test(name);
+    const isAlphabetic = /^[A-Za-z\s]+$/.test(name);
     return {
       minLength,
       isAlphabetic,
@@ -29,8 +29,8 @@ export default function CreateAccount() {
   };
   // Last name
   const [lastName, setLastName] = useState("");
-  const [lastNameValid, setLastNameValid] = useState(false);
-  const [lastNameIsTyping, setLastNameIsTyping] = useState({
+  const [lastNameIsTyping, setLastNameIsTyping] = useState(false); // should be a boolean
+  const [lastNameValid, setLastNameValid] = useState({
     minLength: false,
     isAlphabetic: true,
   });
@@ -39,38 +39,71 @@ export default function CreateAccount() {
     const value = e.target.value;
     setLastName(value);
     setLastNameValid(validateName(value));
-  }
-  // Username - set after you already have your db configured
+  };
+
+  // Email
+  // todo: Validate by checking if there's already an account with this email if so prompt user to login
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const [email, setEmail] = useState("");
+  const [emailIsTyping, setEmailIsTyping] = useState(false);
+  const [emailValid, setEmailValid] = useState(false);
+  const handleEmail = (e) => {
+    setEmailIsTyping(true);
+    const value = e.target.value;
+    setEmail(value);
+    setEmailValid(validateEmail(value));
+  };
+
+  // Username
+  // TODO: Validate by checking with the database to make sure there's no other user with the same name
   const [username, setUserName] = useState("");
   const [usernameValid, setUsernameValid] = useState(false);
   const [usernameIsTyping, setUsernameIsTypeing] = useState(false);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  // Input validation
+  // Password
+  const validatePassword = (password) => {
+    const minLength = password.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const noSpaces = /^[^\s]+$/.test(password);
 
-  const [emailValid, setEmailValid] = useState(false);
-  const [confirmPasswordValid, setConfirmPasswordValid] = useState(false);
-  const [birthDateError, setBirthDateError] = useState(false);
-  const [passwordValidation, setPasswordValidation] = useState({
+    return {
+      minLength,
+      hasUpperCase,
+      hasLowerCase,
+      hasNumber,
+      hasSpecialChar,
+      noSpaces,
+    };
+  };
+  const [password, setPassword] = useState("");
+  const [passwordIsTyping, setPasswordIsTyping] = useState(false);
+  const [passwordValid, setPasswordValid] = useState({
     minLength: false,
     hasUpperCase: false,
     hasLowerCase: false,
     hasNumber: false,
     hasSpecialChar: false,
+    noSpaces: true,
   });
+  const handlePassword = (e) => {
+    setPasswordIsTyping(true);
+    const value = e.target.value;
+    setPassword(value);
+    setPasswordValid(validatePassword(value));
+  };
+
+  // Confirm password
+  const [confirmPassword, setConfirmPassword] = useState("");
+  // Birth date
+  const [birthDate, setBirthDate] = useState("");
+  // Input validation
+
+  const [confirmPasswordValid, setConfirmPasswordValid] = useState(false);
+  const [birthDateError, setBirthDateError] = useState(false);
   const navigate = useNavigate();
-
-// Validation functions
-
-  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const [isFormValid, setIsFormValid] = useState(false);
-
-  const validatePassword = (password) => {
-    const minLength = 8
-  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -88,36 +121,33 @@ export default function CreateAccount() {
             <div className={styles.section}>
               <label>
                 First:
-                <input
-                  type="text"
-                  onChange={handleFirstName}
-                  maxLength={50}
-                />
+                <input type="text" onChange={handleFirstName} maxLength={50} />
               </label>
-              <div className={styles.error}>
-               {firstNameIsTyping && !firstNameValid.minLength && (
-                <div>2 character minimum</div>
-               )}
-               {firstNameIsTyping && !firstNameValid.isAlphabetic && (
-                <div>Only alphabetic characters allowed</div>
-               )}
+              <div className={styles.errorContainer}>
+                {firstNameIsTyping && !firstNameValid.minLength && (
+                  <div className={styles.error}>2 character minimum</div>
+                )}
+                {firstNameIsTyping && !firstNameValid.isAlphabetic && (
+                  <div className={styles.error}>
+                    Only alphabetic characters allowed
+                  </div>
+                )}
               </div>
             </div>
             {/* Last name */}
-            <div>
+            <div className={styles.section}>
               <label>
                 Last:
-                <input
-                  type="text"
-                  onChange={handleLastName}
-                />
+                <input type="text" onChange={handleLastName} maxLength={50} />
               </label>
-              <div className={styles.error}>
+              <div className={styles.errorContainer}>
                 {lastNameIsTyping && !lastNameValid.minLength && (
-                  <div>2 character minimum</div>
+                  <div className={styles.error}>2 character minimum</div>
                 )}
                 {lastNameIsTyping && !lastNameValid.isAlphabetic && (
-                  <div>Only alphabetic characters allowed</div>
+                  <div className={styles.error}>
+                    Only alphabetic characters allowed
+                  </div>
                 )}
               </div>
             </div>
@@ -125,17 +155,12 @@ export default function CreateAccount() {
           {/* Email */}
           <label>
             Email:
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              maxLength={255}
-
-            />
-          <div className={styles.error}>
-            {/* {email.length > 0 && !emailRegex.test(email) ? "Invalid email" : ""} */}
-          </div>
+            <input type="email" onChange={handleEmail} maxLength={255} />
+            <div className={styles.errorContainer}>
+              {emailIsTyping && !emailValid && (
+                <div className={styles.error}>Invalid Email</div>
+              )}
+            </div>
           </label>
           {/* Username */}
           <label>
@@ -155,11 +180,43 @@ export default function CreateAccount() {
           </label>
           {/* Password */}
           <label>
-            <input 
+            Password:
+            <input type="password" onChange={handlePassword} />
+          </label>
+          <div className={styles.errorContainer}>
+            {passwordIsTyping && !passwordValid.minLength && (
+              <div className={styles.error}>Need at least 8 characters</div>
+            )}
+            {passwordIsTyping && !passwordValid.hasUpperCase && (
+              <div className={styles.error}>
+                Need at least 1 uppercase character
+              </div>
+            )}
+            {passwordIsTyping && !passwordValid.hasLowerCase && (
+              <div className={styles.error}>
+                Need at least 1 lowercase character
+              </div>
+            )}
+            {passwordIsTyping && !passwordValid.hasNumber && (
+              <div className={styles.error}>Need at least 1 number</div>
+            )}
+            {passwordIsTyping && !passwordValid.hasSpecialChar && (
+              <div className={styles.error}>
+                Need at least 1 special character ex. $,#,@,*
+              </div>
+            )}
+            {passwordIsTyping && !passwordValid.noSpaces && (
+              <div className={styles.error}>
+                Password cannot contain spaces!
+              </div>
+            )}
+          </div>
+          {/* Confirm Password */}
+          <label>
+            Confirm Password:
+            <input
               type="password"
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              // onChange={}
             />
           </label>
           {/* Submit Button */}
