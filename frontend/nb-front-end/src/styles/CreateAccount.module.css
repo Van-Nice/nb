@@ -6,7 +6,6 @@ label {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-bottom: 10px; /* Add some space between labels */
 }
 
 input[type="text"],
@@ -25,6 +24,13 @@ input[type="date"] {
     box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
     width: fit-content; /* Adjust the width to fit the content */
 }
+
+input[type="email"] {
+    width: 100%; /* Make the input fields take up the full width of their container */
+    padding: 10px; /* Add padding for better appearance */
+    font-size: 16px; /* Increase the font size */
+    box-sizing: border-box;
+  }
 
 .link {
     text-align: center;
@@ -71,4 +77,16 @@ input[type="date"] {
 .inactiveButton {
     background-color: grey;
     cursor: not-allowed;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+}
+
+.error {
+    color: red;
+    font-size: 0.875em;
+    margin-top: 0.25em;
+    min-height: 1.2em; /* Reserve space for the error message */
 }
