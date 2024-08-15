@@ -169,6 +169,30 @@ export default function CreateAccount() {
     setUsernameIsTyping(true);
     setPasswordIsTyping(true);
     setConfirmPasswordIsTyping(true);
+    setBirthDateIsTyping(true);
+
+    // Validate each input
+    const isFirstNameValid = firstNameValid.minLength && firstNameValid.isAlphabetic;
+    const isLastNameValid = lastNameValid.minLength && lastNameValid.isAlphabetic;
+    const isEmailValid = emailValid;
+    const isUsernameValid = username.length >= 6;
+    const isPasswordValid = passwordValid.minLength &&
+      passwordValid.hasUpperCase &&
+      passwordValid.hasLowerCase &&
+      passwordValid.hasNumber &&
+      passwordValid.hasSpecialChar &&
+      passwordValid.noSpaces;
+    const isConfirmPasswordValid = confirmPasswordValid;
+    const isBirthDateValid = birthDateValid.formatValid && !birthDateValid.tooYoung && !birthDateValid.tooOld;
+
+    // Check if all inputs are valid
+    if (isFirstNameValid && isLastNameValid && isEmailValid && isUsernameValid && isPasswordValid && isConfirmPasswordValid && isBirthDateValid) {
+      // todo: send form to backend /create-account api
+      console.log("Form is valid. Submitting...");
+      // Add your form submission logic here
+    } else {
+      console.log("Form is invalid. Please correct the errors and try again.");
+    }
   };
 
   return (
