@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import styles from "../styles/CreateAccount.module.css";
 
 // TODO: Validate user input before submitting
 
 export default function CreateAccount() {
+  const navigate = useNavigate();
+
   // Name
   const validateName = (name) => {
     const minLength = name.length > 1;
@@ -58,7 +61,7 @@ export default function CreateAccount() {
   // TODO: Validate by checking with the database to make sure there's no other user with the same name
   const [username, setUserName] = useState("");
   const [usernameValid, setUsernameValid] = useState(false);
-  const [usernameIsTyping, setUsernameIsTypeing] = useState(false);
+  const [usernameIsTyping, setUsernameIsTyping] = useState(false);
 
   // Password
   const validatePassword = (password) => {
@@ -88,25 +91,84 @@ export default function CreateAccount() {
     hasSpecialChar: false,
     noSpaces: true,
   });
+  const [showPassword, setShowPassword] = useState(false);
   const handlePassword = (e) => {
     setPasswordIsTyping(true);
     const value = e.target.value;
     setPassword(value);
     setPasswordValid(validatePassword(value));
   };
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   // Confirm password
+  const validateConfirmPassword = (confirmPassword, password) => {
+    return confirmPassword === password;
+  };
   const [confirmPassword, setConfirmPassword] = useState("");
-  // Birth date
-  const [birthDate, setBirthDate] = useState("");
-  // Input validation
-
+  const [confirmPasswordIsTyping, setConfirmPasswordIsTyping] = useState(false);
   const [confirmPasswordValid, setConfirmPasswordValid] = useState(false);
-  const [birthDateError, setBirthDateError] = useState(false);
-  const navigate = useNavigate();
+  const handleConfirmPassword = (e) => {
+    setConfirmPasswordIsTyping(true);
+    const value = e.target.value;
+    setConfirmPassword(value);
+    setConfirmPasswordValid(validateConfirmPassword(value, password));
+  };
+
+  // Birth date
+  const validateDate = (date) => {
+    // Regular expression to check if the date is in MM/DD/YYYY format
+    const regex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
+    const format = regex.test(date);
+    const formatValid = regex.test(date);
+    // Check if above 13 and below 115
+    const [year, month, day] = date.split("-");
+    const birthDate = new Date(year, month - 1, day);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    // Adjust age if the current date is before the
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    console.log(age);
+    const tooYoung = age < 13;
+    const tooOld = age > 120;
+
+    return {
+      formatValid,
+      tooYoung,
+      tooOld,
+    };
+  };
+  const [birthDate, setBirthDate] = useState("");
+  const [birthDateIsTyping, setBirthDateIsTyping] = useState(false);
+  const [birthDateValid, setBirthDateValid] = useState({
+    formatValid: false,
+    tooYoung: false,
+    tooOld: false,
+  });
+  const handleDate = (e) => {
+    setBirthDateIsTyping(true);
+    const value = e.target.value;
+    console.log(value);
+    setBirthDate(value);
+    setBirthDateValid(validateDate(value));
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    // todo: set each input as isTyping to see any potential errors
+    setFirstNameIsTyping(true);
+    setLastNameIsTyping(true);
+    setEmailIsTyping(true);
+    setUsernameIsTyping(true);
+    setPasswordIsTyping(true);
+    setConfirmPasswordIsTyping(true);
   };
 
   return (
@@ -181,7 +243,16 @@ export default function CreateAccount() {
           {/* Password */}
           <label>
             Password:
-            <input type="password" onChange={handlePassword} />
+            <div className={styles.passwordContainer}>
+              <input
+                className={styles.passwordInput}
+                type={showPassword ? "text" : "password"}
+                onChange={handlePassword}
+              />
+              <span className={styles.toggleIcon} onClick={toggleShowPassword}>
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
           </label>
           <div className={styles.errorContainer}>
             {passwordIsTyping && !passwordValid.minLength && (
@@ -214,11 +285,40 @@ export default function CreateAccount() {
           {/* Confirm Password */}
           <label>
             Confirm Password:
-            <input
-              type="password"
-              // onChange={}
-            />
+            <div className={styles.passwordContainer}>
+              <input
+                className={styles.passwordInput}
+                type={showPassword ? "text" : "password"}
+                onChange={handleConfirmPassword}
+              />
+              <span className={styles.toggleIcon}>
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
           </label>
+          <div className={styles.errorContainer}>
+            {confirmPasswordIsTyping && !confirmPasswordValid && (
+              <div className={styles.error}>Passwords do not match</div>
+            )}
+          </div>
+          {/* Date of birth */}
+          <label htmlFor="">
+            Date of Birth:
+            <input type="date" onChange={handleDate} />
+          </label>
+          <div className={styles.errorContainer}>
+            {birthDateIsTyping && !birthDateValid.formatValid && (
+              <div className={styles.error}>Invalid Date</div>
+            )}
+            {birthDateIsTyping && birthDateValid.tooYoung && (
+              <div className={styles.error}>Must be 13 or older</div>
+            )}
+            {birthDateIsTyping && birthDateValid.tooOld && (
+              <div className={styles.error}>
+                I don't believe your older than 120
+              </div>
+            )}
+          </div>
           {/* Submit Button */}
           <button type="submit" className={styles.createAccountButton}>
             Create Account

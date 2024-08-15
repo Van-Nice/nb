@@ -94,3 +94,27 @@ input[type="email"] {
 .errorContainer {
   min-height: 1.2em;
 }
+
+.eyeIcon {
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.passwordContainer {
+    position: relative;
+    width: 100%;
+  }
+
+.passwordInput {
+    position: relative;
+    width: 100%;
+
+  }
+  
+  .toggleIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
