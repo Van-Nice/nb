@@ -1,5 +1,7 @@
 <?php
 
+// todo: Create a script 
+
 // Function to set CORS headers
 function setCorsHeaders(): void
 {
@@ -23,7 +25,7 @@ header('Content-Type: application/json');
 // Routing based on the request URI
 $requestUri = $_SERVER['REQUEST_URI'];
 
-if ($requestUri === '/create-account') {
+if ($requestUri === '/auth/create-account') {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         require_once __DIR__ . '/../api/createAccount.php';
     } else {
@@ -33,7 +35,7 @@ if ($requestUri === '/create-account') {
             'message' => 'Only POST requests are allowed'
         ]);
     }
-} elseif ($requestUri === '/auth') {
+} elseif ($requestUri === '/auth/login') {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         require_once __DIR__ . '/../api/auth.php';
     } else {

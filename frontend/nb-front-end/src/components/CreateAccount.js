@@ -162,7 +162,7 @@ export default function CreateAccount() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // todo: set each input as isTyping to see any potential errors
+    // Set each input as isTyping to see any potential errors
     setFirstNameIsTyping(true);
     setLastNameIsTyping(true);
     setEmailIsTyping(true);
@@ -186,12 +186,42 @@ export default function CreateAccount() {
     const isBirthDateValid = birthDateValid.formatValid && !birthDateValid.tooYoung && !birthDateValid.tooOld;
 
     // Check if all inputs are valid
-    if (isFirstNameValid && isLastNameValid && isEmailValid && isUsernameValid && isPasswordValid && isConfirmPasswordValid && isBirthDateValid) {
-      // todo: send form to backend /create-account api
-      console.log("Form is valid. Submitting...");
-      // Add your form submission logic here
-    } else {
-      console.log("Form is invalid. Please correct the errors and try again.");
+    if (isFirstNameValid && isLastNameValid && isEmailValid && isUsernameValid && isPasswordValid && isConfirmPasswordValid && isBirthDateValid) { // Form is valid
+      const form = {
+        firstName,
+        lastName,
+        email,
+        username,
+        password,
+        confirmPassword,
+        birthDate
+      }
+      console.log(form);
+      // todo: send form to backend /auth/create-account api
+      try { // POST request successful
+        const response = await fetch('http://localhost:8000/auth/create-account', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(form),
+        });
+        if (response.ok) { // Create account form data valid
+          const responseData = await response.json();
+          console.log('Account created successfully: ', responseData);
+          navigate('/email-confirmation-instruction'); // Navigate to email confirmation instruction page
+        } else { // form data invalid
+          const responseError = await response.json();
+          console.error('Error creating account:', responseError);
+          alert('Error creating account: ' + responseError);
+        }
+
+      } catch (error) { // POST request failed
+        console.error('Network error:', error);
+        alert('Network error' + error.message);
+      }
+    } else { // Form is invalid
+      alert("Form is invalid. Please correct the errors and try again.");
     }
   };
 
