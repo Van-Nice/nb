@@ -1,6 +1,6 @@
 <?php
 
-// todo: Create a script 
+// TODO: Create a script for running/stopping front end, back end, and the database all in one command 
 
 // Function to set CORS headers
 function setCorsHeaders(): void

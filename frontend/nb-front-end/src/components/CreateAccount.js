@@ -3,8 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import styles from "../styles/CreateAccount.module.css";
 
-// TODO: Validate user input before submitting
-
 export default function CreateAccount() {
   const navigate = useNavigate();
 
@@ -379,6 +377,9 @@ export default function CreateAccount() {
           </button>
         </div>
       </form>
+      <Link to="/login" className={styles.link}>
+        Login
+      </Link>
     </>
   );
 }

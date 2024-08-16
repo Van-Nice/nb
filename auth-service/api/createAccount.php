@@ -1,22 +1,7 @@
 <?php
 require_once __DIR__ . '/../utils/email.php';
 
-use Dotenv\Dotenv;
 
-try {
-    $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-    $dotenv->load();
-} catch (Exception $e) {
-    echo 'Failed to load .env file: ',  $e->getMessage();
-    exit;
-}
-
-$bungoEmail = $_ENV['BUNGO_EMAIL'];
-$bungoEmailPassword = $_ENV['BUNGO_EMAIL_PASSWORD'];
-
-if (!$bungoEmail || !$bungoEmailPassword) {
-    echo 'Failed to load .env variables';
-}
 
 $database = require_once __DIR__ . '/../config/db.php';
 $usersCollection = $database->selectCollection('users');
