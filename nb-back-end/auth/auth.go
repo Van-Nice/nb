@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"regexp"
 	"time"
-
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -81,9 +80,6 @@ func HandleCreateAccount(c *gin.Context) {
         return
     }
 
-    // Set the CreatedAt field to the current time
-    form.CreatedAt = time.Now()
-
     // Validate the form data
     if minLength, isAlphabetic := validateName(form.FirstName); !minLength || !isAlphabetic {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid first name"})
@@ -109,6 +105,10 @@ func HandleCreateAccount(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid birth date"})
         return
     }
+    // The form data is now valid
+
+    // Set the CreatedAt field to the current time
+    form.CreatedAt = time.Now()
 
     // Create password hash
     hashedPassword, err := hashPassword(form.Password)
@@ -116,14 +116,11 @@ func HandleCreateAccount(c *gin.Context) {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
         return
     }
-
-    // Initialize the database connection
-    db.InitDB()
-    defer db.CloseDB()
+    // TODO: Figure out how to take the POST req body and have it function the same way the payload variable does in auth_test.go
 
     // Insert data into the database
     err = db.Exec("INSERT INTO users (first_name, last_name, email, username, password, date_of_birth, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-        form.FirstName, form.LastName, form.Email, form.Username, hashedPassword, form.BirthDate, form.CreatedAt)
+        form.FirstName, form.LastName, form.Email, form.Username, string(hashedPassword), form.BirthDate, form.CreatedAt)
     if err != nil {
         log.Printf("Database error: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create account"})

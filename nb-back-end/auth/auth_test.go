@@ -31,8 +31,8 @@ func TestHandleCreateAccount(t *testing.T) {
     payload := `{
         "first_name": "John",
         "last_name": "Doe",
-        "email": "johndoe@example.com",
-        "username": "johndoe",
+        "email": "johndoe@example3.com",
+        "username": "johndoe3",
         "password": "Password1!",
         "confirm_password": "Password1!",
         "birth_date": "2000-01-01"

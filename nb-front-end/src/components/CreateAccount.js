@@ -191,7 +191,6 @@ export default function CreateAccount() {
         email,
         username,
         password,
-        confirmPassword,
         birthDate
       }
       console.log(form);

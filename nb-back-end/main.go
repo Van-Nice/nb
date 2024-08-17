@@ -1,23 +1,28 @@
 package main
 
 import (
-    "context"
-    "fmt"
-    "github.com/jackc/pgx/v4"
+    "github.com/gin-gonic/gin"
+    "nb-back-end/auth"
+    "nb-back-end/db"
+    "github.com/joho/godotenv"
     "log"
 )
 
 func main() {
-    conn, err := pgx.Connect(context.Background(), "postgres://username:password@localhost:5432/mydb")
+    // Load environment variables from .env file
+    err := godotenv.Load(".env") // Ensure this path is correct relative to the test file
     if err != nil {
-        log.Fatal(err)
-    }
-    defer conn.Close(context.Background())
-
-    commandTag, err := conn.Exec(context.Background(), "INSERT INTO mytable (name) VALUES ($1)", "John Doe")
-    if err != nil {
-        log.Fatal(err)
+        log.Fatalf("Error loading .env file: %v", err)
     }
 
-    fmt.Println(commandTag.RowsAffected())
+    // Initialize the database connection
+    db.InitDB()
+    defer db.CloseDB()
+
+    gin.SetMode(gin.ReleaseMode)
+
+    router := gin.Default()
+    router.POST("/auth/create-account", auth.HandleCreateAccount)
+
+    router.Run(":8080")
 }
