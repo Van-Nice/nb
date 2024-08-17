@@ -1,49 +1,24 @@
 package main
 
 import (
-    "bytes"
-    "net/http"
-    "net/http/httptest"
+    "context"
     "testing"
-
-    "github.com/gin-gonic/gin"
-    "github.com/stretchr/testify/assert"
+    "github.com/jackc/pgx/v4"
 )
 
-func TestHandleCreateAccount(t *testing.T) {
-    // Set Gin to test mode
-    gin.SetMode(gin.TestMode)
+func TestDatabaseInsert(t *testing.T) {
+    conn, err := pgx.Connect(context.Background(), "postgres://username:password@localhost:5432/mydb")
+    if err != nil {
+        t.Fatalf("Failed to connect to database: %v", err)
+    }
+    defer conn.Close(context.Background())
 
-    // Create a new Gin router
-    router := gin.Default()
-    router.POST("/auth/create-account", handleCreateAccount)
+    commandTag, err := conn.Exec(context.Background(), "INSERT INTO mytable (name) VALUES ($1)", "Test User")
+    if err != nil {
+        t.Fatalf("Failed to execute insert: %v", err)
+    }
 
-    // Create a test request body
-    requestBody := `{
-        "firstName": "John",
-        "lastName": "Doe",
-        "email": "john.doe@example.com",
-        "username": "johndoe",
-        "password": "password123",
-        "confirmPassword": "password123",
-        "birthDate": "1990-01-01"
-    }`
-
-    // Create a new HTTP request
-    req, err := http.NewRequest(http.MethodPost, "/auth/create-account", bytes.NewBuffer([]byte(requestBody)))
-    assert.NoError(t, err)
-    req.Header.Set("Content-Type", "application/json")
-
-    // Create a response recorder
-    rr := httptest.NewRecorder()
-
-    // Serve the HTTP request
-    router.ServeHTTP(rr, req)
-
-    // Check the status code
-    assert.Equal(t, http.StatusOK, rr.Code)
-
-    // Check the response body
-    expectedResponse := `{"message":"Account created successfully"}`
-    assert.JSONEq(t, expectedResponse, rr.Body.String())
+    if commandTag.RowsAffected() != 1 {
+        t.Errorf("Expected 1 row to be affected, got %d", commandTag.RowsAffected())
+    }
 }

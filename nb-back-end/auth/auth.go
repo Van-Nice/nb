@@ -1,10 +1,10 @@
-package main
+package auth
 
 import (
-	"fmt"
-	"regexp"
+    "fmt"
+    "regexp"
     "time"
-    "context"
+    "nb-back-end/db" // Import the db package
     "github.com/gin-gonic/gin"
     "net/http"
 )
@@ -60,7 +60,7 @@ type CreateAccountForm struct {
     BirthDate       string `json:"birth_date"`
 }
 
-func handleCreateAccount(c *gin.Context) {
+func HandleCreateAccount(c *gin.Context) {
     var form CreateAccountForm
 
     // Bind the JSON data to the struct
@@ -95,8 +95,12 @@ func handleCreateAccount(c *gin.Context) {
         return
     }
 
+    // Initialize the database connection
+    db.InitDB()
+    defer db.CloseDB()
+
     // Insert data into the database
-    _, err := db.Exec(context.Background(), "INSERT INTO accounts (first_name, last_name, email, username, password, birth_date) VALUES ($1, $2, $3, $4, $5, $6)",
+    err := db.Exec("INSERT INTO accounts (first_name, last_name, email, username, password, birth_date) VALUES ($1, $2, $3, $4, $5, $6)",
         form.FirstName, form.LastName, form.Email, form.Username, form.Password, form.BirthDate)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create account"})
@@ -106,6 +110,3 @@ func handleCreateAccount(c *gin.Context) {
     // Respond with success
     c.JSON(http.StatusOK, gin.H{"message": "Account created successfully"})
 }
-
-// Add your validation functions here
-// ...

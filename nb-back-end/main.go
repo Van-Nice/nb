@@ -1,28 +1,23 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "net/http"
+    "context"
+    "fmt"
+    "github.com/jackc/pgx/v4"
+    "log"
 )
 
 func main() {
-    // Initialize the database connection
-    initDB()
-    defer closeDB()
+    conn, err := pgx.Connect(context.Background(), "postgres://username:password@localhost:5432/mydb")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer conn.Close(context.Background())
 
-    // Create a Gin router
-    router := gin.Default()
+    commandTag, err := conn.Exec(context.Background(), "INSERT INTO mytable (name) VALUES ($1)", "John Doe")
+    if err != nil {
+        log.Fatal(err)
+    }
 
-    // Define a route
-    router.GET("/", func(c *gin.Context) {
-        c.JSON(http.StatusOK, gin.H{
-            "message": "Hello, World!",
-        })
-    })
-
-    // Handle Auth here
-    router.POST("/auth/create-account", handleCreateAccount)
-
-    // Run the server on port 8080
-    router.Run(":8080")
+    fmt.Println(commandTag.RowsAffected())
 }
