@@ -1,12 +1,15 @@
 package auth
 
 import (
-    "fmt"
-    "regexp"
-    "time"
-    "nb-back-end/db" // Import the db package
-    "github.com/gin-gonic/gin"
-    "net/http"
+	"fmt"
+	"log"
+	"nb-back-end/db" // Import the db package
+	"net/http"
+	"regexp"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func validateName(name string) (bool, bool) {
@@ -49,6 +52,14 @@ func validateDate(date string) (bool, bool, bool) {
     return formatValid, tooYoung, tooOld
 }
 
+func hashPassword(password string) (string, error) {
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+    if err != nil {
+        return "", err
+    }
+    return string(hashedPassword), nil
+}
+
 // CreateAccountForm represents the form data for creating an account
 type CreateAccountForm struct {
     FirstName       string `json:"first_name"`
@@ -58,6 +69,7 @@ type CreateAccountForm struct {
     Password        string `json:"password"`
     ConfirmPassword string `json:"confirm_password"`
     BirthDate       string `json:"birth_date"`
+    CreatedAt       time.Time `json:"created_at"`
 }
 
 func HandleCreateAccount(c *gin.Context) {
@@ -68,6 +80,9 @@ func HandleCreateAccount(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
+
+    // Set the CreatedAt field to the current time
+    form.CreatedAt = time.Now()
 
     // Validate the form data
     if minLength, isAlphabetic := validateName(form.FirstName); !minLength || !isAlphabetic {
@@ -95,14 +110,22 @@ func HandleCreateAccount(c *gin.Context) {
         return
     }
 
+    // Create password hash
+    hashedPassword, err := hashPassword(form.Password)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+        return
+    }
+
     // Initialize the database connection
     db.InitDB()
     defer db.CloseDB()
 
     // Insert data into the database
-    err := db.Exec("INSERT INTO accounts (first_name, last_name, email, username, password, birth_date) VALUES ($1, $2, $3, $4, $5, $6)",
-        form.FirstName, form.LastName, form.Email, form.Username, form.Password, form.BirthDate)
+    err = db.Exec("INSERT INTO users (first_name, last_name, email, username, password, date_of_birth, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+        form.FirstName, form.LastName, form.Email, form.Username, hashedPassword, form.BirthDate, form.CreatedAt)
     if err != nil {
+        log.Printf("Database error: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create account"})
         return
     }

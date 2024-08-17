@@ -9,6 +9,4 @@ auth-service/.env
 .DS_Store
 Thumbs.db
 /vendor
-auth-service/.env
-auth-service/vendor/
-auth-service/public/requests.http
+nb-back-end/.env
