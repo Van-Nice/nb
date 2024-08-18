@@ -18,6 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
+    "github.com/golang-jwt/jwt/v5"
 )
 
 func validateName(name string) (bool, bool) {
@@ -243,8 +244,9 @@ func HandleLogin(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
+    log.Printf("This is the login data", login)
     // Check for user in db based on email
-    userID, firstName, lastName, username, password, createdAt, err := db.GetUserByEmail("wilsonwalter808@gmail.com")
+    userID, firstName, lastName, username, password, createdAt, err := db.GetUserByEmail(login.Email)
     if err != nil {
         log.Println("User not found or other error occurred:", err)
     } else {

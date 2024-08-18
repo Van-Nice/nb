@@ -10,3 +10,4 @@ auth-service/.env
 Thumbs.db
 /vendor
 nb-back-end/.env
+jwt-system-design.md

@@ -62,15 +62,21 @@ func GetUserByEmail(email string) (int, string, string, string, string, time.Tim
     var userID int
     var firstName, lastName, username, password string
     var createdAt time.Time
+    var emailValidated bool
 
     // Execute the query to retrieve the user details by email
     err := db.QueryRow(context.Background(), 
-        "SELECT user_id, first_name, last_name, username, password, created_at FROM users WHERE email = $1", 
-        email).Scan(&userID, &firstName, &lastName, &username, &password, &createdAt)
+        "SELECT user_id, first_name, last_name, username, password, created_at, email_validated FROM users WHERE email = $1", 
+        email).Scan(&userID, &firstName, &lastName, &username, &password, &createdAt, &emailValidated)
     
     if err != nil {
         log.Printf("Error fetching user by email: %v", err)
         return 0, "", "", "", "", time.Time{}, fmt.Errorf("QueryRow failed: %v", err)
+    }
+
+    // Check if email is validated
+    if !emailValidated {
+        return 0, "", "", "", "", time.Time{}, fmt.Errorf("Email not validated")
     }
 
     return userID, firstName, lastName, username, password, createdAt, nil
