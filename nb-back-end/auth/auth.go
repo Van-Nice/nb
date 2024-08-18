@@ -127,10 +127,11 @@ func HandleCreateAccount(c *gin.Context) {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
         return
     }
-
+    // TODO: log tokenExpiration & token as well as their types
+    
     // Set the CreatedAt field to the current time
     createdAt := time.Now()
-    tokenExpiration := createdAt.Add(24 * time.Hour)
+    tokenExpiration := time.Now().Add(24 * time.Hour)
 
     // Generate confirmation token
     token, err := generateToken(32)
@@ -139,6 +140,8 @@ func HandleCreateAccount(c *gin.Context) {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate confirmation token"})
         return
     }
+    fmt.Printf("token: %v, type: %T\n", token, token)
+    fmt.Printf("tokenExpiration: %v, type: %T\n", tokenExpiration, tokenExpiration)
 
     // Insert data into the database
     err = db.Exec("INSERT INTO users (first_name, last_name, email, username, password, date_of_birth, created_at, token, token_expiration, email_validated) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
@@ -189,6 +192,7 @@ func HandleCreateAccount(c *gin.Context) {
 func HandleVerifyEmail(c *gin.Context) {
     token := c.Query("token")
     if token == "" {
+        log.Printf("Token was empty")
         c.JSON(http.StatusBadRequest, gin.H{"error": "Token is required"})
         return
     }
@@ -196,12 +200,17 @@ func HandleVerifyEmail(c *gin.Context) {
     // Retrieve user by token
     userID, tokenExpiration, err := db.GetUserByToken(token)
     if err == sql.ErrNoRows {
+        log.Printf("Could not get user by token!")
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
         return
     } else if err != nil {
+        log.Printf("There was a database error")
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
         return
     }
+
+    // Log the userID and tokenExpiration
+    log.Printf("UserID: %v, TokenExpiration: %v", userID, tokenExpiration)
 
     // Check if token has expired
     if time.Now().After(tokenExpiration) {

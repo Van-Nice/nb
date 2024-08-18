@@ -47,12 +47,13 @@ func GetUserByToken(token string) (int, time.Time, error) {
     var userID int
     var tokenExpiration time.Time
 
-    log.Printf("Executing query: SELECT user_id, token_expiration FROM users WHERE token = $1 with token: %s", token)
+    // log.Printf("Executing query: SELECT user_id, token_expiration FROM users WHERE token = $1 with token: %s", token)
     err := db.QueryRow(context.Background(), "SELECT user_id, token_expiration FROM users WHERE token = $1", token).Scan(&userID, &tokenExpiration)
     if err != nil {
+        log.Printf("There was an error fetching data from db")
         return 0, time.Time{}, fmt.Errorf("QueryRow failed: %v", err)
     }
 
-    log.Printf("Query result: userID = %d, tokenExpiration = %s", userID, tokenExpiration)
+    // log.Printf("Query result: userID = %d, tokenExpiration = %s", userID, tokenExpiration)
     return userID, tokenExpiration, nil
 }
