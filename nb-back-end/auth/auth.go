@@ -193,6 +193,7 @@ func HandleVerifyEmail(c *gin.Context) {
         return
     }
 
+    // Retrieve user by token
     userID, tokenExpiration, err := db.GetUserByToken(token)
     if err == sql.ErrNoRows {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
@@ -201,19 +202,19 @@ func HandleVerifyEmail(c *gin.Context) {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
         return
     }
-    
+
     // Check if token has expired
     if time.Now().After(tokenExpiration) {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Token has expired"})
         return
     }
-    
+
     // Update user to mark email as verified
     err = db.Exec("UPDATE users SET token = NULL, token_expiration = NULL, email_validated = TRUE WHERE user_id = $1", userID)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
         return
     }
-    
+
     c.JSON(http.StatusOK, gin.H{"status": "success", "email_validated": true})
 }
