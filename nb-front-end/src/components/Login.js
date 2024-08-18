@@ -1,12 +1,26 @@
 import React, {useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from '../styles/Login.module.css';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState('');
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  }
+
+  const handlePassword = (e) => {
+    setPassword(e.target.value);
+  }
+
+  const handleEmail = (e) => {
+    setEmail(e.target.value);
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -22,16 +36,22 @@ export default function Login() {
       return;
     }
 
+    const login = {
+      email,
+      password
+    }
+
     try {
-      const response = await fetch('http://localhost:8080/auth', {
+      const response = await fetch('http://localhost:8080/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify(login),
       });
 
       if (!response.ok) {
+        setError(true);
         throw new Error('Invalid login credentials');
       }
 
@@ -49,12 +69,30 @@ export default function Login() {
       <form onSubmit={handleSubmit}>
         <label>
           Email:
-          <input type="text" name="email" />
+          <input 
+            type="email" 
+            name="email"
+            value={email}
+            onChange={handleEmail}
+          />
         </label>
         <label>
           Password:
-          <input type="password" name="password" />
+          <div className={styles.passwordInput}>
+            <input 
+              className={styles.passwordInput}
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={handlePassword}
+            />
+            <span className={styles.toggleIcon} onClick={toggleShowPassword}>
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
         </label>
+        {error && (
+          <div className={styles.error}>Invalid credentials</div>
+        )}
         <button type="submit">Login</button>
       </form>
       <Link to="/create-account">Create Account</Link>
