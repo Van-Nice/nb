@@ -227,3 +227,36 @@ func HandleVerifyEmail(c *gin.Context) {
 
     c.JSON(http.StatusOK, gin.H{"status": "success", "email_validated": true})
 }
+
+// TODO: Create function for handling /auth/login api endpoint
+
+type Login struct {
+    Email       string      `json:email`
+    Password    string      `json:password`
+}
+
+func HandleLogin(c *gin.Context) {
+    var login Login
+
+    // Bind JSON data to Login
+    if err := c.ShouldBindJSON(&login); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    // Check for user in db based on email
+    userID, firstName, lastName, username, password, createdAt, err := db.GetUserByEmail("wilsonwalter808@gmail.com")
+    if err != nil {
+        log.Println("User not found or other error occurred:", err)
+    } else {
+        log.Printf("User found: ID=%d, Name=%s %s, Username=%s, CreatedAt=%s", userID, firstName, lastName, username, createdAt)
+    }
+    // Once user has been retrieved via email, validate password
+    // Compare the inputted password with the hashed password
+    err = bcrypt.CompareHashAndPassword([]byte(password), []byte(login.Password))
+    if err != nil {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid login credentials"})
+        return
+    }
+    // If the password matches, return a success response
+    c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
+}

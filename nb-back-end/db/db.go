@@ -57,3 +57,23 @@ func GetUserByToken(token string) (int, time.Time, error) {
     // log.Printf("Query result: userID = %d, tokenExpiration = %s", userID, tokenExpiration)
     return userID, tokenExpiration, nil
 }
+
+func GetUserByEmail(email string) (int, string, string, string, string, time.Time, error) {
+    var userID int
+    var firstName, lastName, username, password string
+    var createdAt time.Time
+
+    // Execute the query to retrieve the user details by email
+    err := db.QueryRow(context.Background(), 
+        "SELECT user_id, first_name, last_name, username, password, created_at FROM users WHERE email = $1", 
+        email).Scan(&userID, &firstName, &lastName, &username, &password, &createdAt)
+    
+    if err != nil {
+        log.Printf("Error fetching user by email: %v", err)
+        return 0, "", "", "", "", time.Time{}, fmt.Errorf("QueryRow failed: %v", err)
+    }
+
+    return userID, firstName, lastName, username, password, createdAt, nil
+}
+
+

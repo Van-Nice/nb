@@ -35,6 +35,7 @@ func main() {
     }))
     router.POST("/auth/create-account", auth.HandleCreateAccount)
     router.GET("/email-confirmation", auth.HandleVerifyEmail)
+    router.GET("/auth/login", auth.HandleLogin)
 
 
     if err := router.Run(":8080"); err != nil {
