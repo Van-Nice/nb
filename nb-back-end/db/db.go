@@ -5,6 +5,7 @@ import (
     "fmt"
     "log"
     "os"
+    "time"
     "github.com/jackc/pgx/v4"
 )
 
@@ -39,4 +40,17 @@ func Exec(sql string, args ...interface{}) error {
         return fmt.Errorf("Exec failed: %v", err)
     }
     return nil
+}
+
+// GetUserByToken retrieves a user by their confirmation token.
+func GetUserByToken(token string) (int, time.Time, error) {
+    var userID int
+    var tokenExpiration time.Time
+
+    err := db.QueryRow(context.Background(), "SELECT id, token_expiration FROM users WHERE confirmation_token = $1", token).Scan(&userID, &tokenExpiration)
+    if err != nil {
+        return 0, time.Time{}, fmt.Errorf("QueryRow failed: %v", err)
+    }
+
+    return userID, tokenExpiration, nil
 }

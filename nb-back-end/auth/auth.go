@@ -1,19 +1,34 @@
 package auth
 
 import (
+	"crypto/rand"
+	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"log"
-	"nb-back-end/db" // Import the db package
+	"nb-back-end/db"
+	"nb-back-end/emailer"
 	"net/http"
+	"os"
 	"regexp"
+	"strconv"
 	"time"
+	"unicode"
+
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func validateName(name string) (bool, bool) {
-    minLength := len(name) > 1
-    isAlphabetic := regexp.MustCompile(`^[A-Za-z\s]+$`).MatchString(name)
+    minLength := len(name) >= 2
+    isAlphabetic := true
+    for _, char := range name {
+        if !unicode.IsLetter(char) {
+            isAlphabetic = false
+            break
+        }
+    }
     return minLength, isAlphabetic
 }
 
@@ -29,10 +44,6 @@ func validatePassword(password string) (bool, bool, bool, bool, bool, bool) {
     hasSpecialChar := regexp.MustCompile(`[!@#$%^&*(),.?":{}|<>]`).MatchString(password)
     noSpaces := regexp.MustCompile(`^[^\s]+$`).MatchString(password)
     return minLength, hasUpperCase, hasLowerCase, hasNumber, hasSpecialChar, noSpaces
-}
-
-func validateConfirmPassword(confirmPassword, password string) bool {
-    return confirmPassword == password
 }
 
 func validateDate(date string) (bool, bool, bool) {
@@ -59,18 +70,26 @@ func hashPassword(password string) (string, error) {
     return string(hashedPassword), nil
 }
 
-// CreateAccountForm represents the form data for creating an account
-type CreateAccountForm struct {
-    FirstName       string `json:"first_name"`
-    LastName        string `json:"last_name"`
-    Email           string `json:"email"`
-    Username        string `json:"username"`
-    Password        string `json:"password"`
-    ConfirmPassword string `json:"confirm_password"`
-    BirthDate       string `json:"birth_date"`
-    CreatedAt       time.Time `json:"created_at"`
+func generateToken(length int) (string, error) {
+    token := make([]byte, length)
+    _, err := rand.Read(token)
+    if err != nil {
+        return "", err
+    }
+    return base64.RawURLEncoding.EncodeToString(token), nil
 }
 
+// CreateAccountForm represents the form data for creating an account
+type CreateAccountForm struct {
+	FirstName       string    `json:"firstName"`
+	LastName        string    `json:"lastName"`
+	Email           string    `json:"email"`
+	Username        string    `json:"username"`
+	Password        string    `json:"password"`
+	BirthDate       string    `json:"birthDate"`
+}
+
+// Create account
 func HandleCreateAccount(c *gin.Context) {
     var form CreateAccountForm
 
@@ -81,11 +100,12 @@ func HandleCreateAccount(c *gin.Context) {
     }
 
     // Validate the form data
-    if minLength, isAlphabetic := validateName(form.FirstName); !minLength || !isAlphabetic {
+    minLength, isAlphabetic := validateName(form.FirstName)
+    if !minLength || !isAlphabetic {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid first name"})
         return
     }
-    if minLength, isAlphabetic := validateName(form.LastName); !minLength || !isAlphabetic {
+    if minLength, isAlphabetic := validateName(form.LastName); minLength && isAlphabetic {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid last name"})
         return
     }
@@ -97,36 +117,103 @@ func HandleCreateAccount(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid password"})
         return
     }
-    if !validateConfirmPassword(form.ConfirmPassword, form.Password) {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Passwords do not match"})
-        return
-    }
     if formatValid, tooYoung, tooOld := validateDate(form.BirthDate); !formatValid || tooYoung || tooOld {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid birth date"})
         return
     }
-    // The form data is now valid
-
-    // Set the CreatedAt field to the current time
-    form.CreatedAt = time.Now()
-
     // Create password hash
     hashedPassword, err := hashPassword(form.Password)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
         return
     }
-    // TODO: Figure out how to take the POST req body and have it function the same way the payload variable does in auth_test.go
+
+    // Set the CreatedAt field to the current time
+    createdAt := time.Now()
+    tokenExpiration := createdAt.Add(24 * time.Hour)
+
+    // Generate confirmation token
+    token, err := generateToken(32)
+    if err != nil {
+        log.Printf("Error generating confirmation token: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate confirmation token"})
+        return
+    }
 
     // Insert data into the database
-    err = db.Exec("INSERT INTO users (first_name, last_name, email, username, password, date_of_birth, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-        form.FirstName, form.LastName, form.Email, form.Username, string(hashedPassword), form.BirthDate, form.CreatedAt)
+    err = db.Exec("INSERT INTO users (first_name, last_name, email, username, password, date_of_birth, created_at, token, token_expiration, email_validated) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+    form.FirstName, form.LastName, form.Email, form.Username, string(hashedPassword), form.BirthDate, createdAt, token, tokenExpiration, false)
     if err != nil {
         log.Printf("Database error: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create account"})
         return
+    } 
+
+    // Load environment variables from .env file
+    envErr := godotenv.Load(".env") // Ensure this path is correct relative to the test file
+    if envErr != nil {
+        log.Fatalf("Error loading .env file: %v", envErr)
     }
 
-    // Respond with success
+    portStr := os.Getenv("EMAIL_PORT")
+    port, err := strconv.Atoi(portStr)
+    if err != nil {
+        log.Fatalf("Error converting EMAIL_PORT to integer: %v", err)
+    }
+
+    config := emailer.Config{
+        SMTPHost:    os.Getenv("EMAIL_HOST"),
+        SMTPPort:    port,
+        SenderEmail: os.Getenv("EMAIL"),
+        SenderName:  "Bungo",
+        SenderPass:  os.Getenv("EMAIL_PASSWORD"),
+    }
+
+    emailService := emailer.NewEmailer(config)
+
+    err = emailService.SendConfirmationEmail(
+        form.Email,
+        form.Username,
+        "http://localhost:3000/email-confirmation?token=" + token,
+    )
+    if err != nil {
+        log.Printf("Error sending confirmation email: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send confirmation email"})
+        return
+    }
+
     c.JSON(http.StatusOK, gin.H{"message": "Account created successfully"})
+}
+
+// verify email
+func HandleVerifyEmail(c *gin.Context) {
+    token := c.Query("token")
+    if token == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Token is required"})
+        return
+    }
+
+    userID, tokenExpiration, err := db.GetUserByToken(token)
+    if err == sql.ErrNoRows {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
+        return
+    } else if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+        return
+    }
+    
+    // Check if token has expired
+    if time.Now().After(tokenExpiration) {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Token has expired"})
+        return
+    }
+    
+    // Update user to mark email as verified
+    err = db.Exec("UPDATE users SET token = NULL, token_expiration = NULL, email_validated = TRUE WHERE user_id = $1", userID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+        return
+    }
+    
+    c.JSON(http.StatusOK, gin.H{"status": "success", "email_validated": true})
 }

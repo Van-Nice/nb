@@ -43,7 +43,6 @@ export default function CreateAccount() {
   };
 
   // Email
-  // todo: Validate by checking if there's already an account with this email if so prompt user to login
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const [email, setEmail] = useState("");
   const [emailIsTyping, setEmailIsTyping] = useState(false);
@@ -56,7 +55,6 @@ export default function CreateAccount() {
   };
 
   // Username
-  // TODO: Validate by checking with the database to make sure there's no other user with the same name
   const [username, setUserName] = useState("");
   const [usernameValid, setUsernameValid] = useState(false);
   const [usernameIsTyping, setUsernameIsTyping] = useState(false);
@@ -193,10 +191,10 @@ export default function CreateAccount() {
         password,
         birthDate
       }
-      console.log(form);
+      
       // todo: send form to backend /auth/create-account api
       try { // POST request successful
-        const response = await fetch('http://localhost:8000/auth/create-account', {
+        const response = await fetch('http://localhost:8080/auth/create-account', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -210,6 +208,7 @@ export default function CreateAccount() {
         } else { // form data invalid
           const responseError = await response.json();
           console.error('Error creating account:', responseError);
+          console.log(JSON.stringify(form));
           alert('Error creating account: ' + responseError);
         }
 
