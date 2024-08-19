@@ -8,6 +8,7 @@ import (
     "github.com/gin-contrib/cors"
     "log"
     "time"
+    "net/http"
 )
 
 func main() {
@@ -37,6 +38,11 @@ func main() {
     router.GET("/email-confirmation", auth.HandleVerifyEmail)
     router.POST("/auth/login", auth.HandleLogin)
 
+    router.GET("/protected", auth.JWTAuthMiddleware(), func(c *gin.Context) {
+        userID := c.GetInt("userID")
+        email := c.GetString("email")
+        c.JSON(http.StatusOK, gin.H{"message": "Protected endpoint", "userID": userID,"email": email})
+    })
 
     if err := router.Run(":8080"); err != nil {
         log.Fatalf("Failed to run server: %v", err)

@@ -1,9 +1,8 @@
 package auth
 
 import (
-	"crypto/rand"
+
 	"database/sql"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"nb-back-end/db"
@@ -17,25 +16,6 @@ import (
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
-
-
-
-func hashPassword(password string) (string, error) {
-    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-    if err != nil {
-        return "", err
-    }
-    return string(hashedPassword), nil
-}
-
-func generateToken(length int) (string, error) {
-    token := make([]byte, length)
-    _, err := rand.Read(token)
-    if err != nil {
-        return "", err
-    }
-    return base64.RawURLEncoding.EncodeToString(token), nil
-}
 
 // CreateAccountForm represents the form data for creating an account
 type CreateAccountForm struct {
@@ -87,7 +67,6 @@ func HandleCreateAccount(c *gin.Context) {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
         return
     }
-    // TODO: log tokenExpiration & token as well as their types
     
     // Set the CreatedAt field to the current time
     createdAt := time.Now()
@@ -188,7 +167,6 @@ func HandleVerifyEmail(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"status": "success", "email_validated": true})
 }
 
-// TODO: Create function for handling /auth/login api endpoint
 
 type Login struct {
     Email       string      `json:email`
@@ -211,13 +189,21 @@ func HandleLogin(c *gin.Context) {
     } else {
         log.Printf("User found: ID=%d, Name=%s %s, Username=%s, CreatedAt=%s", userID, firstName, lastName, username, createdAt)
     }
-    // Once user has been retrieved via email, validate password
-    // Compare the inputted password with the hashed password
+    
+    // Validate password
     err = bcrypt.CompareHashAndPassword([]byte(password), []byte(login.Password))
     if err != nil {
         c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid login credentials"})
         return
     }
+
+    // Generate JWT
+    token, err := GenerateJWT(userID, login.Email)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+        return
+    }
+
     // If the password matches, return a success response
-    c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
+    c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
 }
