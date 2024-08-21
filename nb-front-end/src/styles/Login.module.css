@@ -1,0 +1,46 @@
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    grid-gap: 15px;
+    padding: 0 20px;
+    max-width: 400px;
+    margin: auto;
+}
+
+.error {
+    color: red;
+    font-size: 0.875em;
+    margin-top: 0.25em;
+    min-height: 1.2em; /* Reserve space for the error message */
+}
+
+
+.errorContainer {
+    min-height: 1.2em;
+  }
+  
+.eyeIcon {
+    cursor: pointer;
+    margin-left: 8px;
+}
+  
+.passwordContainer {
+    position: relative;
+    width: 100%;
+}
+  
+.passwordInput {
+    position: relative;
+    width: 100%;
+
+}
+    
+.toggleIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
