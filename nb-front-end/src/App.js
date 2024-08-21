@@ -10,6 +10,7 @@ import CreateAccount from "./components/CreateAccount";
 import Home from "./components/Home";
 import EmailConfirmation from "./components/EmailConfirmation";
 import EmailConfirmationInstruction from "./components/EmailConfirmationInstruction";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
 function App() {
@@ -24,7 +25,7 @@ function App() {
           <Route path="/email-confirmation" element={<EmailConfirmation />} />
           <Route path="/login" element={<Login />} />
           <Route path="/create-account" element={<CreateAccount />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/home" element={<ProtectedRoute  element={Home}/>} />
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
         {/* <footer>

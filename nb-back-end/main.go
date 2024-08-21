@@ -1,14 +1,16 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "nb-back-end/auth"
-    "nb-back-end/db"
-    "github.com/joho/godotenv"
-    "github.com/gin-contrib/cors"
-    "log"
-    "time"
-    "net/http"
+	"log"
+	"nb-back-end/auth"
+	"nb-back-end/db"
+	"net/http"
+	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	// "net/http"
 )
 
 func main() {
@@ -38,10 +40,9 @@ func main() {
     router.GET("/email-confirmation", auth.HandleVerifyEmail)
     router.POST("/auth/login", auth.HandleLogin)
 
+    // Protected route
     router.GET("/protected", auth.JWTAuthMiddleware(), func(c *gin.Context) {
-        userID := c.GetInt("userID")
-        email := c.GetString("email")
-        c.JSON(http.StatusOK, gin.H{"message": "Protected endpoint", "userID": userID,"email": email})
+        c.JSON(http.StatusOK, gin.H{"message": "You are authenticated"})
     })
 
     if err := router.Run(":8080"); err != nil {
