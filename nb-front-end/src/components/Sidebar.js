@@ -5,8 +5,6 @@ import Bungo from "./Bungo";
 import New from "./New";
 import Trash from "./Trash";
 
-// TODO: Sidebar Component: For navigation.
-
 export default function Sidebar() {
   return (
     <div className={parentStyles.sidebar}>

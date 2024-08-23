@@ -1,0 +1,28 @@
+.container {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .icon {
+    font-size: 18px;
+    margin-right: 8px;
+  }
+  
+  .label {
+    font-size: 14px;
+  }
+  
+  .unselected {
+    /* background-color: #fff; */
+    color: #4a4a4a;
+  }
+  
+  .selected {
+    background-color: #e0e0e0;
+    color: #333;
+  }
+  

@@ -11,7 +11,7 @@ export default function Search() {
         <input
           type="text"
           className={styles.searchInput}
-          placeholder="Search in Drive"
+          placeholder="Search in Bungo"
         />
       </div>
     </div>
