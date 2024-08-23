@@ -1,23 +1,22 @@
 import React from "react";
+import styles from "../styles/Home.module.css";
 import TextEditor from "./TextEditor";
-
-// Home page planning
-
-// 1. Needed features
-//  Sidebar: A vertical navigation sidebar on the left
-//  Main Content Area: The main area displaying suggested folders and files
-//  Header: A header at the top for search and navigation
-
-// Needed components
-
-// Later features:
-// Add icons for better visual clarity
-// use modal for the “New” button to create new folders or files
+import Bungo from "./Bungo";
+import Sidebar from "./Sidebar";
+import New from "./New";
+import Suggested from "./Suggested";
+import Search from "./Search";
+import Account from "./Account";
 
 export default function Home() {
   return (
-    <div>
-      This is the home component
+    <div className={styles.gridContainer}>
+      {/* First row + */}
+      <Search className={styles.search}/>
+      <Account className={styles.account}/>
+      <Sidebar className={styles.sidebar}/> 
+      {/* Second row */}
+      <Suggested className={styles.suggested} />
     </div>
   );
 }
