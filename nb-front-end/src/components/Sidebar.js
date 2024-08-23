@@ -1,16 +1,20 @@
 import React from "react";
 import styles from "../styles/Sidebar.module.css"
+import parentStyles from "../styles/Home.module.css"
 import Bungo from "./Bungo";
 import New from "./New";
-
+import Trash from "./Trash";
 
 // TODO: Sidebar Component: For navigation.
 
 export default function Sidebar() {
   return (
-    <div>
-      <Bungo className={styles.bungo}/>
-      <New className={styles.new}/>
+    <div className={parentStyles.sidebar}>
+      <div className={styles.sidebarContainer}>
+        <Bungo />
+        <New/>
+        <Trash />
+      </div>
     </div>
   )
 }

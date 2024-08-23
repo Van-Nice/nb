@@ -1,25 +1,51 @@
 .gridContainer {
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    grid-template-rows: 100px auto;
-    grid-template-areas: 
-        "bungo" "searchbar"
-    ;
-    gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: 100px auto;
+  grid-template-areas:
+    "sidebar search settings account"
+    "sidebar suggested suggested suggested";
+  gap: 10px;
 }
 
 .sidebar {
+    grid-area: sidebar;
     display: flex;
+    width: 100%; /* Set the width of the sidebar */
+    height: 100vh; /* Set the height of the sidebar to the full viewport height */
+    overflow: hidden; /* Ensure there is nothing below the sidebar */
+    /* border: 2px solid black;  */
+    margin-left: 20px;
+    margin-top: 30px;
 }
 
 .search {
-    display: flex;
+  grid-area: search;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border: 2px solid black; */
+}
+
+.settings {
+  grid-area: settings;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border: 2px solid black; */
 }
 
 .suggested {
-    display: flex;
+  grid-area: suggested;
+  display: flex;
+  background-color: #FFFFFF;
 }
 
 .account {
-    display: flex;
+  grid-area: account;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border: 2px solid black; */
+  margin-right: 20px;
 }

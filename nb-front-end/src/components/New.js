@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "../styles/New.module.css";
 import File from "./File";
 import Folder from "./Folder";
 
@@ -7,8 +8,9 @@ import Folder from "./Folder";
 
 export default function New() {
   return (
-    <div>
-      New Component
-    </div>
+    <button className={styles.buttonWrapper}>
+      <span className={styles.icon}>+</span>
+      <span className={styles.text}>New</span>
+    </button>
   )
 }
