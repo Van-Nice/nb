@@ -7,6 +7,8 @@ import (
     "os"
     "time"
     "github.com/jackc/pgx/v4"
+    "go.mongodb.org/mongo-driver/mongo"
+    "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var db *pgx.Conn
@@ -82,4 +84,31 @@ func GetUserByEmail(email string) (int, string, string, string, string, time.Tim
     return userID, firstName, lastName, username, password, createdAt, nil
 }
 
+// Connect to mongo
+var MongoClient *mongo.Client
+
+func InitMongoDB() {
+    var err error
+    mongoURI := os.Getenv("MONGO_CONNECTION_STRING")
+    clientOptions := options.Client().ApplyURI(mongoURI)
+
+    MongoClient, err = mongo.Connect(context.Background(), clientOptions)
+    if err != nil {
+        log.Fatalf("Failed to connect to MongoDB: %v", err)
+    }
+
+    // Ping db to verify connection
+    err = MongoClient.Ping(context.Background(), nil)
+    if err != nil {
+        log.Fatalf("Failed to ping MongoDB: %v", err)
+    }
+    log.Panicln("Connected to MongoDB")
+}
+
+func CloseMongoDB() {
+    if err := MongoClient.Disconnect(context.Background()); err != nil {
+        log.Fatalf("Failed to disconnect MongoDB: %v", err)
+    }
+    log.Printf("Disconnected from MongoDB")
+}
 

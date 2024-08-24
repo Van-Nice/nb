@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
+    "go.mongodb.org/mongo-driver/mongo"
 )
 
 // CreateAccountForm represents the form data for creating an account
@@ -206,4 +207,16 @@ func HandleLogin(c *gin.Context) {
 
     // If the password matches, return a success response
     c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
+}
+
+func HandleProtectedRoute(c *gin.Context) {
+    mongoClient, exists := c.Get("mongoClient")
+    if !exists {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "MongoDB client not found"})
+        return
+    }
+
+    client := mongoClient.(*mongo.Client)
+
+    // Use MongoDB client here
 }

@@ -24,6 +24,9 @@ func main() {
     db.InitDB()
     defer db.CloseDB()
 
+    db.InitMongoDB()
+    defer db.CloseMongoDB()
+
     gin.SetMode(gin.ReleaseMode)
 
     router := gin.Default()
@@ -36,12 +39,25 @@ func main() {
         AllowCredentials: true,
         MaxAge:           12 * time.Hour,
     }))
+
+    // Pass Mongo client to handlers
+    router.Use(func(c *gin.Context) {
+        c.Set("mongoClient", db.MongoClient)
+        c.Next()
+    })
+
     router.POST("/auth/create-account", auth.HandleCreateAccount)
     router.GET("/email-confirmation", auth.HandleVerifyEmail)
     router.POST("/auth/login", auth.HandleLogin)
 
     // Protected route
     router.GET("/protected", auth.JWTAuthMiddleware(), func(c *gin.Context) {
+        mongoClient, exits := c.Get("mongoClient")
+        if !exits {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "MongoDB client not found"})
+            return
+        }
+        // use mongoClient here - insert files and folders
         c.JSON(http.StatusOK, gin.H{"message": "You are authenticated"})
     })
 
