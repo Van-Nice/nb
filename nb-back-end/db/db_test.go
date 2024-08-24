@@ -1,12 +1,10 @@
 package db
 
 import (
-    // "path/filepath"
-    // "os"
-    "testing"
-    "github.com/joho/godotenv"
-    // "github.com/stretchr/testify/assert"
-    "log"
+	"testing"
+    "os"
+	"github.com/joho/godotenv"
+	"log"
 )
 
 func TestDBConnections (t *testing.T) {
@@ -58,4 +56,23 @@ func TestExec(t *testing.T) {
     }
 }
 
+func TestGetUserByEmail(t * testing.T) {
+    err := godotenv.Load("../.env")
+    if err != nil {
+        log.Fatalf("Error loading .env file: %v", err)
+    }
+
+    InitAuthDB()
+    defer CloseAuthDB()
+
+    testEmail := os.Getenv("TEST_EMAIL")
+
+    // Check for user in db based on email
+    userID, firstName, lastName, username, password, createdAt, err := GetUserByEmail(testEmail)
+    if err != nil {
+        log.Println("User not found or other error occurred:", err)
+    } else {
+        log.Printf("User found: ID=%d, Name=%s %s, Username=%s, Password=%s, CreatedAt=%s", userID, firstName, lastName, username, password, createdAt)
+    }
+}
 
