@@ -9,35 +9,37 @@ import (
     "github.com/jackc/pgx/v4"
     "go.mongodb.org/mongo-driver/mongo"
     "go.mongodb.org/mongo-driver/mongo/options"
+    "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var db *pgx.Conn
+var authDB *pgx.Conn
 
-func InitDB() {
+func InitAuthDB() {
     var err error
     connStr := fmt.Sprintf(
         "postgres://%s:%s@%s:%s/%s",
-        os.Getenv("DB_USER"),
-        os.Getenv("DB_PASSWORD"),
-        os.Getenv("DB_HOST"),
-        os.Getenv("DB_PORT"),
-        os.Getenv("DB_NAME"),
+        os.Getenv("POSTGRES_DB_USER"),
+        os.Getenv("POSTGRES_DB_PASSWORD"),
+        os.Getenv("POSTGRES_DB_HOST"),
+        os.Getenv("POSTGRES_DB_PORT"),
+        os.Getenv("POSTGRES_TEST_DB_NAME"), // Switch to toggle in and out of test db
     )
-    db, err = pgx.Connect(context.Background(), connStr)
+    authDB, err = pgx.Connect(context.Background(), connStr)
     if err != nil {
         log.Fatalf("Unable to connect to database: %v\n", err)
     }
-    fmt.Println("Connected to the database")
+    fmt.Println("Connected to: authDB")
 }
 
-func CloseDB() {
-    db.Close(context.Background())
+func CloseAuthDB() {
+    authDB.Close(context.Background())
+    log.Printf("Disconnected from: authDB")
 }
 
 // Exec executes a given SQL statement with arguments and returns an error if any.
 func Exec(sql string, args ...interface{}) error {
     ctx := context.Background()
-    _, err := db.Exec(ctx, sql, args...)
+    _, err := authDB.Exec(ctx, sql, args...)
     if err != nil {
         return fmt.Errorf("Exec failed: %v", err)
     }
@@ -50,7 +52,7 @@ func GetUserByToken(token string) (int, time.Time, error) {
     var tokenExpiration time.Time
 
     // log.Printf("Executing query: SELECT user_id, token_expiration FROM users WHERE token = $1 with token: %s", token)
-    err := db.QueryRow(context.Background(), "SELECT user_id, token_expiration FROM users WHERE token = $1", token).Scan(&userID, &tokenExpiration)
+    err := authDB.QueryRow(context.Background(), "SELECT user_id, token_expiration FROM users WHERE token = $1", token).Scan(&userID, &tokenExpiration)
     if err != nil {
         log.Printf("There was an error fetching data from db")
         return 0, time.Time{}, fmt.Errorf("QueryRow failed: %v", err)
@@ -67,7 +69,7 @@ func GetUserByEmail(email string) (int, string, string, string, string, time.Tim
     var emailValidated bool
 
     // Execute the query to retrieve the user details by email
-    err := db.QueryRow(context.Background(), 
+    err := authDB.QueryRow(context.Background(), 
         "SELECT user_id, first_name, last_name, username, password, created_at, email_validated FROM users WHERE email = $1", 
         email).Scan(&userID, &firstName, &lastName, &username, &password, &createdAt, &emailValidated)
     
@@ -85,30 +87,79 @@ func GetUserByEmail(email string) (int, string, string, string, string, time.Tim
 }
 
 // Connect to mongo
-var MongoClient *mongo.Client
+var contentDB *mongo.Client
 
-func InitMongoDB() {
+// File represents the structure of a file document incontentDB 
+type File struct {
+	ID         primitive.ObjectID `bson:"_id,omitempty"`
+	UserID     primitive.ObjectID `bson:"user_id"`
+	FolderID   primitive.ObjectID `bson:"folder_id,omitempty"` // Folder ID is optional (could be in the root directory)
+	Name       string             `bson:"name"`
+	Content    string             `bson:"content"`
+	CreatedAt  time.Time          `bson:"created_at"`
+	UpdatedAt  time.Time          `bson:"updated_at"`
+}
+
+// Folder represents the structure of a folder document incontentDB 
+type Folder struct {
+	ID           primitive.ObjectID `bson:"_id,omitempty"`
+	UserID       primitive.ObjectID `bson:"user_id"`
+	ParentFolderID primitive.ObjectID `bson:"parent_folder_id,omitempty"` // Parent folder ID is optional
+	Name         string             `bson:"name"`
+	CreatedAt    time.Time          `bson:"created_at"`
+	UpdatedAt    time.Time          `bson:"updated_at"`
+}
+
+func InitContentDB() {
     var err error
     mongoURI := os.Getenv("MONGO_CONNECTION_STRING")
     clientOptions := options.Client().ApplyURI(mongoURI)
 
-    MongoClient, err = mongo.Connect(context.Background(), clientOptions)
+    contentDB, err = mongo.Connect(context.Background(), clientOptions)
     if err != nil {
-        log.Fatalf("Failed to connect to MongoDB: %v", err)
+        log.Fatalf("Failed to connect to contentDB: %v", err)
     }
 
     // Ping db to verify connection
-    err = MongoClient.Ping(context.Background(), nil)
+    err = contentDB.Ping(context.Background(), nil)
     if err != nil {
-        log.Fatalf("Failed to ping MongoDB: %v", err)
+        log.Fatalf("Failed to ping contentDB: %v", err)
     }
-    log.Panicln("Connected to MongoDB")
+    log.Println("Connected to: contentDB")
 }
 
-func CloseMongoDB() {
-    if err := MongoClient.Disconnect(context.Background()); err != nil {
-        log.Fatalf("Failed to disconnect MongoDB: %v", err)
+func CloseContentDB() {
+    if err := contentDB.Disconnect(context.Background()); err != nil {
+        log.Fatalf("Failed to disconnect contentDB: %v", err)
     }
-    log.Printf("Disconnected from MongoDB")
+    log.Printf("Disconnected from: contentDB")
+}
+
+// InsertFile inserts a new file into the "files" collection incontentDB 
+func InsertFile(file File) (*mongo.InsertOneResult, error) {
+	collection := contentDB.Database("your_database_name").Collection("files")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result, err := collection.InsertOne(ctx, file)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// InsertFolder inserts a new folder into the "folders" collection incontentDB 
+func InsertFolder(folder Folder) (*mongo.InsertOneResult, error) {
+	collection := contentDB.Database("your_database_name").Collection("folders")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result, err := collection.InsertOne(ctx, folder)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 

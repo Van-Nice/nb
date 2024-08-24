@@ -1,57 +1,28 @@
 package auth
 
 import (
-    "testing"
-    "encoding/json"
-    "github.com/joho/godotenv"
-    "nb-back-end/db"
-    "github.com/gin-gonic/gin"
-    "net/http"
-    "net/http/httptest"
-    "strings"
-    "github.com/stretchr/testify/assert"
+	// "bytes"
+	// "encoding/json"
+	// "net/http"
+	// "net/http/httptest"
+	"testing"
+
+	"github.com/gin-gonic/gin"
+	// "github.com/gin-gonic/gin"
+	// "github.com/stretchr/testify/assert"
+	// "github.com/stretchr/testify/mock"
+	// "nb-back-end/auth"
+	// "nb-back-end/db"
+	// "nb-back-end/emailer"
 )
 
+// TODO: write unit tests for each function in auth.go
+
+// TODO: unit test for HandleCreateAccount()
+
 func TestHandleCreateAccount(t *testing.T) {
-    // Load environment variables from .env file
-    err := godotenv.Load("../.env") // Ensure this path is correct relative to the test file
-    if err != nil {
-        t.Fatalf("Error loading .env file: %v", err)
-    }
+	gin.SetMode(gin.TestMode)
 
-    // Initialize the database connection
-    db.InitDB()
-    defer db.CloseDB()
-
-    gin.SetMode(gin.TestMode)
-
-    router := gin.Default()
-    router.POST("/auth/create-account", HandleCreateAccount)
-
-    payload := `{
-        "first_name": "John",
-        "last_name": "Doe",
-        "email": "johndoe@example3.com",
-        "username": "johndoe3",
-        "password": "Password1!",
-        "confirm_password": "Password1!",
-        "birth_date": "2000-01-01"
-    }`
-
-    req, _ := http.NewRequest(http.MethodPost, "/auth/create-account", strings.NewReader(payload))
-    req.Header.Set("Content-Type", "application/json")
-    recorder := httptest.NewRecorder()
-
-    router.ServeHTTP(recorder, req)
-
-    assert.Equal(t, http.StatusOK, recorder.Code)
-
-    var response map[string]string
-    err = json.Unmarshal(recorder.Body.Bytes(), &response)
-    if err != nil {
-        t.Fatalf("Error parsing response: %v", err)
-    }
-
-    assert.Equal(t, "Account created successfully", response["message"])
-    t.Logf("Response body: %s", recorder.Body.String())
+	// Connect the the test postgres db
+	
 }

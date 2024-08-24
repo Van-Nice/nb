@@ -12,3 +12,6 @@ Thumbs.db
 nb-back-end/.env
 jwt-system-design.md
 Designs
+.vscode
+nb-back-end/launch.json
+nb-front-end/launch.json
