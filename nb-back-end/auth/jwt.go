@@ -70,23 +70,29 @@ func ValidateJWT(tokenString string) (*Claims, error) {
 }
 
 func JWTAuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-		if tokenString == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
-			c.Abort()
-			return
-		}
+    return func(c *gin.Context) {
+        tokenString := c.GetHeader("Authorization")
+        if tokenString == "" {
+            log.Println("Authorization header is missing")
+            c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
+            c.Abort()
+            return
+        }
 
-		claims, err := ValidateJWT(tokenString)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-			c.Abort()
-			return
-		}
+        log.Printf("Received token: %s", tokenString)
 
-		c.Set("userID", claims.UserID)
-		c.Set("email", claims.Email)
-		c.Next()
-	}
+        claims, err := ValidateJWT(tokenString)
+        if err != nil {
+            log.Printf("Token validation failed: %v", err)
+            c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+            c.Abort()
+            return
+        }
+
+        log.Printf("Token validated successfully for userID: %d, email: %s", claims.UserID, claims.Email)
+
+        c.Set("userID", claims.UserID)
+        c.Set("email", claims.Email)
+        c.Next()
+    }
 }

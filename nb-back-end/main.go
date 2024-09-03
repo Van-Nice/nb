@@ -47,11 +47,7 @@ func main() {
 	protected := router.Group("/protected")
 	protected.Use(auth.JWTAuthMiddleware())
 	{
-		protected.GET("/home", )
-		// protected.POST("/files", content.HandleCreateFile)
-		// protected.GET("/files", content.HandleGetFiles)
-		// protected.POST("/folders", content.HandleCreateFolder)
-		// protected.GET("/folders", content.HandleGetFolders)
+		protected.GET("/home", auth.HandleHome)
 	}
 
 	if err := router.Run(":8080"); err != nil {
