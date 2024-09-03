@@ -88,9 +88,10 @@ func HandleCreateAccount(c *gin.Context) {
         log.Printf("Database error: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create account"})
         return
-    } 
+    }
+
     // TODO: Insert data into user_settings
-    
+    err = db.InsertUserSettings(UserID)
 
     // Load environment variables from .env file
     envErr := godotenv.Load(".env") // Ensure this path is correct relative to the test file
@@ -162,6 +163,13 @@ func HandleVerifyEmail(c *gin.Context) {
     err = db.Exec("UPDATE users SET token = NULL, token_expiration = NULL, email_validated = TRUE WHERE user_id = $1", userID)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+        return
+    }
+
+    err = db.InsertUserSettings(userID)
+    if err != nil {
+        log.Panicf("Failed to insert user settings: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert user settings"})
         return
     }
 

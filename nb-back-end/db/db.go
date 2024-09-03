@@ -165,3 +165,15 @@ func InsertFolder(folder Folder) (*mongo.InsertOneResult, error) {
 
 // TODO: Create function that inserts line into user_settings in postgres
 
+func InsertUserSettings(userID int) error {
+    sql := `
+    INSERT INTO user_settings (
+        user_id
+    ) VALUES ($1)
+    `
+    err := Exec(sql, userID)
+    if err != nil {
+        return fmt.Errorf("InsertUserSettings failed: %v", err)
+    }
+    return nil
+}
