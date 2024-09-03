@@ -22,6 +22,47 @@ type User struct {
     EmailValidated bool     `json:"email_validated"`
 }
 
+type UserSettings struct {
+    UserID                int    `json:"user_id"`
+    Theme                 string `json:"theme"`
+    FontFamily            string `json:"font_family"`
+    FontSize              int    `json:"font_size"`
+    LineHeight            float64 `json:"line_height"`
+    AutoSave              bool   `json:"auto_save"`
+    AutoSaveInterval      int    `json:"auto_save_interval"`
+    HighlightCurrentLine  bool   `json:"highlight_current_line"`
+    ShowLineNumbers       bool   `json:"show_line_numbers"`
+    DefaultLanguage       string `json:"default_language"`
+    SyntaxHighlighting    bool   `json:"syntax_highlighting"`
+    EditorLayout          string `json:"editor_layout"`
+    CursorBlinkRate       int    `json:"cursor_blink_rate"`
+    BracketMatching       bool   `json:"bracket_matching"`
+    SnippetsEnabled       bool   `json:"snippets_enabled"`
+    SpellCheck            bool   `json:"spell_check"`
+    IndentGuides          bool   `json:"indent_guides"`
+    WordWrapColumn        int    `json:"word_wrap_column"`
+}
+// File represents the structure of a file document inContentDB 
+type File struct {
+    ID         primitive.ObjectID `bson:"_id,omitempty"`
+    UserID     primitive.ObjectID `bson:"user_id"`
+    FolderID   primitive.ObjectID `bson:"folder_id,omitempty"` // Folder ID is optional (could be in the root directory)
+    Name       string             `bson:"name"`
+    Content    string             `bson:"content"`
+    CreatedAt  time.Time          `bson:"created_at"`
+    UpdatedAt  time.Time          `bson:"updated_at"`
+}
+
+// Folder represents the structure of a folder document inContentDB 
+type Folder struct {
+    ID           primitive.ObjectID `bson:"_id,omitempty"`
+    UserID       primitive.ObjectID `bson:"user_id"`
+    ParentFolderID primitive.ObjectID `bson:"parent_folder_id,omitempty"` // Parent folder ID is optional
+    Name         string             `bson:"name"`
+    CreatedAt    time.Time          `bson:"created_at"`
+    UpdatedAt    time.Time          `bson:"updated_at"`
+}
+
 var authDB *pgx.Conn
 
 func InitAuthDB() {
@@ -99,26 +140,6 @@ func GetUserByEmail(email string) (int, string, string, string, string, time.Tim
 // Connect to mongo
 var ContentDB *mongo.Client
 
-// File represents the structure of a file document inContentDB 
-type File struct {
-	ID         primitive.ObjectID `bson:"_id,omitempty"`
-	UserID     primitive.ObjectID `bson:"user_id"`
-	FolderID   primitive.ObjectID `bson:"folder_id,omitempty"` // Folder ID is optional (could be in the root directory)
-	Name       string             `bson:"name"`
-	Content    string             `bson:"content"`
-	CreatedAt  time.Time          `bson:"created_at"`
-	UpdatedAt  time.Time          `bson:"updated_at"`
-}
-
-// Folder represents the structure of a folder document inContentDB 
-type Folder struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty"`
-	UserID       primitive.ObjectID `bson:"user_id"`
-	ParentFolderID primitive.ObjectID `bson:"parent_folder_id,omitempty"` // Parent folder ID is optional
-	Name         string             `bson:"name"`
-	CreatedAt    time.Time          `bson:"created_at"`
-	UpdatedAt    time.Time          `bson:"updated_at"`
-}
 
 func InitContentDB() {
     var err error
@@ -180,6 +201,7 @@ func InsertUserSettings(userID int) error {
         user_id
     ) VALUES ($1)
     `
+
     err := Exec(sql, userID)
     if err != nil {
         return fmt.Errorf("InsertUserSettings failed: %v", err)
@@ -200,4 +222,43 @@ func GetUserByID(userID int) (*User, error) {
     }
 
     return &user, nil
+}
+
+func QueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row {
+    return authDB.QueryRow(ctx, query, args...)
+}
+
+
+// GetUserSettingsByID retrieves the user settings by user ID
+func GetUserSettingsByID(userID int) (UserSettings, error) {
+    var settings UserSettings
+    sql := `SELECT user_id, theme, font_family, font_size, line_height, auto_save, auto_save_interval, highlight_current_line, show_line_numbers, default_language, syntax_highlighting, editor_layout, cursor_blink_rate, bracket_matching, snippets_enabled, spell_check, indent_guides, word_wrap_column FROM user_settings WHERE user_id = $1`
+    row := authDB.QueryRow(context.Background(), sql, userID)
+    err := row.Scan(
+        &settings.UserID,
+        &settings.Theme,
+        &settings.FontFamily,
+        &settings.FontSize,
+        &settings.LineHeight,
+        &settings.AutoSave,
+        &settings.AutoSaveInterval,
+        &settings.HighlightCurrentLine,
+        &settings.ShowLineNumbers,
+        &settings.DefaultLanguage,
+        &settings.SyntaxHighlighting,
+        &settings.EditorLayout,
+        &settings.CursorBlinkRate,
+        &settings.BracketMatching,
+        &settings.SnippetsEnabled,
+        &settings.SpellCheck,
+        &settings.IndentGuides,
+        &settings.WordWrapColumn,
+    )
+    if err != nil {
+        if err == pgx.ErrNoRows {
+            return settings, nil // No settings found, return empty settings
+        }
+        return settings, fmt.Errorf("GetUserSettingsByID failed: %v", err)
+    }
+    return settings, nil
 }

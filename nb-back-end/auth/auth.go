@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+    "context"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -24,6 +25,15 @@ type CreateAccountForm struct {
 	Username        string    `json:"username"`
 	Password        string    `json:"password"`
 	BirthDate       string    `json:"birthDate"`
+}
+
+type CreateAccountRequest struct {
+    FirstName string `json:"first_name" binding:"required"`
+    LastName  string `json:"last_name" binding:"required"`
+    Email     string `json:"email" binding:"required,email"`
+    Username  string `json:"username" binding:"required"`
+    Password  string `json:"password" binding:"required"`
+    BirthDate string `json:"birth_date" binding:"required"`
 }
 
 // Create account
@@ -81,9 +91,11 @@ func HandleCreateAccount(c *gin.Context) {
     fmt.Printf("token: %v, type: %T\n", token, token)
     fmt.Printf("tokenExpiration: %v, type: %T\n", tokenExpiration, tokenExpiration)
 
-    // Insert data into users table
-    err = db.Exec("INSERT INTO users (first_name, last_name, email, username, password, date_of_birth, created_at, token, token_expiration, email_validated) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-    form.FirstName, form.LastName, form.Email, form.Username, string(hashedPassword), form.BirthDate, createdAt, token, tokenExpiration, false)
+    // Insert data into users table and return user ID
+    var userID int
+    err = db.QueryRow(context.Background(),
+        "INSERT INTO users (first_name, last_name, email, username, password, date_of_birth, created_at, token, token_expiration, email_validated) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING user_id",
+        form.FirstName, form.LastName, form.Email, form.Username, string(hashedPassword), form.BirthDate, createdAt, token, tokenExpiration, false).Scan(&userID)
     if err != nil {
         log.Printf("Database error: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create account"})
@@ -120,6 +132,13 @@ func HandleCreateAccount(c *gin.Context) {
     if err != nil {
         log.Printf("Error sending confirmation email: %v", err)
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send confirmation email"})
+        return
+    }
+
+    err = db.InsertUserSettings(userID)
+    if err != nil {
+        log.Panicf("Failed to insert user settings: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert user settings"})
         return
     }
 
@@ -160,13 +179,6 @@ func HandleVerifyEmail(c *gin.Context) {
     err = db.Exec("UPDATE users SET token = NULL, token_expiration = NULL, email_validated = TRUE WHERE user_id = $1", userID)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
-        return
-    }
-
-    err = db.InsertUserSettings(userID)
-    if err != nil {
-        log.Panicf("Failed to insert user settings: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert user settings"})
         return
     }
 
