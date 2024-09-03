@@ -13,7 +13,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -82,7 +81,7 @@ func HandleCreateAccount(c *gin.Context) {
     fmt.Printf("token: %v, type: %T\n", token, token)
     fmt.Printf("tokenExpiration: %v, type: %T\n", tokenExpiration, tokenExpiration)
 
-    // Insert data into the database
+    // Insert data into users table
     err = db.Exec("INSERT INTO users (first_name, last_name, email, username, password, date_of_birth, created_at, token, token_expiration, email_validated) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
     form.FirstName, form.LastName, form.Email, form.Username, string(hashedPassword), form.BirthDate, createdAt, token, tokenExpiration, false)
     if err != nil {
@@ -90,6 +89,8 @@ func HandleCreateAccount(c *gin.Context) {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create account"})
         return
     } 
+    // TODO: Insert data into user_settings
+    
 
     // Load environment variables from .env file
     envErr := godotenv.Load(".env") // Ensure this path is correct relative to the test file
@@ -205,5 +206,11 @@ func HandleLogin(c *gin.Context) {
     }
 
     // If the password matches, return a success response
-    c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
+    c.JSON(http.StatusOK, gin.H{
+        "id":    userID,
+        "name":  firstName + " " + lastName,
+        "email": login.Email,
+        "token": token,
+    })
 }
+

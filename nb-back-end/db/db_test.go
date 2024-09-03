@@ -77,10 +77,3 @@ func TestGetUserByEmail(t * testing.T) {
     }
 }
 
-// TODO: write test for InsertFile
-// Figure out schema for files
-
-
-// TODO: write test for InsertFolder
-// Figure out schema for folders
-

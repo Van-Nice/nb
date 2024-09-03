@@ -16,9 +16,7 @@ import (
 	// "nb-back-end/emailer"
 )
 
-// TODO: write unit tests for each function in auth.go
 
-// TODO: unit test for HandleCreateAccount()
 
 func TestHandleCreateAccount(t *testing.T) {
 	gin.SetMode(gin.TestMode)

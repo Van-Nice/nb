@@ -22,7 +22,7 @@ func InitAuthDB() {
         os.Getenv("POSTGRES_DB_PASSWORD"),
         os.Getenv("POSTGRES_DB_HOST"),
         os.Getenv("POSTGRES_DB_PORT"),
-        os.Getenv("POSTGRES_TEST_DB_NAME"), // Switch to toggle in and out of test db
+        os.Getenv("POSTGRES_DB_NAME"), // Switch to toggle in and out of test db
     )
     authDB, err = pgx.Connect(context.Background(), connStr)
     if err != nil {
@@ -162,4 +162,6 @@ func InsertFolder(folder Folder) (*mongo.InsertOneResult, error) {
 
 	return result, nil
 }
+
+// TODO: Create function that inserts line into user_settings in postgres
 

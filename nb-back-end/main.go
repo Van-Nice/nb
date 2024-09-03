@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"nb-back-end/auth"
-	"nb-back-end/content"
+	// "nb-back-end/content"
 	"nb-back-end/db"
 
 	"github.com/gin-contrib/cors"
@@ -21,9 +21,6 @@ func main() {
 
 	db.InitAuthDB()
 	defer db.CloseAuthDB()
-
-	db.InitContentDB()
-	defer db.CloseContentDB()
 
 	gin.SetMode(gin.ReleaseMode)
 
@@ -44,16 +41,17 @@ func main() {
 
 	router.POST("/auth/create-account", auth.HandleCreateAccount)
 	router.GET("/email-confirmation", auth.HandleVerifyEmail)
-	router.POST("/auth/login", auth.HandleLogin)
+	router.POST("/auth/login", auth.HandleLogin) // TODO: Fix this api endpoint
 
 	// Protected routes
 	protected := router.Group("/protected")
 	protected.Use(auth.JWTAuthMiddleware())
 	{
-		protected.POST("/files", content.HandleCreateFile)
-		protected.GET("/files", content.HandleGetFiles)
-		protected.POST("/folders", content.HandleCreateFolder)
-		protected.GET("/folders", content.HandleGetFolders)
+		protected.GET("/home", )
+		// protected.POST("/files", content.HandleCreateFile)
+		// protected.GET("/files", content.HandleGetFiles)
+		// protected.POST("/folders", content.HandleCreateFolder)
+		// protected.GET("/folders", content.HandleGetFolders)
 	}
 
 	if err := router.Run(":8080"); err != nil {
