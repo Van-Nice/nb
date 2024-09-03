@@ -41,7 +41,7 @@ func main() {
 
 	router.POST("/auth/create-account", auth.HandleCreateAccount)
 	router.GET("/email-confirmation", auth.HandleVerifyEmail)
-	router.POST("/auth/login", auth.HandleLogin) // TODO: Fix this api endpoint
+	router.POST("/auth/login", auth.HandleLogin)
 
 	// Protected routes
 	protected := router.Group("/protected")

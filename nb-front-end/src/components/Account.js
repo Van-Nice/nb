@@ -25,7 +25,8 @@ export default function Account({user}) {
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h2>Account Information</h2>
-            <p>Here is where the account details will be shown.</p>
+            <p><strong>Name:</strong> {user.name}</p>
+            <p><strong>Email:</strong> {user.email}</p>
             <button className={styles.closeButton} onClick={closeModal}>
               Close
             </button>

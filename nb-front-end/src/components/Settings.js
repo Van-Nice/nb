@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { FaCog } from 'react-icons/fa'; // Importing the gear icon from Font Awesome
+import { FaCog } from 'react-icons/fa';
 import styles from '../styles/Settings.module.css';
 import parentStyles from '../styles/Home.module.css';
 
+// TODO: retrieve the user settings and display them with the option to change
 export default function Settings({user}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
