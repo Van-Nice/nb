@@ -12,6 +12,16 @@ import (
     "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type User struct {
+    UserID        int       `json:"user_id"`
+    FirstName     string    `json:"first_name"`
+    LastName      string    `json:"last_name"`
+    Username      string    `json:"username"`
+    Email         string    `json:"email"`
+    CreatedAt     time.Time `json:"created_at"`
+    EmailValidated bool     `json:"email_validated"`
+}
+
 var authDB *pgx.Conn
 
 func InitAuthDB() {
@@ -163,7 +173,6 @@ func InsertFolder(folder Folder) (*mongo.InsertOneResult, error) {
 	return result, nil
 }
 
-// TODO: Create function that inserts line into user_settings in postgres
 
 func InsertUserSettings(userID int) error {
     sql := `
@@ -176,4 +185,19 @@ func InsertUserSettings(userID int) error {
         return fmt.Errorf("InsertUserSettings failed: %v", err)
     }
     return nil
+}
+
+func GetUserByID(userID int) (*User, error) {
+    var user User
+
+    // Execute the query to retrieve the user details by user ID
+    err := authDB.QueryRow(context.Background(),
+        "SELECT user_id, first_name, last_name, username, email, created_at, email_validated FROM users WHERE user_id = $1",
+        userID).Scan(&user.UserID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.CreatedAt, &user.EmailValidated)
+    if err != nil {
+        log.Printf("Error fetching user by ID: %v", err)
+        return nil, fmt.Errorf("QueryRow failed: %v", err)
+    }
+
+    return &user, nil
 }

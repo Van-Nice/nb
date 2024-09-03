@@ -55,7 +55,6 @@ export default function Login() {
         setError(true);
         throw new Error("Invalid login credentials");
       }
-      // TODO: make sure that the post request is returning all data in the proper format/order
       const data = await response.json();
       const user = new User(data.id, data.name, data.email, data.token)
       localStorage.setItem("authToken", data.token);

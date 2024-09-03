@@ -151,7 +151,6 @@ export default function CreateAccount() {
   const handleDate = (e) => {
     setBirthDateIsTyping(true);
     const value = e.target.value;
-    console.log(value);
     setBirthDate(value);
     setBirthDateValid(validateDate(value));
   };
@@ -192,7 +191,7 @@ export default function CreateAccount() {
         birthDate
       }
       
-      // todo: send form to backend /auth/create-account api
+
       try { // POST request successful
         const response = await fetch('http://localhost:8080/auth/create-account', {
           method: 'POST',

@@ -90,9 +90,6 @@ func HandleCreateAccount(c *gin.Context) {
         return
     }
 
-    // TODO: Insert data into user_settings
-    err = db.InsertUserSettings(UserID)
-
     // Load environment variables from .env file
     envErr := godotenv.Load(".env") // Ensure this path is correct relative to the test file
     if envErr != nil {
@@ -219,6 +216,29 @@ func HandleLogin(c *gin.Context) {
         "name":  firstName + " " + lastName,
         "email": login.Email,
         "token": token,
+    })
+}
+
+// HandleHome is a protected route that renders the home page
+func HandleHome(c *gin.Context) {
+    // Retrieve the user ID from the context (set by the authentication middleware)
+    userID, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+        return
+    }
+
+    // Fetch user details from the database
+    user, err := db.GetUserByID(userID.(int))
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user details"})
+        return
+    }
+
+    // Render the home page or return the necessary data
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Welcome to the home page!",
+        "user":    user,
     })
 }
 
