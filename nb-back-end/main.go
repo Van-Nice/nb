@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"nb-back-end/auth"
+	"nb-back-end/content"
 	"nb-back-end/db"
 
 	"github.com/gin-contrib/cors"
@@ -21,8 +22,8 @@ func main() {
 	db.InitAuthDB()
 	defer db.CloseAuthDB()
 
-	db.InitMongoDB()
-	defer db.CloseMongoDB()
+	db.InitContentDB()
+	defer db.CloseContentDB()
 
 	gin.SetMode(gin.ReleaseMode)
 
@@ -37,7 +38,7 @@ func main() {
 	}))
 
 	router.Use(func(c *gin.Context) {
-		c.Set("mongoClient", db.MongoClient)
+		c.Set("mongoClient", db.ContentDB)
 		c.Next()
 	})
 
@@ -49,10 +50,10 @@ func main() {
 	protected := router.Group("/protected")
 	protected.Use(auth.JWTAuthMiddleware())
 	{
-		protected.POST("/files", auth.HandleCreateFile)
-		protected.GET("/files", auth.HandleGetFiles)
-		protected.POST("/folders", auth.HandleCreateFolder)
-		protected.GET("/folders", auth.HandleGetFolders)
+		protected.POST("/files", content.HandleCreateFile)
+		protected.GET("/files", content.HandleGetFiles)
+		protected.POST("/folders", content.HandleCreateFolder)
+		protected.GET("/folders", content.HandleGetFolders)
 	}
 
 	if err := router.Run(":8080"); err != nil {

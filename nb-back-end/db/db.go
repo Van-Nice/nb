@@ -87,9 +87,9 @@ func GetUserByEmail(email string) (int, string, string, string, string, time.Tim
 }
 
 // Connect to mongo
-var contentDB *mongo.Client
+var ContentDB *mongo.Client
 
-// File represents the structure of a file document incontentDB 
+// File represents the structure of a file document inContentDB 
 type File struct {
 	ID         primitive.ObjectID `bson:"_id,omitempty"`
 	UserID     primitive.ObjectID `bson:"user_id"`
@@ -100,7 +100,7 @@ type File struct {
 	UpdatedAt  time.Time          `bson:"updated_at"`
 }
 
-// Folder represents the structure of a folder document incontentDB 
+// Folder represents the structure of a folder document inContentDB 
 type Folder struct {
 	ID           primitive.ObjectID `bson:"_id,omitempty"`
 	UserID       primitive.ObjectID `bson:"user_id"`
@@ -115,29 +115,29 @@ func InitContentDB() {
     mongoURI := os.Getenv("MONGO_CONNECTION_STRING")
     clientOptions := options.Client().ApplyURI(mongoURI)
 
-    contentDB, err = mongo.Connect(context.Background(), clientOptions)
+    ContentDB, err = mongo.Connect(context.Background(), clientOptions)
     if err != nil {
-        log.Fatalf("Failed to connect to contentDB: %v", err)
+        log.Fatalf("Failed to connect to ContentDB: %v", err)
     }
 
     // Ping db to verify connection
-    err = contentDB.Ping(context.Background(), nil)
+    err = ContentDB.Ping(context.Background(), nil)
     if err != nil {
-        log.Fatalf("Failed to ping contentDB: %v", err)
+        log.Fatalf("Failed to ping ContentDB: %v", err)
     }
-    log.Println("Connected to: contentDB")
+    log.Println("Connected to: ContentDB")
 }
 
 func CloseContentDB() {
-    if err := contentDB.Disconnect(context.Background()); err != nil {
-        log.Fatalf("Failed to disconnect contentDB: %v", err)
+    if err := ContentDB.Disconnect(context.Background()); err != nil {
+        log.Fatalf("Failed to disconnect ContentDB: %v", err)
     }
-    log.Printf("Disconnected from: contentDB")
+    log.Printf("Disconnected from: ContentDB")
 }
 
-// InsertFile inserts a new file into the "files" collection incontentDB 
+// InsertFile inserts a new file into the "files" collection inContentDB 
 func InsertFile(file File) (*mongo.InsertOneResult, error) {
-	collection := contentDB.Database("your_database_name").Collection("files")
+	collection := ContentDB.Database("your_database_name").Collection("files")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -149,9 +149,9 @@ func InsertFile(file File) (*mongo.InsertOneResult, error) {
 	return result, nil
 }
 
-// InsertFolder inserts a new folder into the "folders" collection incontentDB 
+// InsertFolder inserts a new folder into the "folders" collection inContentDB 
 func InsertFolder(folder Folder) (*mongo.InsertOneResult, error) {
-	collection := contentDB.Database("your_database_name").Collection("folders")
+	collection := ContentDB.Database("your_database_name").Collection("folders")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

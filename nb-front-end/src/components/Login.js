@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "../styles/Login.module.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import User from '../models/User';
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -54,10 +55,11 @@ export default function Login() {
         setError(true);
         throw new Error("Invalid login credentials");
       }
-
-      const {token} = await response.json();
-      localStorage.setItem("authToken", token);
-      navigate("/home");
+      // TODO: make sure that the post request is returning all data in the proper format/order
+      const data = await response.json();
+      const user = new User(data.id, data.name, data.email, data.token)
+      localStorage.setItem("authToken", data.token);
+      navigate("/home", {state: {user}});
     } catch (error) {
       setError(error.message);
     }

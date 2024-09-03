@@ -1,10 +1,11 @@
 package db
 
 import (
-	"testing"
-    "os"
-	"github.com/joho/godotenv"
 	"log"
+	"os"
+	"testing"
+
+	"github.com/joho/godotenv"
 )
 
 func TestDBConnections (t *testing.T) {
@@ -75,4 +76,11 @@ func TestGetUserByEmail(t * testing.T) {
         log.Printf("User found: ID=%d, Name=%s %s, Username=%s, Password=%s, CreatedAt=%s", userID, firstName, lastName, username, password, createdAt)
     }
 }
+
+// TODO: write test for InsertFile
+// Figure out schema for files
+
+
+// TODO: write test for InsertFolder
+// Figure out schema for folders
 

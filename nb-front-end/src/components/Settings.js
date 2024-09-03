@@ -3,7 +3,7 @@ import { FaCog } from 'react-icons/fa'; // Importing the gear icon from Font Awe
 import styles from '../styles/Settings.module.css';
 import parentStyles from '../styles/Home.module.css';
 
-export default function Settings() {
+export default function Settings({user}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {
