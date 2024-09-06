@@ -13,6 +13,10 @@ export default function New() {
   const handleCreateFile = () => {
     toggleDropdown()
     // TODO: Create new file and route user to it - using dynamic url
+    // Generate a new unique document ID (could use UUID or your backend logic)
+    const newDocId = generateUUID();
+    // Redirect to the new document editor page
+    window.location.href = `/document/${newDocId}`;
 
   };
 
