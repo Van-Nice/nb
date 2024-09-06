@@ -1,26 +1,26 @@
 import React, { useState } from "react";
 import { FaFileAlt, FaFolder } from "react-icons/fa";
 import styles from "../styles/New.module.css";
-import TextEditor from "./TextEditor";
-import axios from 'axios';
+
 
 export default function New() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [fileName, setFileName] = useState("");
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   const handleCreateFile = () => {
+    toggleDropdown()
     // TODO: Create new file and route user to it - using dynamic url
-    setIsDropdownOpen(false); // Close the dropdown
+
   };
 
   const handleCreateFolder = () => {
-    // TODO: Create new folder and route user to it - using dynamic url within home screen 
-    setIsDropdownOpen(false);
-  }
+    toggleDropdown()
+    // TODO: Create new folder and route user to it - using dynamic url within home screen
+
+  };
 
   return (
     <div className={styles.newWrapper}>
@@ -31,17 +31,20 @@ export default function New() {
 
       {isDropdownOpen && (
         <div className={styles.dropdownMenu}>
+          {/* Handle file */}
           <div className={styles.dropdownItem} onClick={handleCreateFile}>
             <FaFileAlt className={styles.dropdownIcon} />
             <span>Create Document</span>
           </div>
-          <div className={styles.dropdownItem}>
-            <FaFolder className={styles.dropdownIcon} onClick={handleCreateFolder}/>
+          {/* Handle folder */}
+          <div className={styles.dropdownItem} onClick={handleCreateFolder}>
+            <FaFolder
+              className={styles.dropdownIcon}
+            />
             <span>Create Folder</span>
           </div>
         </div>
       )}
-
     </div>
   );
 }

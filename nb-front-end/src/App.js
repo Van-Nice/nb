@@ -11,13 +11,19 @@ import Home from "./components/Home";
 import EmailConfirmation from "./components/EmailConfirmation";
 import EmailConfirmationInstruction from "./components/EmailConfirmationInstruction";
 import ProtectedRoute from "./components/ProtectedRoute";
+import DocumentEditor from "./components/DocumentEditor";
 import "./App.css";
+
+// TODO: Create dynamic route for new file
+// TODO: Create dynamic route for new folder
 
 function App() {
   return (
     <Router>
       <div>
         <Routes>
+          <Route path="/document/:id"/>
+            element={<DocumentEditor />}
           <Route
             path="/email-confirmation-instruction"
             element={<EmailConfirmationInstruction />}

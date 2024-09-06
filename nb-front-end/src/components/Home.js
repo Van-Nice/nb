@@ -7,7 +7,6 @@ import Suggested from "./Suggested";
 import Search from "./Search";
 import Account from "./Account";
 
-// TODO: Center searchbar so it looks better
 
 export default function Home() {
   const location = useLocation()
