@@ -7,6 +7,8 @@ import Suggested from "./Suggested";
 import Search from "./Search";
 import Account from "./Account";
 
+// TODO: Center searchbar so it looks better
+
 export default function Home() {
   const location = useLocation()
   const {user} = location.state || {};
@@ -17,7 +19,7 @@ export default function Home() {
       <Sidebar />
       <Search />
       <Settings user={user}/>
-      <Account user={user}/> 
+      <Account user={user}/>
       {/* Second row */}
       <Suggested />
     </div>

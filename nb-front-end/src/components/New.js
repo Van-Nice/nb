@@ -6,7 +6,6 @@ import axios from 'axios';
 
 export default function New() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [fileName, setFileName] = useState("");
 
   const toggleDropdown = () => {
@@ -14,37 +13,14 @@ export default function New() {
   };
 
   const handleCreateFile = () => {
-    setIsEditorOpen(true); // Open the text editor view
+    // TODO: Create new file and route user to it - using dynamic url
     setIsDropdownOpen(false); // Close the dropdown
   };
 
-  const closeEditor = () => {
-    setIsEditorOpen(false); // Close the text editor view
-  };
-
-  const handleFileSave = async (content) => {
-    // Prepare the data for the new file
-    const newFile = {
-      user_id: "your-user-id", // Replace with the actual user ID
-      folder_id: "optional-folder-id", // Replace with the folder ID if needed
-      name: fileName,
-      content: content,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    try {
-      // Send the data to your backend to save in MongoDB
-      const response = await axios.post("/api/files", newFile);
-      console.log("File saved with ID:", response.data.result);
-      // Handle success (e.g., show a notification, update UI, etc.)
-    } catch (error) {
-      console.error("Error saving file:", error);
-      // Handle error (e.g., show an error message)
-    }
-
-    setIsEditorOpen(false); // Close the editor after saving
-  };
+  const handleCreateFolder = () => {
+    // TODO: Create new folder and route user to it - using dynamic url within home screen 
+    setIsDropdownOpen(false);
+  }
 
   return (
     <div className={styles.newWrapper}>
@@ -60,27 +36,12 @@ export default function New() {
             <span>Create Document</span>
           </div>
           <div className={styles.dropdownItem}>
-            <FaFolder className={styles.dropdownIcon} />
+            <FaFolder className={styles.dropdownIcon} onClick={handleCreateFolder}/>
             <span>Create Folder</span>
           </div>
         </div>
       )}
 
-      {isEditorOpen && (
-        <div className={styles.modalOverlay} onClick={closeEditor}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h2>Create New Document</h2>
-            <input
-              type="text"
-              value={fileName}
-              onChange={(e) => setFileName(e.target.value)}
-              placeholder="Enter document name"
-              className={styles.inputField}
-            />
-            <TextEditor onSave={handleFileSave} />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

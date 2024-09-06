@@ -6,6 +6,8 @@
     "sidebar search settings account"
     "sidebar suggested suggested suggested";
   gap: 10px;
+  max-width: 1400px; /* Set the maximum width */
+  margin: 0 auto; /* Center the grid horizontally */
 }
 
 .sidebar {
@@ -22,7 +24,7 @@
 .search {
   grid-area: search;
   display: flex;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
   /* border: 2px solid black; */
 }
