@@ -1,16 +1,17 @@
 package auth
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
+	"nb-back-end/db"
 	"nb-back-end/emailer"
-    "nb-back-end/db"
+	// "nb-back-end/settings"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
-    "context"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -222,12 +223,19 @@ func HandleLogin(c *gin.Context) {
         return
     }
 
+    settings, err := db.GetUserSettingsByID(userID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user settings"})
+        return
+    }
+
     // If the password matches, return a success response
     c.JSON(http.StatusOK, gin.H{
         "id":    userID,
         "name":  firstName + " " + lastName,
         "email": login.Email,
         "token": token,
+        "settings": settings,
     })
 }
 
@@ -253,4 +261,5 @@ func HandleHome(c *gin.Context) {
         "user":    user,
     })
 }
+
 

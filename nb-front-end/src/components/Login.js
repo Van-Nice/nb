@@ -56,10 +56,7 @@ export default function Login() {
         throw new Error("Invalid login credentials");
       }
       const data = await response.json();
-      console.log(data);
-      console.log(data.token);
-      const user = new User(data.id, data.name, data.email, data.token)
-      console.log(user);
+      const user = new User(data.id, data.name, data.email, data.token, data.settings)
       localStorage.setItem("authToken", data.token);
       navigate("/home", {state: {user}});
     } catch (error) {

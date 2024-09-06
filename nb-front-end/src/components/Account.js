@@ -4,7 +4,6 @@ import styles from '../styles/Account.module.css';
 import parentStyles from '../styles/Home.module.css';
 
 export default function Account({user}) {
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {

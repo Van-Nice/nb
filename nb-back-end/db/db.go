@@ -228,7 +228,6 @@ func QueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row {
     return authDB.QueryRow(ctx, query, args...)
 }
 
-
 // GetUserSettingsByID retrieves the user settings by user ID
 func GetUserSettingsByID(userID int) (UserSettings, error) {
     var settings UserSettings
@@ -260,5 +259,6 @@ func GetUserSettingsByID(userID int) (UserSettings, error) {
         }
         return settings, fmt.Errorf("GetUserSettingsByID failed: %v", err)
     }
+    fmt.Println(settings)
     return settings, nil
 }

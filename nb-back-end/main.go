@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"nb-back-end/auth"
-	// "nb-back-end/content"
+	"nb-back-end/settings"
 	"nb-back-end/db"
 
 	"github.com/gin-contrib/cors"
@@ -46,7 +46,8 @@ func main() {
 	// Protected routes
 	protected := router.Group("/protected")
 	protected.Use(auth.JWTAuthMiddleware())
-	{
+	{	
+		protected.GET("/user-settings", settings.HandleUserSettings)
 		protected.GET("/home", auth.HandleHome)
 	}
 
