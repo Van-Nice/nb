@@ -140,7 +140,6 @@ func GetUserByEmail(email string) (int, string, string, string, string, time.Tim
 // Connect to mongo
 var ContentDB *mongo.Client
 
-
 func InitContentDB() {
     var err error
     mongoURI := os.Getenv("MONGO_CONNECTION_STRING")

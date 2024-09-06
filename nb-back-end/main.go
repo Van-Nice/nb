@@ -7,7 +7,7 @@ import (
 	"nb-back-end/auth"
 	"nb-back-end/settings"
 	"nb-back-end/db"
-
+	"nb-back-end/content"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -19,8 +19,13 @@ func main() {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
+	// Connect to Postgres database
 	db.InitAuthDB()
 	defer db.CloseAuthDB()
+
+	// Connect to Mongo database
+	db.InitContentDB()
+	defer db.InitContentDB()
 
 	gin.SetMode(gin.ReleaseMode)
 
@@ -49,6 +54,7 @@ func main() {
 	{	
 		protected.GET("/user-settings", settings.HandleUserSettings)
 		protected.GET("/home", auth.HandleHome)
+		protected.POST("/create-file", content.HandleCreateFile)
 	}
 
 	if err := router.Run(":8080"); err != nil {

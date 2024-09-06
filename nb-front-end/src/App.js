@@ -14,7 +14,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DocumentEditor from "./components/DocumentEditor";
 import "./App.css";
 
-// TODO: Create dynamic route for new file
 // TODO: Create dynamic route for new folder
 
 function App() {
@@ -22,8 +21,9 @@ function App() {
     <Router>
       <div>
         <Routes>
-          <Route path="/document/:id"/>
+          <Route path="/document/:id"
             element={<DocumentEditor />}
+          />
           <Route
             path="/email-confirmation-instruction"
             element={<EmailConfirmationInstruction />}

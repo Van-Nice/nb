@@ -1,13 +1,15 @@
-import React, {useState} from "react";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
 import styles from '../styles/Account.module.css';
 
-export default function FileNameModal() {
+const FileNameModal = forwardRef((props, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileName, setFileName] = useState("");
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  }
+  useImperativeHandle(ref, () => ({
+    openModal() {
+      setIsModalOpen(true);
+    }
+  }));
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -17,13 +19,31 @@ export default function FileNameModal() {
     setFileName(e.target.value);
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Hand file name submission logic here
     console.log("File name submitted:", fileName);
-    closeModal()
+    // Handle file name submission logic here
+    // TODO: Make a POST request to /protected/create-file endpoint
+    try {
+      const response = await fetch('/protected/create-file', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({fileName}),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      console.log('File created successfully:', data)
+    } catch (error) {
+      console.error('Error creating file:', error);
+    }
+    closeModal();
   }
-  
+
   return (
     <>
       {isModalOpen && (
@@ -47,4 +67,6 @@ export default function FileNameModal() {
       )}
     </>
   )
-}
+});
+
+export default FileNameModal;

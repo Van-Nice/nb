@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { FaFileAlt, FaFolder } from "react-icons/fa";
 import styles from "../styles/New.module.css";
-
+import FileNameModal from "./FileNameModal";
 
 export default function New() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const fileNameModalRef = useRef()
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -12,18 +13,13 @@ export default function New() {
 
   const handleCreateFile = () => {
     toggleDropdown()
-    // TODO: Create new file and route user to it - using dynamic url
-    // Generate a new unique document ID (could use UUID or your backend logic)
-    const newDocId = generateUUID();
-    // Redirect to the new document editor page
-    window.location.href = `/document/${newDocId}`;
-
+    // Open the FileNameModal
+    fileNameModalRef.current.openModal();
   };
 
   const handleCreateFolder = () => {
     toggleDropdown()
-    // TODO: Create new folder and route user to it - using dynamic url within home screen
-
+    // Eventually: Create new folder and route user to it - using dynamic url within home screen
   };
 
   return (
@@ -49,6 +45,9 @@ export default function New() {
           </div>
         </div>
       )}
+
+      {/* Include the FileNameModal component */}
+      <FileNameModal ref={fileNameModalRef} />
     </div>
   );
 }
