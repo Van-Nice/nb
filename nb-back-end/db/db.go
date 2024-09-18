@@ -12,6 +12,8 @@ import (
     "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// HANDLE POSTGRES DB
+
 type User struct {
     UserID        int       `json:"user_id"`
     FirstName     string    `json:"first_name"`
@@ -41,26 +43,6 @@ type UserSettings struct {
     SpellCheck            bool   `json:"spell_check"`
     IndentGuides          bool   `json:"indent_guides"`
     WordWrapColumn        int    `json:"word_wrap_column"`
-}
-// File represents the structure of a file document inContentDB 
-type File struct {
-    ID         primitive.ObjectID `bson:"_id,omitempty"`
-    UserID     primitive.ObjectID `bson:"user_id"`
-    FolderID   primitive.ObjectID `bson:"folder_id,omitempty"` // Folder ID is optional (could be in the root directory)
-    Name       string             `bson:"name"`
-    Content    string             `bson:"content"`
-    CreatedAt  time.Time          `bson:"created_at"`
-    UpdatedAt  time.Time          `bson:"updated_at"`
-}
-
-// Folder represents the structure of a folder document inContentDB 
-type Folder struct {
-    ID           primitive.ObjectID `bson:"_id,omitempty"`
-    UserID       primitive.ObjectID `bson:"user_id"`
-    ParentFolderID primitive.ObjectID `bson:"parent_folder_id,omitempty"` // Parent folder ID is optional
-    Name         string             `bson:"name"`
-    CreatedAt    time.Time          `bson:"created_at"`
-    UpdatedAt    time.Time          `bson:"updated_at"`
 }
 
 var authDB *pgx.Conn
@@ -131,14 +113,21 @@ func GetUserByEmail(email string) (int, string, string, string, string, time.Tim
 
     // Check if email is validated
     if !emailValidated {
-        return 0, "", "", "", "", time.Time{}, fmt.Errorf("Email not validated")
+        return 0, "", "", "", "", time.Time{}, fmt.Errorf("email not validated")
     }
 
     return userID, firstName, lastName, username, password, createdAt, nil
 }
 
-// Connect to mongo
+// HANDLE MONGO DB
 var ContentDB *mongo.Client
+
+type File struct {
+    ID            primitive.ObjectID `bson:"_id,omitempty"`
+    UserID        int                `bson:"user_id"`
+    TimeCreated   time.Time          `bson:"time_created"`
+    Content       string             `bson:"content"`
+}
 
 func InitContentDB() {
     var err error
@@ -166,32 +155,35 @@ func CloseContentDB() {
 }
 
 // InsertFile inserts a new file into the "files" collection inContentDB 
-func InsertFile(file File) (*mongo.InsertOneResult, error) {
-	collection := ContentDB.Database("your_database_name").Collection("files")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+func InsertFile(file File) (string, error) {
+    collection := ContentDB.Database("nbdb").Collection("files")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
 
-	result, err := collection.InsertOne(ctx, file)
-	if err != nil {
-		return nil, err
-	}
+    result, err := collection.InsertOne(ctx, file)
+    if err != nil {
+        return "", err
+    }
 
-	return result, nil
+    // Convert the InsertedID to a UUID string
+    insertedID := result.InsertedID.(primitive.ObjectID).Hex()
+
+    return insertedID, nil
 }
 
 // InsertFolder inserts a new folder into the "folders" collection inContentDB 
-func InsertFolder(folder Folder) (*mongo.InsertOneResult, error) {
-	collection := ContentDB.Database("your_database_name").Collection("folders")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+// func InsertFolder(folder Folder) (*mongo.InsertOneResult, error) {
+// 	collection := ContentDB.Database("your_database_name").Collection("folders")
+// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+// 	defer cancel()
 
-	result, err := collection.InsertOne(ctx, folder)
-	if err != nil {
-		return nil, err
-	}
+// 	result, err := collection.InsertOne(ctx, folder)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return result, nil
-}
+// 	return result, nil
+// }
 
 
 func InsertUserSettings(userID int) error {

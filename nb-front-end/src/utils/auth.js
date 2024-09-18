@@ -3,7 +3,7 @@ export const isAuthenticated = async () => {
   if (!token) return false;
 
   try {
-      const response = await fetch("http://localhost:8080/protected/home", {
+      const response = await fetch("http://localhost:8080/protected/", {
           method: "GET",
           headers: {
               "Authorization": token,

@@ -1,6 +1,7 @@
 package content
 
 import (
+	"fmt"
 	"context"
 	"nb-back-end/db"
 	"net/http"
@@ -12,32 +13,43 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// TODO: Ensure file gets wrote to db and return UUID for front end
+type CreateFileInput struct {
+    FileName string `json:"fileName"`
+}
+
+// TODO: Ensure file gets wrote to db and return UUID for frontend
 // HandleCreateFile creates a new file for the authenticated user
 func HandleCreateFile(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID not found"})
-		return
-	}
-
-	var file db.File
-	if err := c.ShouldBindJSON(&file); err != nil {
+	// Bind the incoming JSON to the CreateFileInput struct
+	var input CreateFileInput
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	file.UserID, _ = primitive.ObjectIDFromHex(userID.(string))
-	file.CreatedAt = time.Now()
-	file.UpdatedAt = time.Now()
-
-	result, err := db.InsertFile(file)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create file"})
-		return
+	type File struct {
+		ID            primitive.ObjectID `bson:"_id,omitempty"`
+		UserID        int                `bson:"user_id"`
+		TimeCreated   time.Time          `bson:"time_created"`
+		Content       string             `bson:"content"`
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "File created successfully", "file_id": result.InsertedID})
+    // Create a new ObjectID
+    objectID := primitive.NewObjectID()
+
+    // Create an instance of the File struct
+    file := File{
+        ID:          objectID,
+        UserID:      123, // Example user ID
+        TimeCreated: time.Now(),
+        Content:     "This is the content of the file motherfucka!!!.",
+    }
+
+	db.InsertFile(db.File(file))
+
+	// Print the received filename
+	fmt.Println("Received file name:", input.FileName)
+	c.JSON(http.StatusOK, gin.H{"message": "File Name Received!!!"})
 }
 
 // HandleGetFiles retrieves all files for the authenticated user
@@ -73,31 +85,31 @@ func HandleGetFiles(c *gin.Context) {
 }
 
 // HandleCreateFolder creates a new folder for the authenticated user
-func HandleCreateFolder(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID not found"})
-		return
-	}
+// func HandleCreateFolder(c *gin.Context) {
+// 	userID, exists := c.Get("userID")
+// 	if !exists {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID not found"})
+// 		return
+// 	}
 
-	var folder db.Folder
-	if err := c.ShouldBindJSON(&folder); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+// 	var folder db.Folder
+// 	if err := c.ShouldBindJSON(&folder); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+// 		return
+// 	}
 
-	folder.UserID, _ = primitive.ObjectIDFromHex(userID.(string))
-	folder.CreatedAt = time.Now()
-	folder.UpdatedAt = time.Now()
+// 	folder.UserID, _ = primitive.ObjectIDFromHex(userID.(string))
+// 	folder.CreatedAt = time.Now()
+// 	folder.UpdatedAt = time.Now()
 
-	result, err := db.InsertFolder(folder)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create folder"})
-		return
-	}
+// 	result, err := db.InsertFolder(folder)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create folder"})
+// 		return
+// 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Folder created successfully", "folder_id": result.InsertedID})
-}
+// 	c.JSON(http.StatusOK, gin.H{"message": "Folder created successfully", "folder_id": result.InsertedID})
+// }
 
 // HandleGetFolders retrieves all folders for the authenticated user
 func HandleGetFolders(c *gin.Context) {
@@ -130,5 +142,4 @@ func HandleGetFolders(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"folders": folders})
 }
-
 

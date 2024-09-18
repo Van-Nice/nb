@@ -89,8 +89,6 @@ func JWTAuthMiddleware() gin.HandlerFunc {
             return
         }
 
-        log.Printf("Token validated successfully for userID: %d, email: %s", claims.UserID, claims.Email)
-
         c.Set("userID", claims.UserID)
         c.Set("email", claims.Email)
         c.Next()

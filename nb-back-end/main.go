@@ -51,7 +51,7 @@ func main() {
 	// Protected routes
 	protected := router.Group("/protected")
 	protected.Use(auth.JWTAuthMiddleware())
-	{	
+	{	protected.GET("/")
 		protected.GET("/user-settings", settings.HandleUserSettings)
 		protected.GET("/home", auth.HandleHome)
 		protected.POST("/create-file", content.HandleCreateFile)

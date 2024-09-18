@@ -23,12 +23,17 @@ const FileNameModal = forwardRef((props, ref) => {
     e.preventDefault();
     console.log("File name submitted:", fileName);
     // Handle file name submission logic here
-    // TODO: Make a POST request to /protected/create-file endpoint
     try {
-      const response = await fetch('/protected/create-file', {
+      const token = localStorage.getItem('authToken'); // Ensure the token is correctly retrieved
+      if (!token) {
+        throw new Error('No token found');
+      }
+
+      const response = await fetch('http://localhost:8080/protected/create-file', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `${token}`,
         },
         body: JSON.stringify({fileName}),
       });
@@ -37,7 +42,11 @@ const FileNameModal = forwardRef((props, ref) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      console.log('File created successfully:', data)
+      console.log('File created successfully:', data);
+      
+      // Retrieve the file_id from the response
+      // const fileId = data.file_id;
+      // console.log('File ID:', fileId);
     } catch (error) {
       console.error('Error creating file:', error);
     }

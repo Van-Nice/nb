@@ -21,9 +21,7 @@ function App() {
     <Router>
       <div>
         <Routes>
-          <Route path="/document/:id"
-            element={<DocumentEditor />}
-          />
+          <Route path="/document/:id" element={<ProtectedRoute element={DocumentEditor} />}/>
           <Route
             path="/email-confirmation-instruction"
             element={<EmailConfirmationInstruction />}
