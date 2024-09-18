@@ -49,7 +49,7 @@ const FileNameModal = forwardRef((props, ref) => {
       // Retrieve the file_id from the response
       const fileId = data.file_id;
       console.log('File ID:', fileId);
-      // TODO: Create and navigate to a dynamic route that is based off of the file_id
+      
       // Navigate to the new document route
       navigate(`/document/${fileId}`);
     } catch (error) {

@@ -83,14 +83,12 @@ func GetUserByToken(token string) (int, time.Time, error) {
     var userID int
     var tokenExpiration time.Time
 
-    // log.Printf("Executing query: SELECT user_id, token_expiration FROM users WHERE token = $1 with token: %s", token)
     err := authDB.QueryRow(context.Background(), "SELECT user_id, token_expiration FROM users WHERE token = $1", token).Scan(&userID, &tokenExpiration)
     if err != nil {
         log.Printf("There was an error fetching data from db")
         return 0, time.Time{}, fmt.Errorf("QueryRow failed: %v", err)
     }
 
-    // log.Printf("Query result: userID = %d, tokenExpiration = %s", userID, tokenExpiration)
     return userID, tokenExpiration, nil
 }
 
@@ -124,6 +122,7 @@ var ContentDB *mongo.Client
 type File struct {
     ID            primitive.ObjectID `bson:"_id,omitempty"`
     UserID        int                `bson:"user_id"`
+    FileName 	  string 			 `bson:"file_name"`
     TimeCreated   time.Time          `bson:"time_created"`
     Content       string             `bson:"content"`
 }

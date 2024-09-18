@@ -1,11 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Import the styles
+import 'react-quill/dist/quill.snow.css';
+import styles from '../styles/DocumentEditor.module.css'; 
 
 function DocumentEditor() {
   const { id } = useParams(); // Get the document ID from the URL
   const [content, setContent] = useState('');
+  const ws = useRef(null);
+
+  useEffect(() => {
+    // Establish WebSocket connection
+    ws.current = new WebSocket('ws://localhost:8080/ws');
+
+    ws.current.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    ws.current.onmessage = (event) => {
+      console.log('Received message:', event.data);
+      // Handle incoming messages
+    };
+
+    ws.current.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    ws.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    // Cleanup on component unmount
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     // You could load the document from the server based on the id here
@@ -22,6 +53,11 @@ function DocumentEditor() {
   const handleContentChange = (value) => {
     setContent(value);
     localStorage.setItem(`document-${id}`, value); // Save the content locally
+
+    // Send the updated content to the server via WebSocket
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({id, content: value}));
+    }
   };
 
   return (

@@ -29,6 +29,7 @@ func HandleCreateFile(c *gin.Context) {
 	type File struct {
 		ID            primitive.ObjectID `bson:"_id,omitempty"`
 		UserID        int                `bson:"user_id"`
+		FileName 	  string 			 `bson:"file_name"`
 		TimeCreated   time.Time          `bson:"time_created"`
 		Content       string             `bson:"content"`
 	}

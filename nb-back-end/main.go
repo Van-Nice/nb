@@ -8,6 +8,8 @@ import (
 	"nb-back-end/settings"
 	"nb-back-end/db"
 	"nb-back-end/content"
+	"nb-back-end/websocket"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -55,6 +57,7 @@ func main() {
 		protected.GET("/user-settings", settings.HandleUserSettings)
 		protected.GET("/home", auth.HandleHome)
 		protected.POST("/create-file", content.HandleCreateFile)
+		protected.GET("/ws", websocket.HandleWebSocket)
 	}
 
 	if err := router.Run(":8080"); err != nil {
