@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Import the styles
 
 function DocumentEditor() {
   const { id } = useParams(); // Get the document ID from the URL
@@ -17,21 +19,44 @@ function DocumentEditor() {
     loadDocument();
   }, [id]);
 
-  const handleContentChange = (event) => {
-    setContent(event.target.value);
-    localStorage.setItem(`document-${id}`, event.target.value); // Save the content locally
+  const handleContentChange = (value) => {
+    setContent(value);
+    localStorage.setItem(`document-${id}`, value); // Save the content locally
   };
 
   return (
     <div>
       <h1>Editing Document ID: {id}</h1>
-      <textarea
-        style={{ width: '100%', height: '500px' }}
+      <ReactQuill
         value={content}
         onChange={handleContentChange}
+        modules={DocumentEditor.modules}
+        formats={DocumentEditor.formats}
+        style={{ height: '500px' }}
       />
     </div>
   );
 }
+
+// Quill modules configuration
+DocumentEditor.modules = {
+  toolbar: [
+    [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ 'script': 'sub'}, { 'script': 'super' }],
+    [{ 'indent': '-1'}, { 'indent': '+1' }, { 'direction': 'rtl' }],
+    [{ 'color': [] }, { 'background': [] }],
+    [{ 'align': [] }],
+    ['link', 'image', 'code-block'],
+    ['clean']
+  ],
+};
+
+// Quill formats configuration
+DocumentEditor.formats = [
+  'header', 'font', 'list', 'bullet', 'bold', 'italic', 'underline', 'strike', 'blockquote',
+  'script', 'indent', 'direction', 'color', 'background', 'align', 'link', 'image', 'code-block'
+];
 
 export default DocumentEditor;

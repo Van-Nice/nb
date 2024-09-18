@@ -17,7 +17,6 @@ type CreateFileInput struct {
     FileName string `json:"fileName"`
 }
 
-// TODO: Ensure file gets wrote to db and return UUID for frontend
 // HandleCreateFile creates a new file for the authenticated user
 func HandleCreateFile(c *gin.Context) {
 	// Bind the incoming JSON to the CreateFileInput struct
@@ -49,7 +48,7 @@ func HandleCreateFile(c *gin.Context) {
 
 	// Print the received filename
 	fmt.Println("Received file name:", input.FileName)
-	c.JSON(http.StatusOK, gin.H{"message": "File Name Received!!!"})
+	c.JSON(http.StatusOK, gin.H{"message": "File Name Received!!!", "file_id": objectID})
 }
 
 // HandleGetFiles retrieves all files for the authenticated user

@@ -1,9 +1,11 @@
 import React, { useState, forwardRef, useImperativeHandle } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from '../styles/Account.module.css';
 
 const FileNameModal = forwardRef((props, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileName, setFileName] = useState("");
+  const navigate = useNavigate(); // Get the navigate function
 
   useImperativeHandle(ref, () => ({
     openModal() {
@@ -45,8 +47,11 @@ const FileNameModal = forwardRef((props, ref) => {
       console.log('File created successfully:', data);
       
       // Retrieve the file_id from the response
-      // const fileId = data.file_id;
-      // console.log('File ID:', fileId);
+      const fileId = data.file_id;
+      console.log('File ID:', fileId);
+      // TODO: Create and navigate to a dynamic route that is based off of the file_id
+      // Navigate to the new document route
+      navigate(`/document/${fileId}`);
     } catch (error) {
       console.error('Error creating file:', error);
     }

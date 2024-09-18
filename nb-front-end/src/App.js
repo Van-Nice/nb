@@ -14,8 +14,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DocumentEditor from "./components/DocumentEditor";
 import "./App.css";
 
-// TODO: Create dynamic route for new folder
-
 function App() {
   return (
     <Router>

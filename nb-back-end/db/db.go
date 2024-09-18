@@ -13,7 +13,6 @@ import (
 )
 
 // HANDLE POSTGRES DB
-
 type User struct {
     UserID        int       `json:"user_id"`
     FirstName     string    `json:"first_name"`
