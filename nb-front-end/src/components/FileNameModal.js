@@ -1,11 +1,13 @@
-import React, { useState, forwardRef, useImperativeHandle } from "react";
+import React, { useState, forwardRef, useImperativeHandle, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from '../styles/Account.module.css';
+import { UserContext } from "../UserContext";
 
 const FileNameModal = forwardRef((props, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileName, setFileName] = useState("");
   const navigate = useNavigate(); // Get the navigate function
+  const {userID} = useContext(UserContext);
 
   useImperativeHandle(ref, () => ({
     openModal() {
@@ -37,7 +39,10 @@ const FileNameModal = forwardRef((props, ref) => {
           'Content-Type': 'application/json',
           'Authorization': `${token}`,
         },
-        body: JSON.stringify({fileName}),
+        body: JSON.stringify({
+          userID: userID,  // Include the user ID
+          fileName,        // Include the file name
+        }),
       });
       
       if (!response.ok) {

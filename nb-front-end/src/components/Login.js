@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "../styles/Login.module.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import User from '../models/User';
+import {UserContext} from "../UserContext.js";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,6 +11,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState("");
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+  const {setUserID} = useContext(UserContext)
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -55,9 +57,12 @@ export default function Login() {
         setError(true);
         throw new Error("Invalid login credentials");
       }
+
       const data = await response.json();
-      const user = new User(data.id, data.name, data.email, data.token, data.settings)
+      const user = new User(data.id, data.name, data.email, data.token, data.settings);
+      setUserID(data.id);
       localStorage.setItem("authToken", data.token);
+      localStorage.setItem("userID", data.id)
       navigate("/home", {state: {user}});
     } catch (error) {
       setError(error.message);

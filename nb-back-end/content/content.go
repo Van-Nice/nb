@@ -14,7 +14,8 @@ import (
 )
 
 type CreateFileInput struct {
-    FileName string `json:"fileName"`
+	UserID 		int 	`json:"userID" binding:"required"`
+	FileName 	string  `json:"fileName" binding:"required"`
 }
 
 // HandleCreateFile creates a new file for the authenticated user
@@ -25,6 +26,7 @@ func HandleCreateFile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	fmt.Println(input, input.FileName, input.UserID)
 
 	type File struct {
 		ID            primitive.ObjectID `bson:"_id,omitempty"`
@@ -37,19 +39,23 @@ func HandleCreateFile(c *gin.Context) {
     // Create a new ObjectID
     objectID := primitive.NewObjectID()
 
-    // Create an instance of the File struct
+    // Create an instance of the File struct using the input values
     file := File{
         ID:          objectID,
-        UserID:      123, // Example user ID
+        UserID:      input.UserID,
+        FileName:    input.FileName,
         TimeCreated: time.Now(),
-        Content:     "This is the content of the file motherfucka!!!.",
+        Content:     "",
     }
-
-	db.InsertFile(db.File(file))
+	// Insert the file into the database
+	if _, err := db.InsertFile(db.File(file)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	// Print the received filename
 	fmt.Println("Received file name:", input.FileName)
-	c.JSON(http.StatusOK, gin.H{"message": "File Name Received!!!", "file_id": objectID})
+	c.JSON(http.StatusOK, gin.H{"message": "File Name Received", "file_id": objectID})
 }
 
 // HandleGetFiles retrieves all files for the authenticated user

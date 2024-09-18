@@ -20,3 +20,8 @@ export const isAuthenticated = async () => {
       return false;
   }
 };
+
+export const logout = () => {
+    localStorage.removeItem("userID");
+    localStorage.removeItem("authToken");
+}
