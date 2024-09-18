@@ -1,10 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { FaUser } from 'react-icons/fa'; // Importing the user icon from Font Awesome
 import styles from '../styles/Account.module.css';
 import parentStyles from '../styles/Home.module.css';
+import { UserContext } from '../UserContext';
 
-export default function Account({user}) {
+export default function Account() {
+  //TODO: Get account data from id
+  const {userID} = useContext(UserContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [user, setUser] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const handleGetUserAccount = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          throw new Error("No token found");
+        }
+  
+        const response = await fetch("http://localhost:8080/protected/account-data", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${token}`,
+          },
+          body: JSON.stringify({
+            userID: userID,
+          }),
+        });
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setUser(data.accountData)
+        console.log(data.accountData);
+      } catch (error) {
+        console.error("Error fetching user account:", error);
+        setError(error.message);
+      }
+    };
+    handleGetUserAccount();
+  }, [userID]);
 
   const openModal = () => {
     setIsModalOpen(true);

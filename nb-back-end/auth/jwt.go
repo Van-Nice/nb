@@ -79,8 +79,6 @@ func JWTAuthMiddleware() gin.HandlerFunc {
             return
         }
 
-        log.Printf("Received token: %s", tokenString)
-
         claims, err := ValidateJWT(tokenString)
         if err != nil {
             log.Printf("Token validation failed: %v", err)

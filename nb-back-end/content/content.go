@@ -67,7 +67,7 @@ func HandleGetFiles(c *gin.Context) {
 	}
 
 	client := c.MustGet("mongoClient").(*mongo.Client)
-	collection := client.Database("your_database_name").Collection("files")
+	collection := client.Database("nbdb").Collection("files")
 
 	filter := bson.M{"user_id": userID}
 	cursor, err := collection.Find(context.TODO(), filter)

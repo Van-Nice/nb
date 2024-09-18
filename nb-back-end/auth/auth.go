@@ -241,7 +241,7 @@ func HandleLogin(c *gin.Context) {
 
 // HandleHome is a protected route that renders the home page
 func HandleHome(c *gin.Context) {
-    // Retrieve the user ID from the context (set by the authentication middleware)
+    // Retrieve the user ID 
     userID, exists := c.Get("userID")
     if !exists {
         c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -259,6 +259,28 @@ func HandleHome(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{
         "message": "Welcome to the home page!",
         "user":    user,
+    })
+}
+
+func HandleAccountData(c *gin.Context) {
+    // Retrieve use ID from parameter
+    userID, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+        return
+    }
+
+    user, err := db.GetUserByID(userID.(int))
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user details"})
+        return
+    }
+
+    fmt.Println(user);
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Sending account data",
+        "accountData": user,
     })
 }
 

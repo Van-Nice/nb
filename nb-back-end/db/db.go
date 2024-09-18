@@ -7,6 +7,8 @@ import (
     "os"
     "time"
     "github.com/jackc/pgx/v4"
+    "github.com/jackc/pgx/v4/pgxpool"
+
     "go.mongodb.org/mongo-driver/mongo"
     "go.mongodb.org/mongo-driver/mongo/options"
     "go.mongodb.org/mongo-driver/bson/primitive"
@@ -44,7 +46,7 @@ type UserSettings struct {
     WordWrapColumn        int    `json:"word_wrap_column"`
 }
 
-var authDB *pgx.Conn
+var authDB *pgxpool.Pool
 
 func InitAuthDB() {
     var err error
@@ -56,7 +58,7 @@ func InitAuthDB() {
         os.Getenv("POSTGRES_DB_PORT"),
         os.Getenv("POSTGRES_DB_NAME"), // Switch to toggle in and out of test db
     )
-    authDB, err = pgx.Connect(context.Background(), connStr)
+    authDB, err = pgxpool.Connect(context.Background(), connStr)
     if err != nil {
         log.Fatalf("Unable to connect to database: %v\n", err)
     }
@@ -64,7 +66,7 @@ func InitAuthDB() {
 }
 
 func CloseAuthDB() {
-    authDB.Close(context.Background())
+    authDB.Close()
     log.Printf("Disconnected from: authDB")
 }
 

@@ -1,10 +1,14 @@
-import React, { useState} from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import { FaCog } from 'react-icons/fa';
 import styles from '../styles/Settings.module.css';
 import parentStyles from '../styles/Home.module.css';
+import { UserContext } from '../UserContext';
 
-export default function Settings({ user }) {
+export default function Settings() {
+  // TODO: Get user setting from user id
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const {userID} = useContext(UserContext);
+  const [settings, setSettings] = useState("");
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -13,8 +17,6 @@ export default function Settings({ user }) {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
-  const settings = user.settings;
 
   return (
     <div className={parentStyles.settings}>
@@ -26,7 +28,7 @@ export default function Settings({ user }) {
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h2>Settings</h2>
-            {user ? (
+            {userID ? (
               <div>
                 <p><strong>Theme:</strong> {settings.theme}</p>
                 <p><strong>Font Family:</strong> {settings.font_family}</p>

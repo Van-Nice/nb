@@ -30,8 +30,7 @@ export default function Suggested() {
         }
 
         const data = await response.json();
-        setFiles(data.files); // Assuming the response has a "files" field
-        console.log(data.files);
+        setFiles(data.files || []); // Ensure files is an array        console.log(data.files);
       } catch (error) {
         console.error("Error fetching files:", error);
         setError(error.message);
