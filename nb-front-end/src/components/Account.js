@@ -5,7 +5,6 @@ import parentStyles from '../styles/Home.module.css';
 import { UserContext } from '../UserContext';
 
 export default function Account() {
-  //TODO: Get account data from id
   const {userID} = useContext(UserContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState("");
@@ -34,7 +33,6 @@ export default function Account() {
         }
         const data = await response.json();
         setUser(data.accountData)
-        console.log(data.accountData);
       } catch (error) {
         console.error("Error fetching user account:", error);
         setError(error.message);
@@ -61,7 +59,7 @@ export default function Account() {
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h2>Account Information</h2>
-            <p><strong>Name:</strong> {user.name}</p>
+            <p><strong>Name:</strong> {user.first_name + " " + user.last_name}</p>
             <p><strong>Email:</strong> {user.email}</p>
             <button className={styles.closeButton} onClick={closeModal}>
               Close

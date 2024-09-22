@@ -129,6 +129,14 @@ type File struct {
     Content       string             `bson:"content"`
 }
 
+type Folder struct {
+    ID             primitive.ObjectID   `bson:"_id,omitempty"`
+    UserID         int                  `bson:"user_id"`
+    FolderName     string               `bson:"folder_name"`
+    TimeCreated    time.Time            `bson:"time_created"`
+    ParentFolderID *primitive.ObjectID  `bson:"parent_folder_id,omitempty"` // For nested folders
+}
+
 func InitContentDB() {
     var err error
     mongoURI := os.Getenv("MONGO_CONNECTION_STRING")
@@ -170,21 +178,6 @@ func InsertFile(file File) (string, error) {
 
     return insertedID, nil
 }
-
-// InsertFolder inserts a new folder into the "folders" collection inContentDB 
-// func InsertFolder(folder Folder) (*mongo.InsertOneResult, error) {
-// 	collection := ContentDB.Database("your_database_name").Collection("folders")
-// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
-
-// 	result, err := collection.InsertOne(ctx, folder)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return result, nil
-// }
-
 
 func InsertUserSettings(userID int) error {
     sql := `

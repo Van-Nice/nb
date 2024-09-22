@@ -1,10 +1,15 @@
 import React, { useContext, useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import { UserContext } from "../UserContext";
+import styles from '../styles/Suggested.module.css';
+import { FaFileAlt } from 'react-icons/fa';
 
 export default function Suggested() {
   const { userID } = useContext(UserContext);
   const [files, setFiles] = useState([]);
   const [error, setError] = useState("");
+  const [selectedFileId, setSelectedFileId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleGetFiles = async () => {
@@ -30,7 +35,8 @@ export default function Suggested() {
         }
 
         const data = await response.json();
-        setFiles(data.files || []); // Ensure files is an array        console.log(data.files);
+        setFiles(data.files || []);
+        console.log(data.files);
       } catch (error) {
         console.error("Error fetching files:", error);
         setError(error.message);
@@ -46,13 +52,24 @@ export default function Suggested() {
 
   return (
     <div>
-      <h1>Suggested Files</h1>
       {files.length === 0 ? (
         <p>No files found</p>
       ) : (
-        <ul>
+        <ul className={styles.fileList}>
           {files.map((file) => (
-            <li key={file._id}>{file.file_name}</li>
+            <li
+              key={file._id}
+              className={`${styles.fileItem} ${
+                selectedFileId === file._id ? styles.selected : ''
+              }`}
+              onClick={() => {
+                setSelectedFileId(file._id); // Optional: keep if you need to track selected file
+                navigate(`/document/${file._id}`); // Navigate to the document editor
+              }}
+            >
+              <FaFileAlt className={styles.icon} />
+              {file.file_name}
+            </li>
           ))}
         </ul>
       )}

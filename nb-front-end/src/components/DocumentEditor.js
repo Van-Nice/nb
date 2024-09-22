@@ -10,8 +10,15 @@ function DocumentEditor() {
   const ws = useRef(null);
 
   useEffect(() => {
-    // Establish WebSocket connection
-    ws.current = new WebSocket('ws://localhost:8080/ws');
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
+
+    // Establish WebSocket connection with the token as a query parameter
+    ws.current = new WebSocket(`ws://localhost:8080/protected/ws?token=${encodeURIComponent(token)}`);
 
     ws.current.onopen = () => {
       console.log('WebSocket connection established');
@@ -62,7 +69,7 @@ function DocumentEditor() {
 
   return (
     <div>
-      <h1>Editing Document ID: {id}</h1>
+      <h3>{id}</h3>
       <ReactQuill
         value={content}
         onChange={handleContentChange}
