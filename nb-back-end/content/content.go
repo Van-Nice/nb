@@ -32,18 +32,14 @@ type File struct {
     Content     string             `bson:"content"`
 }
 
-// NewFile creates a new File instance
-func NewFile(userID int, fileName string) File {
-    return File{
-        ID:          primitive.NewObjectID(),
-        UserID:      userID,
-        FileName:    fileName,
-        TimeCreated: time.Now(),
-        Content:     "",
-    }
+type Folder struct {
+    ID             primitive.ObjectID   `bson:"_id,omitempty"`
+    UserID         int                  `bson:"user_id"`
+    FolderName     string               `bson:"folder_name"`
+    TimeCreated    time.Time            `bson:"time_created"`
+    // ParentFolderID *primitive.ObjectID  `bson:"parent_folder_id,omitempty"` // For nested folders
 }
 
-// HandleCreateFile creates a new file for the authenticated user
 // HandleCreateFile creates a new file for the authenticated user
 func HandleCreateFile(c *gin.Context) {
     // Bind the incoming JSON to the CreateFileInput struct
@@ -78,12 +74,18 @@ func HandleCreateFolder(c *gin.Context) {
 	fmt.Println("Folder Input:", input)
 	fmt.Println("UserId:", input.UserId, "FolderName:", input.FolderName)
 
+	// Create an instance of the db.Folder struct using input values
+	folder := db.NewFolder(input.UserId, input.FolderName)
 
+	// Insert the folder into the database
+	if _, err := db.InsertFolder(folder); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprint("Failed to insert folder: %v", err)})
+		return
+	}
 
-	// Send back successful response
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Dummy: Folder created successfully",
-	})
+    // Print the received folder name
+    fmt.Println("Received file name:", input.FolderName)
+    c.JSON(http.StatusOK, gin.H{"message": "File Name Received", "file_id": folder.ID.Hex()})
 }
 
 // HandleGetFiles retrieves all files for the authenticated user

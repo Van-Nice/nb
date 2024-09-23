@@ -149,6 +149,15 @@ type Folder struct {
     // ParentFolderID *primitive.ObjectID  `bson:"parent_folder_id,omitempty"` // For nested folders
 }
 
+func NewFolder(userID int, folderName string) Folder {
+    return Folder{
+        ID:          primitive.NewObjectID(),
+        UserID:      userID,
+        FolderName:  folderName,
+        TimeCreated: time.Now(),
+    }
+}
+
 func InitContentDB() {
     var err error
     mongoURI := os.Getenv("MONGO_CONNECTION_STRING")
