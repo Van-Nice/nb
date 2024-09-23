@@ -19,52 +19,66 @@ type CreateFileInput struct {
 }
 
 type CreateFolderInput struct {
-	UserId 		int 	`json:"userID" binding:"required"`
-	FolderName 	string 	`json:"folderName" binding:"required"`
+	UserId    int    `json:"userID" binding:"required"`
+	FolderName string `json:"folderName" binding:"required"`
 }
 
-// HandleCreateFile creates a new file for the authenticated user
-func HandleCreateFile(c *gin.Context) {
-	// Bind the incoming JSON to the CreateFileInput struct
-	var input CreateFileInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	fmt.Println(input, input.FileName, input.UserID)
+// File represents a file in the database
+type File struct {
+    ID          primitive.ObjectID `bson:"_id,omitempty"`
+    UserID      int                `bson:"user_id"`
+    FileName    string             `bson:"file_name"`
+    TimeCreated time.Time          `bson:"time_created"`
+    Content     string             `bson:"content"`
+}
 
-	type File struct {
-		ID            primitive.ObjectID `bson:"_id,omitempty"`
-		UserID        int                `bson:"user_id"`
-		FileName 	  string 			 `bson:"file_name"`
-		TimeCreated   time.Time          `bson:"time_created"`
-		Content       string             `bson:"content"`
-	}
-
-    // Create a new ObjectID
-    objectID := primitive.NewObjectID()
-
-    // Create an instance of the File struct using the input values
-    file := File{
-        ID:          objectID,
-        UserID:      input.UserID,
-        FileName:    input.FileName,
+// NewFile creates a new File instance
+func NewFile(userID int, fileName string) File {
+    return File{
+        ID:          primitive.NewObjectID(),
+        UserID:      userID,
+        FileName:    fileName,
         TimeCreated: time.Now(),
         Content:     "",
     }
-	// Insert the file into the database
-	if _, err := db.InsertFile(db.File(file)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+}
 
-	// Print the received filename
-	fmt.Println("Received file name:", input.FileName)
-	c.JSON(http.StatusOK, gin.H{"message": "File Name Received", "file_id": objectID})
+// HandleCreateFile creates a new file for the authenticated user
+// HandleCreateFile creates a new file for the authenticated user
+func HandleCreateFile(c *gin.Context) {
+    // Bind the incoming JSON to the CreateFileInput struct
+    var input CreateFileInput
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    fmt.Println(input, input.FileName, input.UserID)
+
+    // Create an instance of the db.File struct using the input values
+    file := db.NewFile(input.UserID, input.FileName)
+
+    // Insert the file into the database
+    if _, err := db.InsertFile(file); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to insert file: %v", err)})
+        return
+    }
+
+    // Print the received filename
+    fmt.Println("Received file name:", input.FileName)
+    c.JSON(http.StatusOK, gin.H{"message": "File Name Received", "file_id": file.ID.Hex()})
 }
 
 func HandleCreateFolder(c *gin.Context) {
-	fmt.Println("You have successfully called protected/create-folder")
+	// fmt.Println("You have successfully called protected/create-folder")
+	var input CreateFolderInput
+	if err := c.ShouldBindJSON(&input); err != nil {  // Use ShouldBindJSON for JSON payload
+	  c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	  return
+	}
+	fmt.Println("Folder Input:", input)
+	fmt.Println("UserId:", input.UserId, "FolderName:", input.FolderName)
+
+
 
 	// Send back successful response
 	c.JSON(http.StatusOK, gin.H{

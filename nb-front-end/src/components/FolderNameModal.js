@@ -23,7 +23,12 @@ const FolderNameModal = forwardRef((props, ref) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Folder Submitted:", folderName);
+    // Logging values before payload to ensure they're valid
+    console.log({
+      userID: userID,
+      folderName,
+    });
+    
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
@@ -37,13 +42,16 @@ const FolderNameModal = forwardRef((props, ref) => {
           'Authorization': `${token}`,
         },
         body: JSON.stringify({
-          userID: userID,
+          userID: Number(userID), // Convert userID to a number explicitly
           folderName,
         }),
       });
       if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error('Error response from server:', errorResponse);
         throw new Error('Network response was not ok');
       }
+      
       const data = await response.json();
       console.log('Folder created successfully:', data)
 

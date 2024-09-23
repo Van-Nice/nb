@@ -46,6 +46,8 @@ const FileNameModal = forwardRef((props, ref) => {
       });
       
       if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error('Error response from server:', errorResponse);
         throw new Error('Network response was not ok');
       }
       const data = await response.json();

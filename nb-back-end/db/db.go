@@ -121,12 +121,24 @@ func GetUserByEmail(email string) (int, string, string, string, string, time.Tim
 // HANDLE MONGO DB
 var ContentDB *mongo.Client
 
+// File represents a file in the database
 type File struct {
-    ID            primitive.ObjectID `bson:"_id,omitempty"`
-    UserID        int                `bson:"user_id"`
-    FileName 	  string 			 `bson:"file_name"`
-    TimeCreated   time.Time          `bson:"time_created"`
-    Content       string             `bson:"content"`
+    ID          primitive.ObjectID `bson:"_id,omitempty"`
+    UserID      int                `bson:"user_id"`
+    FileName    string             `bson:"file_name"`
+    TimeCreated time.Time          `bson:"time_created"`
+    Content     string             `bson:"content"`
+}
+
+// NewFile creates a new File instance
+func NewFile(userID int, fileName string) File {
+    return File{
+        ID:          primitive.NewObjectID(),
+        UserID:      userID,
+        FileName:    fileName,
+        TimeCreated: time.Now(),
+        Content:     "",
+    }
 }
 
 type Folder struct {
@@ -134,7 +146,7 @@ type Folder struct {
     UserID         int                  `bson:"user_id"`
     FolderName     string               `bson:"folder_name"`
     TimeCreated    time.Time            `bson:"time_created"`
-    ParentFolderID *primitive.ObjectID  `bson:"parent_folder_id,omitempty"` // For nested folders
+    // ParentFolderID *primitive.ObjectID  `bson:"parent_folder_id,omitempty"` // For nested folders
 }
 
 func InitContentDB() {
@@ -176,6 +188,21 @@ func InsertFile(file File) (string, error) {
     // Convert the InsertedID to a UUID string
     insertedID := result.InsertedID.(primitive.ObjectID).Hex()
 
+    return insertedID, nil
+}
+
+func InsertFolder(folder Folder) (string, error) {
+    collection := ContentDB.Database("nbdb").Collection("folders")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    result, err := collection.InsertOne(ctx, folder)
+    if err != nil {
+        return "", err
+    }
+
+    // Convert InsertedID to a UUID string
+    insertedID := result.InsertedID.(primitive.ObjectID).Hex()
     return insertedID, nil
 }
 
