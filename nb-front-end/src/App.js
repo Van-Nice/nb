@@ -13,6 +13,7 @@ import EmailConfirmation from "./components/EmailConfirmation";
 import EmailConfirmationInstruction from "./components/EmailConfirmationInstruction";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DocumentEditor from "./components/DocumentEditor";
+import Suggested from "./components/Suggested";
 import "./App.css";
 
 function App() {
@@ -29,7 +30,10 @@ function App() {
             <Route path="/email-confirmation" element={<EmailConfirmation />} />
             <Route path="/login" element={<Login />} />
             <Route path="/create-account" element={<CreateAccount />} />
-            <Route path="/home" element={<ProtectedRoute  element={Home}/>} />
+            <Route path="/home" element={<ProtectedRoute element={Home} />}>
+              <Route index element={<Suggested />} /> {/* Default when /home is accessed */}
+              <Route path="folders/:folderID" element={<Suggested />} />
+            </Route>
             <Route path="/" element={<Navigate to="/login" />} />
           </Routes>
           {/* <footer>

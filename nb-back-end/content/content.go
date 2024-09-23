@@ -19,39 +19,71 @@ type CreateFileInput struct {
 }
 
 type CreateFolderInput struct {
-	UserId    int    `json:"userID" binding:"required"`
-	FolderName string `json:"folderName" binding:"required"`
+    FolderName     string `json:"folderName" binding:"required"`
+    ParentFolderID string `json:"parentFolderID,omitempty"` // Now a string
+}
+
+type GetFolderContents struct {
+	UserId    		int    				`json:"userID" binding:"required"`
+	FolderId 		string 				`json:"folderID" binding:"required"`
 }
 
 // File represents a file in the database
 type File struct {
-    ID          primitive.ObjectID `bson:"_id,omitempty"`
-    UserID      int                `bson:"user_id"`
-    FileName    string             `bson:"file_name"`
-    TimeCreated time.Time          `bson:"time_created"`
-    Content     string             `bson:"content"`
+    ID             primitive.ObjectID  `bson:"_id,omitempty"`
+    UserID         int                 `bson:"user_id"`
+    FileName       string              `bson:"file_name"`
+    TimeCreated    time.Time           `bson:"time_created"`
+    Content        string              `bson:"content"`
+    ParentFolderID *primitive.ObjectID `bson:"parent_folder_id,omitempty"`
 }
 
 type Folder struct {
-    ID             primitive.ObjectID   `bson:"_id,omitempty"`
-    UserID         int                  `bson:"user_id"`
-    FolderName     string               `bson:"folder_name"`
-    TimeCreated    time.Time            `bson:"time_created"`
-    // ParentFolderID *primitive.ObjectID  `bson:"parent_folder_id,omitempty"` // For nested folders
+    ID             primitive.ObjectID  `bson:"_id,omitempty"`
+    UserID         int                 `bson:"user_id"`
+    FolderName     string              `bson:"folder_name"`
+    TimeCreated    time.Time           `bson:"time_created"`
+    ParentFolderID *primitive.ObjectID `bson:"parent_folder_id,omitempty"`
 }
 
 // HandleCreateFile creates a new file for the authenticated user
 func HandleCreateFile(c *gin.Context) {
-    // Bind the incoming JSON to the CreateFileInput struct
-    var input CreateFileInput
+    // Retrieve userID from context
+    userIDInterface, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return
+    }
+
+    userID, ok := userIDInterface.(int)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+        return
+    }
+
+    var input struct {
+        FileName       string `json:"fileName" binding:"required"`
+        ParentFolderID string `json:"parentFolderID,omitempty"`
+    }
+
     if err := c.ShouldBindJSON(&input); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
-    fmt.Println(input, input.FileName, input.UserID)
 
-    // Create an instance of the db.File struct using the input values
-    file := db.NewFile(input.UserID, input.FileName)
+    // Convert ParentFolderID from string to ObjectID if provided
+    var parentFolderID *primitive.ObjectID
+    if input.ParentFolderID != "" {
+        id, err := primitive.ObjectIDFromHex(input.ParentFolderID)
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid parent folder ID"})
+            return
+        }
+        parentFolderID = &id
+    }
+
+    // Create a new file
+    file := db.NewFile(userID, input.FileName, parentFolderID)
 
     // Insert the file into the database
     if _, err := db.InsertFile(file); err != nil {
@@ -59,34 +91,53 @@ func HandleCreateFile(c *gin.Context) {
         return
     }
 
-    // Print the received filename
-    fmt.Println("Received file name:", input.FileName)
-    c.JSON(http.StatusOK, gin.H{"message": "File Name Received", "file_id": file.ID.Hex()})
+    c.JSON(http.StatusOK, gin.H{"message": "File created", "file_id": file.ID.Hex()})
 }
+
 
 func HandleCreateFolder(c *gin.Context) {
-	// fmt.Println("You have successfully called protected/create-folder")
-	var input CreateFolderInput
-	if err := c.ShouldBindJSON(&input); err != nil {  // Use ShouldBindJSON for JSON payload
-	  c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	  return
-	}
-	fmt.Println("Folder Input:", input)
-	fmt.Println("UserId:", input.UserId, "FolderName:", input.FolderName)
+    // Retrieve userID from context
+    userIDInterface, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return
+    }
 
-	// Create an instance of the db.Folder struct using input values
-	folder := db.NewFolder(input.UserId, input.FolderName)
+    userID, ok := userIDInterface.(int)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+        return
+    }
 
-	// Insert the folder into the database
-	if _, err := db.InsertFolder(folder); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprint("Failed to insert folder: %v", err)})
-		return
-	}
+    var input CreateFolderInput
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-    // Print the received folder name
-    fmt.Println("Received file name:", input.FolderName)
-    c.JSON(http.StatusOK, gin.H{"message": "File Name Received", "file_id": folder.ID.Hex()})
+    // Convert ParentFolderID from string to ObjectID if provided
+    var parentFolderID *primitive.ObjectID
+    if input.ParentFolderID != "" {
+        id, err := primitive.ObjectIDFromHex(input.ParentFolderID)
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid parent folder ID"})
+            return
+        }
+        parentFolderID = &id
+    }
+
+    // Create a new folder
+    folder := db.NewFolder(userID, input.FolderName, parentFolderID)
+
+    // Insert the folder into the database
+    if _, err := db.InsertFolder(folder); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to insert folder: %v", err)})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Folder created", "folder_id": folder.ID.Hex()})
 }
+
 
 // HandleGetFiles retrieves all files for the authenticated user
 func HandleGetFiles(c *gin.Context) {
@@ -149,6 +200,57 @@ func HandleGetFolders(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"folders": folders})
+}
+
+func HandleGetFolderContents(c *gin.Context) {
+    // Retrieve userID from the context (set by JWT middleware)
+    userIDInterface, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return
+    }
+
+    userID, ok := userIDInterface.(int)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+        return
+    }
+
+    // Get folderID from the request body (or query parameters if preferred)
+    var input struct {
+        FolderID string `json:"folderID"` // folderID is now optional
+    }
+
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+        return
+    }
+
+    var folderID *primitive.ObjectID
+    if input.FolderID != "" {
+        // Convert folderID from string to ObjectID
+        id, err := primitive.ObjectIDFromHex(input.FolderID)
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid folder ID"})
+            return
+        }
+        folderID = &id
+    } else {
+        // folderID is nil, indicating the root folder
+        folderID = nil
+    }
+
+    folder, subFolders, files, err := db.GetFolderContents(userID, folderID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to fetch folder contents: %v", err)})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "folder":     folder,
+        "subFolders": subFolders,
+        "files":      files,
+    })
 }
 
 

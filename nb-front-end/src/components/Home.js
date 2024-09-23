@@ -1,4 +1,5 @@
-import React from "react";
+import React, {useState} from "react";
+import { Outlet } from "react-router-dom";
 import styles from "../styles/Home.module.css";
 import Sidebar from "./Sidebar";
 import Settings from "./Settings";
@@ -15,8 +16,8 @@ export default function Home() {
       <Search />
       <Settings/>
       <Account/>
-      {/* Second row */}
-      <Suggested />
+      {/* Render child routes here */}
+      <Outlet />
     </div>
   );
 }

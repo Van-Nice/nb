@@ -49,7 +49,7 @@ func main() {
 	router.POST("/auth/create-account", auth.HandleCreateAccount)
 	router.GET("/email-confirmation", auth.HandleVerifyEmail)
 	router.POST("/auth/login", auth.HandleLogin)
-
+	// Create endpoint for fetching the contents of a folder
 	// Protected routes
 	protected := router.Group("/protected")
 	protected.Use(auth.JWTAuthMiddleware())
@@ -64,6 +64,7 @@ func main() {
 		protected.POST("/get-folders", content.HandleGetFolders)
 		protected.GET("/ws", websocket.HandleWebSocket)
 		protected.POST("/account-data", auth.HandleAccountData)
+		protected.POST("/folders", content.HandleGetFolderContents)
 	}
 
 	if err := router.Run(":8080"); err != nil {

@@ -1,17 +1,19 @@
 package db
 
 import (
-    "context"
-    "fmt"
-    "log"
-    "os"
-    "time"
-    "github.com/jackc/pgx/v4"
-    "github.com/jackc/pgx/v4/pgxpool"
+	"context"
+	"fmt"
+	"log"
+	"os"
+	"time"
 
-    "go.mongodb.org/mongo-driver/mongo"
-    "go.mongodb.org/mongo-driver/mongo/options"
-    "go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // HANDLE POSTGRES DB
@@ -123,38 +125,42 @@ var ContentDB *mongo.Client
 
 // File represents a file in the database
 type File struct {
-    ID          primitive.ObjectID `bson:"_id,omitempty"`
-    UserID      int                `bson:"user_id"`
-    FileName    string             `bson:"file_name"`
-    TimeCreated time.Time          `bson:"time_created"`
-    Content     string             `bson:"content"`
+    ID             primitive.ObjectID  `bson:"_id,omitempty"`
+    UserID         int                 `bson:"user_id"`
+    FileName       string              `bson:"file_name"`
+    TimeCreated    time.Time           `bson:"time_created"`
+    Content        string              `bson:"content"`
+    ParentFolderID *primitive.ObjectID `bson:"parent_folder_id,omitempty"`
 }
 
 // NewFile creates a new File instance
-func NewFile(userID int, fileName string) File {
+func NewFile(userID int, fileName string, parentFolderID *primitive.ObjectID) File {
     return File{
-        ID:          primitive.NewObjectID(),
-        UserID:      userID,
-        FileName:    fileName,
-        TimeCreated: time.Now(),
-        Content:     "",
+        ID:             primitive.NewObjectID(),
+        UserID:         userID,
+        FileName:       fileName,
+        TimeCreated:    time.Now(),
+        Content:        "",
+        ParentFolderID: parentFolderID,
     }
 }
 
+
 type Folder struct {
-    ID             primitive.ObjectID   `bson:"_id,omitempty"`
-    UserID         int                  `bson:"user_id"`
-    FolderName     string               `bson:"folder_name"`
-    TimeCreated    time.Time            `bson:"time_created"`
-    // ParentFolderID *primitive.ObjectID  `bson:"parent_folder_id,omitempty"` // For nested folders
+    ID             primitive.ObjectID  `bson:"_id,omitempty"`
+    UserID         int                 `bson:"user_id"`
+    FolderName     string              `bson:"folder_name"`
+    TimeCreated    time.Time           `bson:"time_created"`
+    ParentFolderID *primitive.ObjectID `bson:"parent_folder_id,omitempty"`
 }
 
-func NewFolder(userID int, folderName string) Folder {
+func NewFolder(userID int, folderName string, parentFolderID *primitive.ObjectID) Folder {
     return Folder{
-        ID:          primitive.NewObjectID(),
-        UserID:      userID,
-        FolderName:  folderName,
-        TimeCreated: time.Now(),
+        ID:             primitive.NewObjectID(),
+        UserID:         userID,
+        FolderName:     folderName,
+        TimeCreated:    time.Now(),
+        ParentFolderID: parentFolderID,
     }
 }
 
@@ -281,4 +287,82 @@ func GetUserSettingsByID(userID int) (UserSettings, error) {
     }
     fmt.Println(settings)
     return settings, nil
+}
+
+func GetFolderContents(userID int, folderID *primitive.ObjectID) (Folder, []Folder, []File, error) {
+    var folder Folder
+    var subFolders []Folder
+    var files []File
+
+    collection := ContentDB.Database("nbdb").Collection("folders")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    if folderID != nil {
+        // Fetch the folder by its ID and user ID
+        err := collection.FindOne(ctx, bson.M{"_id": *folderID, "user_id": userID}).Decode(&folder)
+        if err != nil {
+            return Folder{}, nil, nil, fmt.Errorf("failed to fetch folder: %v", err)
+        }
+    } else {
+        // Set folder as empty since we're at the root
+        folder = Folder{}
+    }
+
+    // Fetch sub-folders
+    subFoldersFilter := bson.M{
+        "user_id": userID,
+    }
+
+    if folderID == nil {
+        // Fetch folders where ParentFolderID is null (root-level folders)
+        subFoldersFilter["parent_folder_id"] = bson.M{"$exists": false}
+    } else {
+        // Fetch folders where ParentFolderID matches the current folder
+        subFoldersFilter["parent_folder_id"] = *folderID
+    }
+
+    cursor, err := collection.Find(ctx, subFoldersFilter)
+    if err != nil {
+        return Folder{}, nil, nil, fmt.Errorf("failed to fetch sub-folders: %v", err)
+    }
+    defer cursor.Close(ctx)
+
+    for cursor.Next(ctx) {
+        var subFolder Folder
+        if err := cursor.Decode(&subFolder); err != nil {
+            return Folder{}, nil, nil, fmt.Errorf("failed to decode subfolder: %v", err)
+        }
+        subFolders = append(subFolders, subFolder)
+    }
+
+    // Fetch files
+    fileCollection := ContentDB.Database("nbdb").Collection("files")
+    filesFilter := bson.M{
+        "user_id": userID,
+    }
+
+    if folderID == nil {
+        // Fetch files where ParentFolderID is null (root-level files)
+        filesFilter["parent_folder_id"] = bson.M{"$exists": false}
+    } else {
+        // Fetch files where ParentFolderID matches the current folder
+        filesFilter["parent_folder_id"] = *folderID
+    }
+
+    fileCursor, err := fileCollection.Find(ctx, filesFilter)
+    if err != nil {
+        return Folder{}, nil, nil, fmt.Errorf("failed to fetch files: %v", err)
+    }
+    defer fileCursor.Close(ctx)
+
+    for fileCursor.Next(ctx) {
+        var file File
+        if err := fileCursor.Decode(&file); err != nil {
+            return Folder{}, nil, nil, fmt.Errorf("failed to decode file: %v", err)
+        }
+        files = append(files, file)
+    }
+
+    return folder, subFolders, files, nil
 }
