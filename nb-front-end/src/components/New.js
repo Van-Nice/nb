@@ -2,10 +2,12 @@ import React, { useState, useRef } from "react";
 import { FaFileAlt, FaFolder } from "react-icons/fa";
 import styles from "../styles/New.module.css";
 import FileNameModal from "./FileNameModal";
+import FolderNameModal from "./FolderNameModal";
 
 export default function New() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const fileNameModalRef = useRef()
+  const fileNameModalRef = useRef();
+  const folderNameModalRef = useRef();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -20,6 +22,7 @@ export default function New() {
   const handleCreateFolder = () => {
     toggleDropdown()
     // Eventually: Create new folder and route user to it - using dynamic url within home screen
+    folderNameModalRef.current.openModal();
   };
 
   return (
@@ -48,6 +51,7 @@ export default function New() {
 
       {/* Include the FileNameModal component */}
       <FileNameModal ref={fileNameModalRef} />
+      <FolderNameModal ref={folderNameModalRef} />
     </div>
   );
 }

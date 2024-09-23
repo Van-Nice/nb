@@ -40,8 +40,8 @@ const FileNameModal = forwardRef((props, ref) => {
           'Authorization': `${token}`,
         },
         body: JSON.stringify({
-          userID: userID,  // Include the user ID
-          fileName,        // Include the file name
+          userID: userID,  
+          fileName,        
         }),
       });
       

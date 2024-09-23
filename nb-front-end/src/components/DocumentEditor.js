@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import styles from '../styles/DocumentEditor.module.css'; 
+// import styles from '../styles/DocumentEditor.module.css'; 
 
 function DocumentEditor() {
   const { id } = useParams(); // Get the document ID from the URL
   const [content, setContent] = useState('');
+  // const [fileName, setFileName] = useState('');
   const ws = useRef(null);
 
   useEffect(() => {

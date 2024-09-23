@@ -59,6 +59,7 @@ func main() {
 		protected.GET("/user-settings", settings.HandleUserSettings)
 		protected.GET("/home", auth.HandleHome)
 		protected.POST("/create-file", content.HandleCreateFile)
+		protected.POST("/create-folder", content.HandleCreateFolder)
 		protected.POST("/get-files", content.HandleGetFiles)
 		protected.GET("/ws", websocket.HandleWebSocket)
 		protected.POST("/account-data", auth.HandleAccountData)

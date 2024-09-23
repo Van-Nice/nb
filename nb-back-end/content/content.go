@@ -18,6 +18,11 @@ type CreateFileInput struct {
 	FileName 	string  `json:"fileName" binding:"required"`
 }
 
+type CreateFolderInput struct {
+	UserId 		int 	`json:"userID" binding:"required"`
+	FolderName 	string 	`json:"folderName" binding:"required"`
+}
+
 // HandleCreateFile creates a new file for the authenticated user
 func HandleCreateFile(c *gin.Context) {
 	// Bind the incoming JSON to the CreateFileInput struct
@@ -56,6 +61,15 @@ func HandleCreateFile(c *gin.Context) {
 	// Print the received filename
 	fmt.Println("Received file name:", input.FileName)
 	c.JSON(http.StatusOK, gin.H{"message": "File Name Received", "file_id": objectID})
+}
+
+func HandleCreateFolder(c *gin.Context) {
+	fmt.Println("You have successfully called protected/create-folder")
+
+	// Send back successful response
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Dummy: Folder created successfully",
+	})
 }
 
 // HandleGetFiles retrieves all files for the authenticated user
