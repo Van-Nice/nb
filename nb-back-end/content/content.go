@@ -120,4 +120,35 @@ func HandleGetFiles(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"files": files})
 }
 
+func HandleGetFolders(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID not found"})
+		return
+	}
+
+	client := c.MustGet("mongoClient").(*mongo.Client)
+	collection := client.Database("nbdb").Collection("folders")
+
+	filter := bson.M{"user_id": userID}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch files"})
+		return
+	}
+	defer cursor.Close(context.TODO())
+
+	var folders []bson.M
+	for cursor.Next(context.TODO()) {
+		var folder bson.M
+		if err := cursor.Decode(&folder); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode folder"})
+			return
+		}
+		folders = append(folders, folder)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"folders": folders})
+}
+
 
