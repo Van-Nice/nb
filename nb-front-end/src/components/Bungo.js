@@ -1,10 +1,17 @@
 import React from "react";
 import styles from "../styles/Bungo.module.css";
 import parentStyles from "../styles/Sidebar.module.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Bungo() {
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate('/home');
+    };
+
     return (
-        <div className={parentStyles.bungo}>
+        <div className={parentStyles.bungo} onClick={handleClick}>
             <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 376.4 133.59">
             <defs>
             </defs>

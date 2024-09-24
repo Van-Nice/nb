@@ -13,7 +13,7 @@ const ItemTypes = {
 function DraggableFolder({ folder, onClick, onDrop }) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.FOLDER,
-    item: { id: folder.ID, type: 'folder' }, // Add type here
+    item: { id: folder.ID, type: 'folder' },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -69,6 +69,7 @@ export default function Suggested() {
   const [error, setError] = useState("");
   const [selectedFileId, setSelectedFileId] = useState(null);
   const navigate = useNavigate();
+  const [dropEvent, setDropEvent] = useState(0); // State to track drop events
 
   useEffect(() => {
     const fetchContents = async () => {
@@ -103,7 +104,7 @@ export default function Suggested() {
     };
 
     fetchContents(); // Fetch contents whenever folderID changes
-  }, [folderID]);
+  }, [folderID, dropEvent]);
 
   const handleDrop = async (item, targetFolder) => {
     console.log(`Dropped item ${item.id} into folder ${targetFolder.ID}`);
@@ -147,7 +148,8 @@ export default function Suggested() {
       }
   
       console.log("Move response data:", data);
-      // Optionally update state or refetch contents
+      // Update the dropEvent state to trigger useEffect
+      setDropEvent(prev => prev + 1);
     } catch (err) {
       console.error("Error moving item: ", err);
       setError(err.message);

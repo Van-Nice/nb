@@ -5,26 +5,38 @@
     margin: 0;
   }
   
-  /* Style each list item */
-  .fileItem {
-    cursor: pointer;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-  }
+/* Suggested.module.css */
+.fileItem {
+  cursor: pointer;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.fileItem:hover {
+  background-color: #e0e0e0;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.over {
+  background-color: #d0d0d0; /* Change this color as needed */
+}
   
-  /* Icon styling */
-  .icon {
-    margin-right: 8px;
-    color: #555; /* You can change the color as needed */
-  }
-  
-  /* Selected item styling */
-  .selected {
-    background-color: #f0f0f0; /* Highlight color */
-  }
-  
-  /* Hover effect */
-  .fileItem:hover {
-    background-color: #e0e0e0;
-  }
+/* Icon styling */
+.icon {
+  margin-right: 8px;
+  color: #555; /* You can change the color as needed */
+}
+
+/* Selected item styling */
+.selected {
+  background-color: #f0f0f0; /* Highlight color */
+}
+
+/* Hover effect */
+.fileItem:hover {
+  background-color: #e0e0e0;
+}

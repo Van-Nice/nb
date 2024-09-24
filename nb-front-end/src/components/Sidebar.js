@@ -5,6 +5,7 @@ import Bungo from "./Bungo";
 import New from "./New";
 import Trash from "./Trash";
 
+
 export default function Sidebar() {
   return (
     <div className={parentStyles.sidebar}>

@@ -9,6 +9,6 @@
 
 .bungo {
     display: flex;
-
+    cursor: pointer;
     width: 100px;
 }
