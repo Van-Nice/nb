@@ -4,8 +4,9 @@ import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import styles from '../styles/Suggested.module.css';
 import { FaFileAlt, FaFolder } from 'react-icons/fa';
+import Trash from "./Trash";
 
-const ItemTypes = {
+export const ItemTypes = {
   FOLDER: 'folder',
   FILE: 'file',
 };
@@ -161,41 +162,39 @@ export default function Suggested() {
   }
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div>
-        {/* Display Folders */}
-        {folders.length === 0 ? (
-          <p>No folders found</p>
-        ) : (
-          <ul className={styles.fileList}>
-            {folders.map((folder) => (
-              <DraggableFolder
-                key={folder.ID}
-                folder={folder}
-                onClick={() => navigate(`/home/folders/${folder.ID}`)}
-                onDrop={handleDrop}
-              />
-            ))}
-          </ul>
-        )}
-        {/* Display Files */}
-        {files.length === 0 ? (
-          <p>No files found</p>
-        ) : (
-          <ul className={styles.fileList}>
-            {files.map((file) => (
-              <DraggableFile
-                key={file.ID}
-                file={file}
-                onClick={() => {
-                  setSelectedFileId(file.ID);
-                  navigate(`/document/${file.ID}`);
-                }}
-              />
-            ))}
-          </ul>
-        )}
-      </div>
-    </DndProvider>
+    <div>
+      {/* Display Folders */}
+      {folders.length === 0 ? (
+        <p>No folders found</p>
+      ) : (
+        <ul className={styles.fileList}>
+          {folders.map((folder) => (
+            <DraggableFolder
+              key={folder.ID}
+              folder={folder}
+              onClick={() => navigate(`/home/folders/${folder.ID}`)}
+              onDrop={handleDrop}
+            />
+          ))}
+        </ul>
+      )}
+      {/* Display Files */}
+      {files.length === 0 ? (
+        <p>No files found</p>
+      ) : (
+        <ul className={styles.fileList}>
+          {files.map((file) => (
+            <DraggableFile
+              key={file.ID}
+              file={file}
+              onClick={() => {
+                setSelectedFileId(file.ID);
+                navigate(`/document/${file.ID}`);
+              }}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

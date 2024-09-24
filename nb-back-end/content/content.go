@@ -302,3 +302,52 @@ func HandleMoveItem(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"message": "Item moved successfully"})
   }
 
+  func HandleCheckTrashFolder(c *gin.Context) {
+    userID, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found"})
+        return
+    }
+
+    client := c.MustGet("mongoClient").(*mongo.Client)
+    collection := client.Database("nbdb").Collection("folders")
+
+    filter := bson.M{"user_id": userID, "folder_name": "Trash"}
+    var folder bson.M
+    err := collection.FindOne(context.TODO(), filter).Decode(&folder)
+    if err != nil {
+        if err == mongo.ErrNoDocuments {
+            c.JSON(http.StatusOK, gin.H{"trashFolderID": nil})
+        } else {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check trash folder"})
+        }
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"trashFolderID": folder["_id"].(primitive.ObjectID).Hex()})
+}
+
+func HandleCreateTrashFolder(c *gin.Context) {
+    userIDInterface, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return
+    }
+
+    userID, ok := userIDInterface.(int)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+        return
+    }
+
+    // Create a new trash folder
+    folder := db.NewFolder(userID, "Trash", nil)
+
+    // Insert the folder into the database
+    if _, err := db.InsertFolder(folder); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to insert folder: %v", err)})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Trash folder created", "trashFolderID": folder.ID.Hex()})
+}
