@@ -46,6 +46,12 @@ type Folder struct {
     ParentFolderID *primitive.ObjectID `bson:"parent_folder_id,omitempty"`
 }
 
+type MoveItemInput struct {
+    ItemType      string `json:"itemType"`
+    ItemID        string `json:"itemID"`
+    TargetFolderID string `json:"targetFolderID"`
+}
+
 // HandleCreateFile creates a new file for the authenticated user
 func HandleCreateFile(c *gin.Context) {
     // Retrieve userID from context
@@ -253,4 +259,8 @@ func HandleGetFolderContents(c *gin.Context) {
     })
 }
 
+func HandleMoveItem(c *gin.Context) {
+    // var input MoveItemInput
+
+}
 

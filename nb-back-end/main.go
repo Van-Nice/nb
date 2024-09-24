@@ -65,6 +65,7 @@ func main() {
 		protected.GET("/ws", websocket.HandleWebSocket)
 		protected.POST("/account-data", auth.HandleAccountData)
 		protected.POST("/folders", content.HandleGetFolderContents)
+		// protected.POST("/move-item", content.HandleMoveItem)
 	}
 
 	if err := router.Run(":8080"); err != nil {
