@@ -6,13 +6,11 @@ import styles from '../styles/Trash.module.css';
 import { ItemTypes } from './Suggested';
 
 export default function Trash() {
-  const [isSelected, setIsSelected] = useState(false);
-  const navigate = useNavigate();
+    const [isSelected, setIsSelected] = useState(false);
 
-  const handleClick = () => {
-    setIsSelected(!isSelected);
-    navigate('/home/trash'); // Navigate to the trash folder route
-  };
+    const handleClick = () => {
+      setIsSelected(!isSelected);
+    };
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: [ItemTypes.FILE, ItemTypes.FOLDER],
@@ -29,7 +27,6 @@ export default function Trash() {
       if (!token) {
         throw new Error("No token found");
       }
-
     } catch (err) {
       console.error("Error moving item: ", err);
     }
