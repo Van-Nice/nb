@@ -6,18 +6,22 @@ import Settings from "./Settings";
 import Suggested from "./Suggested";
 import Search from "./Search";
 import Account from "./Account";
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
 
 export default function Home() {
 
   return (
-    <div className={styles.gridContainer}>
-      {/* First row + */}
-      <Sidebar />
-      <Search />
-      <Settings/>
-      <Account/>
-      {/* Render child routes here */}
-      <Outlet />
-    </div>
+    <DndProvider backend={HTML5Backend}>
+      <div className={styles.gridContainer}>
+        {/* First row + */}
+        <Sidebar />
+        <Search />
+        <Settings/>
+        <Account/>
+        {/* Render child routes here */}
+        <Outlet />
+      </div>
+    </DndProvider>
   );
 }

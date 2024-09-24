@@ -5,8 +5,6 @@ import parentStyles from "../styles/Home.module.css";
 import { UserContext } from "../UserContext";
 import LogoutButton from "./LogoutButton";
 
-// TODO: Add logout button to account modal
-
 export default function Account() {
   const { userID } = useContext(UserContext);
   const [isModalOpen, setIsModalOpen] = useState(false);

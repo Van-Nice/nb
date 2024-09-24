@@ -131,6 +131,7 @@ type File struct {
     TimeCreated    time.Time           `bson:"time_created"`
     Content        string              `bson:"content"`
     ParentFolderID *primitive.ObjectID `bson:"parent_folder_id,omitempty"`
+    IsDeleted      bool               `bson:"is_deleted"`
 }
 
 // NewFile creates a new File instance
@@ -142,6 +143,7 @@ func NewFile(userID int, fileName string, parentFolderID *primitive.ObjectID) Fi
         TimeCreated:    time.Now(),
         Content:        "",
         ParentFolderID: parentFolderID,
+        IsDeleted: false,
     }
 }
 
@@ -152,6 +154,7 @@ type Folder struct {
     FolderName     string              `bson:"folder_name"`
     TimeCreated    time.Time           `bson:"time_created"`
     ParentFolderID *primitive.ObjectID `bson:"parent_folder_id,omitempty"`
+    IsDeleted      bool               `bson:"is_deleted"`
 }
 
 func NewFolder(userID int, folderName string, parentFolderID *primitive.ObjectID) Folder {
@@ -161,6 +164,7 @@ func NewFolder(userID int, folderName string, parentFolderID *primitive.ObjectID
         FolderName:     folderName,
         TimeCreated:    time.Now(),
         ParentFolderID: parentFolderID,
+        IsDeleted: false,
     }
 }
 
@@ -300,7 +304,7 @@ func GetFolderContents(userID int, folderID *primitive.ObjectID) (Folder, []Fold
 
     if folderID != nil {
         // Fetch the folder by its ID and user ID
-        err := collection.FindOne(ctx, bson.M{"_id": *folderID, "user_id": userID}).Decode(&folder)
+        err := collection.FindOne(ctx, bson.M{"_id": *folderID, "user_id": userID, "is_deleted": false}).Decode(&folder)
         if err != nil {
             return Folder{}, nil, nil, fmt.Errorf("failed to fetch folder: %v", err)
         }
@@ -312,6 +316,7 @@ func GetFolderContents(userID int, folderID *primitive.ObjectID) (Folder, []Fold
     // Fetch sub-folders
     subFoldersFilter := bson.M{
         "user_id": userID,
+        "is_deleted": false,
     }
 
     if folderID == nil {
@@ -340,6 +345,7 @@ func GetFolderContents(userID int, folderID *primitive.ObjectID) (Folder, []Fold
     fileCollection := ContentDB.Database("nbdb").Collection("files")
     filesFilter := bson.M{
         "user_id": userID,
+        "is_deleted": false,
     }
 
     if folderID == nil {

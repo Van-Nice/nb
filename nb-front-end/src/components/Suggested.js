@@ -4,8 +4,9 @@ import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import styles from '../styles/Suggested.module.css';
 import { FaFileAlt, FaFolder } from 'react-icons/fa';
+import Trash from "./Trash";
 
-const ItemTypes = {
+export const ItemTypes = {
   FOLDER: 'folder',
   FILE: 'file',
 };
@@ -78,6 +79,32 @@ export default function Suggested() {
         if (!token) {
           throw new Error("No token found");
         }
+        let folderIDToUse = folderID;
+  
+        if (folderID === 'trash') {
+          // Fetch the Trash folder ID
+          const response = await fetch('http://localhost:8080/protected/check-trash-folder', {
+            method: 'GET',
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `${token}`,
+            },
+          });
+          if (!response.ok) {
+            const errorResponse = await response.json();
+            console.error('Error response from server:', errorResponse);
+            throw new Error('Failed to get trash folder ID');
+          }
+          const data = await response.json();
+          folderIDToUse = data.trashFolderID;
+          if (!folderIDToUse) {
+            // Trash folder doesn't exist, display empty contents
+            setFolders([]);
+            setFiles([]);
+            return;
+          }
+        }
+  
         const response = await fetch("http://localhost:8080/protected/folders", {
           method: "POST",
           headers: {
@@ -85,7 +112,7 @@ export default function Suggested() {
             "Authorization": `${token}`,
           },
           body: JSON.stringify({
-            folderID: folderID || null,
+            folderID: folderIDToUse || null,
           }),
         });
         if (!response.ok) {
@@ -95,6 +122,7 @@ export default function Suggested() {
         }
         const data = await response.json();
         console.log("Fetched data:", data);
+        // Filter out the trash folder
         setFolders(data.subFolders || []);
         setFiles(data.files || []);
       } catch (err) {
@@ -102,8 +130,8 @@ export default function Suggested() {
         setError(err.message);
       }
     };
-
-    fetchContents(); // Fetch contents whenever folderID changes
+  
+    fetchContents();
   }, [folderID, dropEvent]);
 
   const handleDrop = async (item, targetFolder) => {
@@ -161,41 +189,39 @@ export default function Suggested() {
   }
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div>
-        {/* Display Folders */}
-        {folders.length === 0 ? (
-          <p>No folders found</p>
-        ) : (
-          <ul className={styles.fileList}>
-            {folders.map((folder) => (
-              <DraggableFolder
-                key={folder.ID}
-                folder={folder}
-                onClick={() => navigate(`/home/folders/${folder.ID}`)}
-                onDrop={handleDrop}
-              />
-            ))}
-          </ul>
-        )}
-        {/* Display Files */}
-        {files.length === 0 ? (
-          <p>No files found</p>
-        ) : (
-          <ul className={styles.fileList}>
-            {files.map((file) => (
-              <DraggableFile
-                key={file.ID}
-                file={file}
-                onClick={() => {
-                  setSelectedFileId(file.ID);
-                  navigate(`/document/${file.ID}`);
-                }}
-              />
-            ))}
-          </ul>
-        )}
-      </div>
-    </DndProvider>
+    <div>
+      {/* Display Folders */}
+      {folders.length === 0 ? (
+        <p>No folders found</p>
+      ) : (
+        <ul className={styles.fileList}>
+          {folders.map((folder) => (
+            <DraggableFolder
+              key={folder.ID}
+              folder={folder}
+              onClick={() => navigate(`/home/folders/${folder.ID}`)}
+              onDrop={handleDrop}
+            />
+          ))}
+        </ul>
+      )}
+      {/* Display Files */}
+      {files.length === 0 ? (
+        <p>No files found</p>
+      ) : (
+        <ul className={styles.fileList}>
+          {files.map((file) => (
+            <DraggableFile
+              key={file.ID}
+              file={file}
+              onClick={() => {
+                setSelectedFileId(file.ID);
+                navigate(`/document/${file.ID}`);
+              }}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

@@ -66,6 +66,8 @@ func main() {
 		protected.POST("/account-data", auth.HandleAccountData)
 		protected.POST("/folders", content.HandleGetFolderContents)
 		protected.POST("/move-item", content.HandleMoveItem)
+		protected.GET("/check-trash-folder", content.HandleCheckTrashFolder)
+		protected.POST("/create-trash-folder", content.HandleCreateTrashFolder)
 	}
 
 	if err := router.Run(":8080"); err != nil {

@@ -33,6 +33,7 @@ function App() {
             <Route path="/home" element={<ProtectedRoute element={Home} />}>
               <Route index element={<Suggested />} /> {/* Default when /home is accessed */}
               <Route path="folders/:folderID" element={<Suggested />} />
+              <Route path="trash/" element={<Suggested />} />
             </Route>
             <Route path="/" element={<Navigate to="/login" />} />
           </Routes>
