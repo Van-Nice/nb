@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
-import { useDrag, useDrop, DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useDrag, useDrop } from 'react-dnd';
 import styles from '../styles/Suggested.module.css';
 import { FaFileAlt, FaFolder } from 'react-icons/fa';
-import Trash from "./Trash";
 
 export const ItemTypes = {
   FOLDER: 'folder',
@@ -70,7 +68,8 @@ export default function Suggested() {
   const [error, setError] = useState("");
   const [selectedFileId, setSelectedFileId] = useState(null);
   const navigate = useNavigate();
-  const [dropEvent, setDropEvent] = useState(0); // State to track drop events
+  const [dropEvent, setDropEvent] = useState(0);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchContents = async () => {
@@ -79,18 +78,32 @@ export default function Suggested() {
         if (!token) {
           throw new Error("No token found");
         }
-        let folderIDToUse = folderID;
   
-        const response = await fetch("http://localhost:8080/protected/folders", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `${token}`,
-          },
-          body: JSON.stringify({
-            folderID: folderIDToUse || null,
-          }),
-        });
+        let response;
+        console.log(folderID);
+        if (location.pathname === '/home/trash') {
+          // Fetch deleted items
+          response = await fetch("http://localhost:8080/protected/deleted-items", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `${token}`,
+            },
+          });
+        } else {
+          // Fetch normal folder contents
+          response = await fetch("http://localhost:8080/protected/folders", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `${token}`,
+            },
+            body: JSON.stringify({
+              folderID: folderID || null,
+            }),
+          });
+        }
+  
         if (!response.ok) {
           const errorResponse = await response.json();
           console.error('Error response from server:', errorResponse);
@@ -98,9 +111,17 @@ export default function Suggested() {
         }
         const data = await response.json();
         console.log("Fetched data:", data);
-        // Filter out the trash folder
-        setFolders(data.subFolders || []);
-        setFiles(data.files || []);
+        console.log("locations.pathname = ", location.pathname);
+        if (location.pathname === '/home/trash') {
+          console.log("Should be loading trash")
+          // Update state with deleted items
+          setFolders(data.deletedFolders || []);
+          setFiles(data.deletedFiles || []);
+        } else {
+          // Update state with normal items
+          setFolders(data.subFolders || []);
+          setFiles(data.files || []);
+        }
       } catch (err) {
         console.error("Error fetching folder contents:", err);
         setError(err.message);
@@ -108,7 +129,7 @@ export default function Suggested() {
     };
   
     fetchContents();
-  }, [folderID, dropEvent]);
+  }, [folderID, dropEvent, location]);
 
   const handleDrop = async (item, targetFolder) => {
     console.log(`Dropped item ${item.id} into folder ${targetFolder.ID}`);

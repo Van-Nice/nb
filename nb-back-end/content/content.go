@@ -13,8 +13,6 @@ import (
 	// "go.mongodb.org/mongo-driver/mongo"
 )
 
-
-
 type CreateFileInput struct {
 	UserID 		int 	`json:"userID" binding:"required"`
 	FileName 	string  `json:"fileName" binding:"required"`
@@ -314,3 +312,29 @@ func HandleDeleteItem(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"message": "Item marked as deleted successfully"})
 }
 
+func HandleGetDeletedItems(c *gin.Context) {
+    // Retrieve userID from the context (set by JWT middleware)
+    userIDInterface, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return
+    }
+
+    userID, ok := userIDInterface.(int)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+        return
+    }
+
+    // Fetch deleted items from the database
+    deletedFolders, deletedFiles, err := db.GetDeletedItems(userID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to fetch deleted items: %v", err)})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "deletedFolders": deletedFolders,
+        "deletedFiles":   deletedFiles,
+    })
+}

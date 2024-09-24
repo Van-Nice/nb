@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDrop } from 'react-dnd';
 import { FaTrashAlt } from 'react-icons/fa'; // Importing the trash icon from Font Awesome
 import styles from '../styles/Trash.module.css';
 import { ItemTypes } from './Suggested';
 
 export default function Trash() {
-    const [isSelected, setIsSelected] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
+  const navigate = useNavigate();
 
-    const handleClick = () => {
-      setIsSelected(!isSelected);
-    };
+  const handleClick = () => {
+    setIsSelected(!isSelected);
+    // TODO: Display all items in suggested that are deleted
+    navigate(`/home/trash`);
+  };
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: [ItemTypes.FILE, ItemTypes.FOLDER],

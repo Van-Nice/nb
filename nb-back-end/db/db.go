@@ -372,3 +372,56 @@ func GetFolderContents(userID int, folderID *primitive.ObjectID) (Folder, []Fold
 
     return folder, subFolders, files, nil
 }
+
+func GetDeletedItems(userID int) ([]Folder, []File, error) {
+    var deletedFolders []Folder
+    var deletedFiles []File
+
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    // Fetch deleted folders
+    folderCollection := ContentDB.Database("nbdb").Collection("folders")
+    folderFilter := bson.M{
+        "user_id":    userID,
+        "is_deleted": true,
+    }
+
+    folderCursor, err := folderCollection.Find(ctx, folderFilter)
+    if err != nil {
+        return nil, nil, fmt.Errorf("failed to fetch deleted folders: %v", err)
+    }
+    defer folderCursor.Close(ctx)
+
+    for folderCursor.Next(ctx) {
+        var folder Folder
+        if err := folderCursor.Decode(&folder); err != nil {
+            return nil, nil, fmt.Errorf("failed to decode folder: %v", err)
+        }
+        deletedFolders = append(deletedFolders, folder)
+    }
+
+    // Fetch deleted files
+    fileCollection := ContentDB.Database("nbdb").Collection("files")
+    fileFilter := bson.M{
+        "user_id":    userID,
+        "is_deleted": true,
+    }
+
+    fileCursor, err := fileCollection.Find(ctx, fileFilter)
+    if err != nil {
+        return nil, nil, fmt.Errorf("failed to fetch deleted files: %v", err)
+    }
+    defer fileCursor.Close(ctx)
+
+    for fileCursor.Next(ctx) {
+        var file File
+        if err := fileCursor.Decode(&file); err != nil {
+            return nil, nil, fmt.Errorf("failed to decode file: %v", err)
+        }
+        deletedFiles = append(deletedFiles, file)
+    }
+    fmt.Println(deletedFiles, deletedFiles);
+
+    return deletedFolders, deletedFiles, nil
+}
