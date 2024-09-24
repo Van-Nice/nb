@@ -60,14 +60,11 @@ func main() {
 		protected.GET("/home", auth.HandleHome)
 		protected.POST("/create-file", content.HandleCreateFile)
 		protected.POST("/create-folder", content.HandleCreateFolder)
-		protected.POST("/get-files", content.HandleGetFiles)
-		protected.POST("/get-folders", content.HandleGetFolders)
 		protected.GET("/ws", websocket.HandleWebSocket)
 		protected.POST("/account-data", auth.HandleAccountData)
 		protected.POST("/folders", content.HandleGetFolderContents)
 		protected.POST("/move-item", content.HandleMoveItem)
-		protected.GET("/check-trash-folder", content.HandleCheckTrashFolder)
-		protected.POST("/create-trash-folder", content.HandleCreateTrashFolder)
+		protected.POST("/delete-item", content.HandleDelete)
 	}
 
 	if err := router.Run(":8080"); err != nil {

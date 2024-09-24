@@ -81,30 +81,6 @@ export default function Suggested() {
         }
         let folderIDToUse = folderID;
   
-        if (folderID === 'trash') {
-          // Fetch the Trash folder ID
-          const response = await fetch('http://localhost:8080/protected/check-trash-folder', {
-            method: 'GET',
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `${token}`,
-            },
-          });
-          if (!response.ok) {
-            const errorResponse = await response.json();
-            console.error('Error response from server:', errorResponse);
-            throw new Error('Failed to get trash folder ID');
-          }
-          const data = await response.json();
-          folderIDToUse = data.trashFolderID;
-          if (!folderIDToUse) {
-            // Trash folder doesn't exist, display empty contents
-            setFolders([]);
-            setFiles([]);
-            return;
-          }
-        }
-  
         const response = await fetch("http://localhost:8080/protected/folders", {
           method: "POST",
           headers: {

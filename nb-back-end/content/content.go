@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
+	// "go.mongodb.org/mongo-driver/mongo"
 )
 
 
@@ -38,7 +38,7 @@ type File struct {
     TimeCreated    time.Time           `bson:"time_created"`
     Content        string              `bson:"content"`
     ParentFolderID *primitive.ObjectID `bson:"parent_folder_id,omitempty"`
-    IsDeleted      bool               `bson:"is_deleted"`
+    IsDeleted      bool                `bson:"is_deleted"`
 }
 
 type Folder struct {
@@ -47,13 +47,18 @@ type Folder struct {
     FolderName     string              `bson:"folder_name"`
     TimeCreated    time.Time           `bson:"time_created"`
     ParentFolderID *primitive.ObjectID `bson:"parent_folder_id,omitempty"`
-    IsDeleted      bool               `bson:"is_deleted"` // Add this field
+    IsDeleted      bool                `bson:"is_deleted"` // Add this field
 }
 
 type MoveItemInput struct {
-    ItemID        string `json:"itemID"`
+    ItemID         string `json:"itemID"`
     TargetFolderID string `json:"targetFolderID"`
-    ItemType      string `json:"itemType"`
+    ItemType       string `json:"itemType"`
+}
+
+type HandleDeleteInput struct {
+    ItemID         string `json:"itemID" binding:"required"`
+	UserId    		int   `json:"userID" binding:"required"`
 }
 
 // HandleCreateFile creates a new file for the authenticated user
@@ -148,70 +153,6 @@ func HandleCreateFolder(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"message": "Folder created", "folder_id": folder.ID.Hex()})
 }
 
-
-// HandleGetFiles retrieves all files for the authenticated user
-func HandleGetFiles(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID not found"})
-		return
-	}
-
-	client := c.MustGet("mongoClient").(*mongo.Client)
-	collection := client.Database("nbdb").Collection("files")
-
-	filter := bson.M{"user_id": userID}
-	cursor, err := collection.Find(context.TODO(), filter)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch files"})
-		return
-	}
-	defer cursor.Close(context.TODO())
-
-	var files []bson.M
-	for cursor.Next(context.TODO()) {
-		var file bson.M
-		if err := cursor.Decode(&file); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode file"})
-			return
-		}
-		files = append(files, file)
-	}
-
-	c.JSON(http.StatusOK, gin.H{"files": files})
-}
-
-func HandleGetFolders(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID not found"})
-		return
-	}
-
-	client := c.MustGet("mongoClient").(*mongo.Client)
-	collection := client.Database("nbdb").Collection("folders")
-
-	filter := bson.M{"user_id": userID}
-	cursor, err := collection.Find(context.TODO(), filter)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch files"})
-		return
-	}
-	defer cursor.Close(context.TODO())
-
-	var folders []bson.M
-	for cursor.Next(context.TODO()) {
-		var folder bson.M
-		if err := cursor.Decode(&folder); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode folder"})
-			return
-		}
-		folders = append(folders, folder)
-	}
-
-	c.JSON(http.StatusOK, gin.H{"folders": folders})
-}
-
 func HandleGetFolderContents(c *gin.Context) {
     // Retrieve userID from the context (set by JWT middleware)
     userIDInterface, exists := c.Get("userID")
@@ -304,54 +245,14 @@ func HandleMoveItem(c *gin.Context) {
     }
   
     c.JSON(http.StatusOK, gin.H{"message": "Item moved successfully"})
-  }
-
-  func HandleCheckTrashFolder(c *gin.Context) {
-    userID, exists := c.Get("userID")
-    if !exists {
-        c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found"})
-        return
-    }
-
-    client := c.MustGet("mongoClient").(*mongo.Client)
-    collection := client.Database("nbdb").Collection("folders")
-
-    filter := bson.M{"user_id": userID, "folder_name": "Trash"}
-    var folder bson.M
-    err := collection.FindOne(context.TODO(), filter).Decode(&folder)
-    if err != nil {
-        if err == mongo.ErrNoDocuments {
-            c.JSON(http.StatusOK, gin.H{"trashFolderID": nil})
-        } else {
-            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check trash folder"})
-        }
-        return
-    }
-
-    c.JSON(http.StatusOK, gin.H{"trashFolderID": folder["_id"].(primitive.ObjectID).Hex()})
 }
 
-func HandleCreateTrashFolder(c *gin.Context) {
-    userIDInterface, exists := c.Get("userID")
-    if !exists {
-        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+func HandleDelete(c *gin.Context) {
+    var input HandleDeleteInput
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
-
-    userID, ok := userIDInterface.(int)
-    if !ok {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
-        return
-    }
-
-    // Create a new trash folder
-    folder := db.NewFolder(userID, "Trash", nil)
-
-    // Insert the folder into the database
-    if _, err := db.InsertFolder(folder); err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to insert folder: %v", err)})
-        return
-    }
-
-    c.JSON(http.StatusOK, gin.H{"message": "Trash folder created", "trashFolderID": folder.ID.Hex()})
+    fmt.Println(input, input.ItemID, input.UserId)
+    c.JSON(http.StatusOK, gin.H{"message": "Successfully called deletion function"})
 }

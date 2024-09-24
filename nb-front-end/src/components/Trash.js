@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { FaTrashAlt } from 'react-icons/fa'; // Importing the trash icon from Font Awesome
-import { useNavigate } from 'react-router-dom';
 import styles from '../styles/Trash.module.css';
 import { ItemTypes } from './Suggested';
 
@@ -27,6 +26,7 @@ export default function Trash() {
       if (!token) {
         throw new Error("No token found");
       }
+      
     } catch (err) {
       console.error("Error moving item: ", err);
     }
