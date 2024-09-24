@@ -47,9 +47,9 @@ type Folder struct {
 }
 
 type MoveItemInput struct {
-    ItemType      string `json:"itemType"`
     ItemID        string `json:"itemID"`
     TargetFolderID string `json:"targetFolderID"`
+    ItemType      string `json:"itemType"`
 }
 
 // HandleCreateFile creates a new file for the authenticated user
@@ -260,7 +260,45 @@ func HandleGetFolderContents(c *gin.Context) {
 }
 
 func HandleMoveItem(c *gin.Context) {
-    // var input MoveItemInput
-
-}
+    var input MoveItemInput
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    } 
+    // Log the input for debugging
+    fmt.Printf("MoveItemInput: %+v\n", input)
+  
+    itemID, err := primitive.ObjectIDFromHex(input.ItemID)
+    if err != nil {
+      c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid item ID"})
+      return
+    }
+  
+    targetFolderID, err := primitive.ObjectIDFromHex(input.TargetFolderID)
+    if err != nil {
+      c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid target folder ID"})
+      return
+    }
+  
+    // Move the file or folder based on the itemType
+    if input.ItemType == "file" {
+      // Update the file's ParentFolderID
+      collection := db.ContentDB.Database("nbdb").Collection("files")
+      _, err := collection.UpdateOne(context.TODO(), bson.M{"_id": itemID}, bson.M{"$set": bson.M{"parent_folder_id": targetFolderID}})
+      if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to move file"})
+        return
+      }
+    } else if input.ItemType == "folder" {
+      // Update the folder's ParentFolderID
+      collection := db.ContentDB.Database("nbdb").Collection("folders")
+      _, err := collection.UpdateOne(context.TODO(), bson.M{"_id": itemID}, bson.M{"$set": bson.M{"parent_folder_id": targetFolderID}})
+      if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to move folder"})
+        return
+      }
+    }
+  
+    c.JSON(http.StatusOK, gin.H{"message": "Item moved successfully"})
+  }
 
