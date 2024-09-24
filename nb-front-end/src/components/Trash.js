@@ -26,7 +26,24 @@ export default function Trash() {
       if (!token) {
         throw new Error("No token found");
       }
-      
+      const response = await fetch("http://localhost:8080/protected/delete-item", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `${token}`,
+        },
+        body: JSON.stringify({
+          itemID: item.id,
+          itemType: item.type,
+        })
+      });
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error('Error response from server:', errorResponse);
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      console.log("fetched data from trash drop:", data)
     } catch (err) {
       console.error("Error moving item: ", err);
     }

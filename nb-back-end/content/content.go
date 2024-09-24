@@ -58,7 +58,7 @@ type MoveItemInput struct {
 
 type HandleDeleteInput struct {
     ItemID         string `json:"itemID" binding:"required"`
-	UserId    		int   `json:"userID" binding:"required"`
+    ItemType       string `json:"itemType" binding:"required"`
 }
 
 // HandleCreateFile creates a new file for the authenticated user
@@ -247,12 +247,70 @@ func HandleMoveItem(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"message": "Item moved successfully"})
 }
 
-func HandleDelete(c *gin.Context) {
+func HandleDeleteItem(c *gin.Context) {
     var input HandleDeleteInput
     if err := c.ShouldBindJSON(&input); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
-    fmt.Println(input, input.ItemID, input.UserId)
-    c.JSON(http.StatusOK, gin.H{"message": "Successfully called deletion function"})
+
+    // Retrieve userID from the context (set by JWT middleware)
+    userIDInterface, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return
+    }
+
+    userID, ok := userIDInterface.(int)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+        return
+    }
+
+    // Convert itemID from string to ObjectID
+    itemID, err := primitive.ObjectIDFromHex(input.ItemID)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid item ID"})
+        return
+    }
+
+    // Determine which collection to update based on itemType
+    var collectionName string
+    if input.ItemType == "file" {
+        collectionName = "files"
+    } else if input.ItemType == "folder" {
+        collectionName = "folders"
+    } else {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid item type"})
+        return
+    }
+
+    // Get the collection
+    collection := db.ContentDB.Database("nbdb").Collection(collectionName)
+
+    // Build the filter and update
+    filter := bson.M{
+        "_id":     itemID,
+        "user_id": userID, // Ensure the user owns the item
+    }
+    update := bson.M{
+        "$set": bson.M{
+            "is_deleted": true,
+        },
+    }
+
+    // Perform the update operation
+    result, err := collection.UpdateOne(context.TODO(), filter, update)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to mark item as deleted"})
+        return
+    }
+
+    if result.MatchedCount == 0 {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Item not found or you do not have permission to delete it"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Item marked as deleted successfully"})
 }
+
