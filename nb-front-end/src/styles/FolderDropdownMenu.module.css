@@ -1,0 +1,84 @@
+.dropdownWrapper {
+  position: relative;
+  width: 250px; /* Adjust as needed */
+}
+
+.buttonWrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background-color: #f1f3f4;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  text-align: left;
+  border-radius: 4px;
+}
+
+.icon {
+  margin-right: 10px;
+}
+
+.text {
+  flex-grow: 1;
+  font-weight: 500;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #dadce0;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(60,64,67,0.3), 0 4px 8px rgba(60,64,67,0.15);
+}
+
+.folderList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.folderItem {
+  cursor: pointer;
+}
+
+.folderRow {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+}
+
+.folderRow:hover {
+  background-color: #f1f3f4;
+}
+
+.folderIcon {
+  margin-right: 8px;
+  color: #5f6368;
+}
+
+.folderIconPlaceholder {
+  width: 24px; /* Same width as the icons to align text */
+}
+
+.folderName {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  color: #202124;
+}
+
+.folderName:hover {
+  text-decoration: none;
+}
+
+.subFolderList {
+  margin: 0;
+  padding: 0;
+}

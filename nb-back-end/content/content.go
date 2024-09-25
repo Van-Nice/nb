@@ -338,3 +338,31 @@ func HandleGetDeletedItems(c *gin.Context) {
         "deletedFiles":   deletedFiles,
     })
 }
+
+// HandleGetNestedFolders handles the request to get nested folders
+func HandleGetNestedFolders(c *gin.Context) {
+    // Retrieve userID from the context (set by JWT middleware)
+    userIDInterface, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return
+    }
+
+    userID, ok := userIDInterface.(int)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+        return
+    }
+
+    // Fetch all folders for the user
+    folders, err := db.GetAllFolders(userID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to fetch folders: %v", err)})
+        return
+    }
+
+    // Build the nested folder structure
+    nestedFolders := db.BuildFolderTree(folders)
+
+    c.JSON(http.StatusOK, gin.H{"folders": nestedFolders})
+}

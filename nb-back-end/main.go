@@ -66,6 +66,7 @@ func main() {
 		protected.POST("/move-item", content.HandleMoveItem)
 		protected.POST("/delete-item", content.HandleDeleteItem)
 		protected.GET("/deleted-items", content.HandleGetDeletedItems)
+		protected.GET("/nested-folders", content.HandleGetNestedFolders)
 	}
 
 	if err := router.Run(":8080"); err != nil {

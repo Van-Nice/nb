@@ -425,3 +425,65 @@ func GetDeletedItems(userID int) ([]Folder, []File, error) {
 
     return deletedFolders, deletedFiles, nil
 }
+
+// GetAllFolders fetches all folders for a given user from the database
+func GetAllFolders(userID int) ([]Folder, error) {
+    var folders []Folder
+
+    collection := ContentDB.Database("nbdb").Collection("folders")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    cursor, err := collection.Find(ctx, bson.M{"user_id": userID, "is_deleted": false})
+    if err != nil {
+        return nil, fmt.Errorf("failed to fetch folders: %v", err)
+    }
+    defer cursor.Close(ctx)
+
+    for cursor.Next(ctx) {
+        var folder Folder
+        if err := cursor.Decode(&folder); err != nil {
+            return nil, fmt.Errorf("failed to decode folder: %v", err)
+        }
+        folders = append(folders, folder)
+    }
+
+    return folders, nil
+}
+
+// FolderNode represents a folder in the nested structure
+type FolderNode struct {
+    ID             primitive.ObjectID `json:"id"`
+    FolderName     string             `json:"folderName"`
+    SubFolders     []*FolderNode      `json:"subFolders"`
+}
+
+// BuildFolderTree builds a nested folder structure from a flat list of folders
+func BuildFolderTree(folders []Folder) []*FolderNode {
+    folderMap := make(map[primitive.ObjectID]*FolderNode)
+    var rootFolders []*FolderNode
+
+    // Initialize folder nodes and map them by ID
+    for _, folder := range folders {
+        folderNode := &FolderNode{
+            ID:         folder.ID,
+            FolderName: folder.FolderName,
+            SubFolders: []*FolderNode{},
+        }
+        folderMap[folder.ID] = folderNode
+    }
+
+    // Build the tree structure
+    for _, folder := range folders {
+        if folder.ParentFolderID == nil {
+            // Root folder
+            rootFolders = append(rootFolders, folderMap[folder.ID])
+        } else {
+            // Sub-folder
+            parentFolderNode := folderMap[*folder.ParentFolderID]
+            parentFolderNode.SubFolders = append(parentFolderNode.SubFolders, folderMap[folder.ID])
+        }
+    }
+
+    return rootFolders
+}
