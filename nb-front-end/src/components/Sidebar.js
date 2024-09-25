@@ -6,13 +6,13 @@ import New from "./New";
 import Trash from "./Trash";
 
 
-export default function Sidebar() {
+export default function Sidebar({triggerRefresh}) {
   return (
     <div className={parentStyles.sidebar}>
       <div className={styles.sidebarContainer}>
         <Bungo />
-        <New/>
-        <Trash />
+        <New triggerRefresh={triggerRefresh}/>
+        <Trash onDropComplete={triggerRefresh} />
       </div>
     </div>
   )

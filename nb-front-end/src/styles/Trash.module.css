@@ -25,4 +25,13 @@
     background-color: #e0e0e0;
     color: #333;
   }
+
+  .over {
+    background-color: #d0d0d0; /* Change this color as needed */
+  }
+  
+  /* Add hover state */
+  .container:hover {
+    background-color: #f0f0f0; /* Highlight color on hover */
+  }
   

@@ -10,18 +10,22 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 
 export default function Home() {
-  const [refresh, setRefresh] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const triggerRefresh = () => {
+    setRefreshKey(prevKey => prevKey + 1);
+  }
 
   return (
     <DndProvider backend={HTML5Backend}>
       <div className={styles.gridContainer}>
         {/* First row + */}
-        <Sidebar />
+        <Sidebar triggerRefresh={triggerRefresh}/>
         <Search />
         <Settings/>
         <Account/>
         {/* Render child routes here */}
-        <Outlet />
+        <Outlet context={{refreshKey}}/>
       </div>
     </DndProvider>
   );

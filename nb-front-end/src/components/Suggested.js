@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, useOutletContext } from 'react-router-dom';
 import { useDrag, useDrop } from 'react-dnd';
 import styles from '../styles/Suggested.module.css';
 import { FaFileAlt, FaFolder } from 'react-icons/fa';
@@ -70,6 +70,7 @@ export default function Suggested() {
   const navigate = useNavigate();
   const [dropEvent, setDropEvent] = useState(0);
   const location = useLocation();
+  const { refreshKey } = useOutletContext();
 
   useEffect(() => {
     const fetchContents = async () => {
@@ -129,7 +130,7 @@ export default function Suggested() {
     };
   
     fetchContents();
-  }, [folderID, dropEvent, location]);
+  }, [folderID, dropEvent, location, refreshKey]);
 
   const handleDrop = async (item, targetFolder) => {
     console.log(`Dropped item ${item.id} into folder ${targetFolder.ID}`);

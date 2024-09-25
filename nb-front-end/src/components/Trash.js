@@ -5,13 +5,12 @@ import { FaTrashAlt } from 'react-icons/fa'; // Importing the trash icon from Fo
 import styles from '../styles/Trash.module.css';
 import { ItemTypes } from './Suggested';
 
-export default function Trash() {
+export default function Trash({onDropComplete}) {
   const [isSelected, setIsSelected] = useState(false);
   const navigate = useNavigate();
 
   const handleClick = () => {
     setIsSelected(!isSelected);
-    // TODO: Display all items in suggested that are deleted
     navigate(`/home/trash`);
   };
 
@@ -46,8 +45,8 @@ export default function Trash() {
         console.error('Error response from server:', errorResponse);
         throw new Error('Network response was not ok');
       }
-      const data = await response.json();
-      console.log("fetched data from trash drop:", data)
+      // const data = await response.json();
+      onDropComplete()
     } catch (err) {
       console.error("Error moving item: ", err);
     }

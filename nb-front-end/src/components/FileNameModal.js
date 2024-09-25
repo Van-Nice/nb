@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from '../styles/Account.module.css';
 import { UserContext } from "../UserContext";
 
-const FileNameModal = forwardRef((props, ref) => {
+const FileNameModal = forwardRef(({triggerRefresh}, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileName, setFileName] = useState("");
   const navigate = useNavigate(); // Get the navigate function
@@ -59,6 +59,7 @@ const FileNameModal = forwardRef((props, ref) => {
       
       // Navigate to the new document route
       navigate(`/document/${fileId}`);
+      triggerRefresh();
     } catch (error) {
       console.error('Error creating file:', error);
     }

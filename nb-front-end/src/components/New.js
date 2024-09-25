@@ -4,7 +4,7 @@ import styles from "../styles/New.module.css";
 import FileNameModal from "./FileNameModal";
 import FolderNameModal from "./FolderNameModal";
 
-export default function New() {
+export default function New({triggerRefresh}) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const fileNameModalRef = useRef();
   const folderNameModalRef = useRef();
@@ -50,8 +50,8 @@ export default function New() {
       )}
 
       {/* Include the FileNameModal component */}
-      <FileNameModal ref={fileNameModalRef} />
-      <FolderNameModal ref={folderNameModalRef} />
+      <FileNameModal ref={fileNameModalRef} triggerRefresh={triggerRefresh}/>
+      <FolderNameModal ref={folderNameModalRef} triggerRefresh={triggerRefresh}/>
     </div>
   );
 }
