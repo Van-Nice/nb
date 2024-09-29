@@ -491,3 +491,17 @@ func BuildFolderTree(folders []Folder) []*FolderNode {
 
     return rootFolders
 }
+
+func GetFileByID(fileID primitive.ObjectID) (*File, error) {
+    collection := ContentDB.Database("nbdb").Collection("files")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    var file File
+    err := collection.FindOne(ctx, bson.M{"_id": fileID}).Decode(&file)
+    if err != nil {
+        return nil, err
+    }
+
+    return &file, nil
+}

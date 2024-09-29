@@ -366,3 +366,29 @@ func HandleGetNestedFolders(c *gin.Context) {
 
     c.JSON(http.StatusOK, gin.H{"folders": nestedFolders})
 }
+
+func HandleGetFileName(c *gin.Context) {
+    fileID := c.Query("id")
+    fmt.Println(fileID)
+    // Check if fileID is empty
+    if fileID == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "File ID is required"})
+        return
+    }
+
+    // Attempt to convert fileID to ObjectID
+    id, err := primitive.ObjectIDFromHex(fileID)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file ID"})
+        return
+    }
+
+    // Proceed with fetching the file using the valid ObjectID
+    file, err := db.GetFileByID(id)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to fetch file: %v", err)})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"file": file})
+}

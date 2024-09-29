@@ -1,67 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation, useOutletContext } from 'react-router-dom';
-import { useDrag, useDrop } from 'react-dnd';
 import styles from '../styles/Suggested.module.css';
-import { FaFileAlt, FaFolder } from 'react-icons/fa';
+import DraggableFolder from "./DraggableFolder";
+import DraggableFile from "./DraggableFile";
 
 export const ItemTypes = {
   FOLDER: 'folder',
   FILE: 'file',
 };
 
-function DraggableFolder({ folder, onClick, onDrop }) {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: ItemTypes.FOLDER,
-    item: { id: folder.ID, type: 'folder' },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  }));
-
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: [ItemTypes.FOLDER, ItemTypes.FILE],
-    drop: (item) => onDrop(item, folder),
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  }));
-
-  return (
-    <li
-      ref={(node) => drag(drop(node))}
-      key={folder.ID}
-      className={`${styles.fileItem} ${isDragging ? styles.dragging : ''} ${isOver ? styles.over : ''}`}
-      onClick={onClick}
-    >
-      <FaFolder className={styles.icon} />
-      {folder.FolderName}
-    </li>
-  );
-}
-
-function DraggableFile({ file, onClick }) {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: ItemTypes.FILE,
-    item: { id: file.ID, type: 'file' }, // Add type here
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  }));
-
-  return (
-    <li
-      ref={drag}
-      key={file.ID}
-      className={`${styles.fileItem} ${isDragging ? styles.dragging : ''}`}
-      onClick={onClick}
-    >
-      <FaFileAlt className={styles.icon} />
-      {file.FileName}
-    </li>
-  );
-}
-
-export default function Suggested() {
+export default function Suggested({selectedFile}) {
   const { folderID } = useParams(); // Get folderID from URL
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
@@ -142,9 +90,8 @@ export default function Suggested() {
       const requestBody = JSON.stringify({
         itemID: item.id,
         targetFolderID: targetFolder.ID,
-        itemType: item.type, // Add itemType here
+        itemType: item.type,
       });
-      console.log('Request Body:', requestBody); // Log request body
   
       const response = await fetch('http://localhost:8080/protected/move-item', {
         method: "POST",

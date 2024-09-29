@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "../../.."
+		},
+		{
+			"path": "../../../../../vscprojects/websocket-playground"
+		}
+	],
+	"settings": {}
+}

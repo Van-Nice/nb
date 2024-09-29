@@ -1,63 +1,55 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import MenuBar from "./MenuBar"
-import { FaFileAlt} from 'react-icons/fa';
-import styles from '../styles/DocumentEditor.module.css'
-import Account from './Account';
-
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useOutletContext } from "react-router-dom";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import MenuBar from "./MenuBar";
+import { FaFileAlt } from "react-icons/fa";
+import styles from "../styles/DocumentEditor.module.css";
+import Account from "./Account";
 
 function DocumentEditor() {
-  const { id } = useParams(); // Get the document ID from the URL
-  const [content, setContent] = useState('');
-  // const [fileName, setFileName] = useState('');
+  const { id } = useParams();
+  const context = useOutletContext();
+
+  const [fileName, setFileName] = useState("");
+  const [content, setContent] = useState("");
   const ws = useRef(null);
-
+  // TODO: Fetch file name and create a web socket connection
   useEffect(() => {
-    // Retrieve the token from localStorage
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      console.error('No token found');
-      return;
-    }
+    const fetchFileContent = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          console.error("No token found");
+          return;
+        }
+        const response = await fetch(
+          `http://localhost:8080/protected/files?id=${id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `${token}`,
+            },
+          }
+        );
 
-    // Establish WebSocket connection with the token as a query parameter
-    ws.current = new WebSocket(`ws://localhost:8080/protected/ws?token=${encodeURIComponent(token)}`);
+        if (!response.ok) {
+          const errorResponse = await response.json();
+          console.error("Error response from server:", errorResponse);
+          throw new Error("Network response was not ok");
+        }
 
-    ws.current.onopen = () => {
-      console.log('WebSocket connection established');
-    };
-
-    ws.current.onmessage = (event) => {
-      console.log('Received message:', event.data);
-      // Handle incoming messages
-    };
-
-    ws.current.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
-
-    ws.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    // Cleanup on component unmount
-    return () => {
-      if (ws.current) {
-        ws.current.close();
+        const data = await response.json();
+        setFileName(data.file.FileName);
+        // Fetch file content from the backend
+        const contentResponse = await fetch()
+      } catch (err) {
+        console.error("Error fetching file content:", err);
       }
     };
-  }, []);
 
-  useEffect(() => {
-    const loadDocument = async () => {
-      const savedContent = localStorage.getItem(`document-${id}`);
-      if (savedContent) {
-        setContent(savedContent);
-      }
-    };
-    loadDocument();
+    fetchFileContent();
   }, [id]);
 
   const handleContentChange = (value) => {
@@ -66,19 +58,19 @@ function DocumentEditor() {
 
     // Send the updated content to the server via WebSocket
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({id, content: value}));
+      ws.current.send(JSON.stringify({ id, content: value }));
     }
   };
 
   const handleMenuAction = (action) => {
-    if (action === 'Save') {
-      console.log('Saving document...');
+    if (action === "Save") {
+      console.log("Saving document...");
       // You can handle save action here
-    } else if (action === 'New') {
-      setContent('');
-      console.log('New document created');
-    } else if (action === 'Download') {
-      console.log('Download document');
+    } else if (action === "New") {
+      setContent("");
+      console.log("New document created");
+    } else if (action === "Download") {
+      console.log("Download document");
       // You can trigger a download action here
     }
   };
@@ -87,19 +79,18 @@ function DocumentEditor() {
     <div>
       <div className={styles.headerWrapper}>
         <div className={styles.header}>
-          <FaFileAlt className={styles.documentIcon}/>
-          <h3>{id}</h3>
+          <FaFileAlt className={styles.documentIcon} />
+          <h3>{fileName || id}</h3>
         </div>
-        <Account className={styles.account}/>
+        <Account className={styles.account} />
       </div>
-      <MenuBar onMenuAction={handleMenuAction} className={styles.menubar}/>
+      <MenuBar onMenuAction={handleMenuAction} className={styles.menubar} />
       <div className={styles.editor}>
         <ReactQuill
           value={content}
           onChange={handleContentChange}
           modules={DocumentEditor.modules}
           formats={DocumentEditor.formats}
-          style={{ height: '500px' }}
         />
       </div>
     </div>
@@ -109,22 +100,38 @@ function DocumentEditor() {
 // Quill modules configuration
 DocumentEditor.modules = {
   toolbar: [
-    [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{ 'script': 'sub'}, { 'script': 'super' }],
-    [{ 'indent': '-1'}, { 'indent': '+1' }, { 'direction': 'rtl' }],
-    [{ 'color': [] }, { 'background': [] }],
-    [{ 'align': [] }],
-    ['link', 'image', 'code-block'],
-    ['clean']
+    [{ header: "1" }, { header: "2" }, { font: [] }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["bold", "italic", "underline", "strike", "blockquote"],
+    [{ script: "sub" }, { script: "super" }],
+    [{ indent: "-1" }, { indent: "+1" }, { direction: "rtl" }],
+    [{ color: [] }, { background: [] }],
+    [{ align: [] }],
+    ["link", "image", "code-block"],
+    ["clean"],
   ],
 };
 
 // Quill formats configuration
 DocumentEditor.formats = [
-  'header', 'font', 'list', 'bullet', 'bold', 'italic', 'underline', 'strike', 'blockquote',
-  'script', 'indent', 'direction', 'color', 'background', 'align', 'link', 'image', 'code-block'
+  "header",
+  "font",
+  "list",
+  "bullet",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "script",
+  "indent",
+  "direction",
+  "color",
+  "background",
+  "align",
+  "link",
+  "image",
+  "code-block",
 ];
 
 export default DocumentEditor;

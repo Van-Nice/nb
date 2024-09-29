@@ -25,7 +25,7 @@ export default function Home() {
         <Settings/>
         <Account/>
         {/* Render child routes here */}
-        <Outlet context={{refreshKey}}/>
+        <Outlet context={refreshKey} />
       </div>
     </DndProvider>
   );
