@@ -39,11 +39,11 @@ function DocumentEditor() {
           console.error("Error response from server:", errorResponse);
           throw new Error("Network response was not ok");
         }
-
+        
         const data = await response.json();
         setFileName(data.file.FileName);
-        // Fetch file content from the backend
-        const contentResponse = await fetch()
+        // setContent(data.file.Content || "")
+        // Establish web socket connection here
       } catch (err) {
         console.error("Error fetching file content:", err);
       }
@@ -51,6 +51,41 @@ function DocumentEditor() {
 
     fetchFileContent();
   }, [id]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
+    
+    const socket = new WebSocket("ws://localhost:8080/protected/ws");
+    
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+      // Send the token as part of the initial message
+      socket.send(JSON.stringify({ type: "auth", token }));
+    };
+    
+    socket.onmessage = (event) => {
+      console.log("Received message from server:", event.data);
+    };
+    
+    socket.onerror = (error) => {
+      console.log("WebSocket error:", error);
+    };
+    
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    ws.current = socket;
+
+    // Cleanup when component unmounts
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   const handleContentChange = (value) => {
     setContent(value);
