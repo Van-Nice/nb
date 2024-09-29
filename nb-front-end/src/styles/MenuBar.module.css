@@ -1,0 +1,19 @@
+.menuWrapper {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem;
+}
+
+.dropdown {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    position: absolute;
+    background-color: #f0f0f0;
+    /* border: 1px solid #ccc; */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    gap: 1rem;
+    z-index: 1000;
+    padding: .25rem 0;
+    width: 10rem;
+}

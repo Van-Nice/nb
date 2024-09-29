@@ -99,7 +99,7 @@ export default function FolderDropdownMenu({ triggerRefresh }) {
     <div className={styles.dropdownWrapper}>
       <button className={styles.buttonWrapper} onClick={toggleDropdown}>
         <span className={styles.icon}><FolderIcon /></span>
-        <span className={styles.text}>Folders</span>
+        <span className={styles.text}>Root</span>
       </button>
 
       {isDropdownOpen && (

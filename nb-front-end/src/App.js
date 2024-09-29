@@ -16,6 +16,12 @@ import DocumentEditor from "./components/DocumentEditor";
 import Suggested from "./components/Suggested";
 import "./App.css";
 
+// Road to MVP
+// TODO: Fully functioning menu bar
+// - Night theme feature
+// - Mobile CSS queries for all features
+// - Improved document editor component styling
+
 function App() {
   return (
     <UserProvider>

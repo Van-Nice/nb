@@ -1,13 +1,12 @@
 .dropdownWrapper {
   position: relative;
-  width: 250px; /* Adjust as needed */
+  width: 150px;
 }
 
 .buttonWrapper {
   display: flex;
   align-items: center;
   cursor: pointer;
-  background-color: #f1f3f4;
   border: none;
   padding: 10px;
   width: 100%;
@@ -64,7 +63,7 @@
 }
 
 .folderIconPlaceholder {
-  width: 24px; /* Same width as the icons to align text */
+  width: 24px;
 }
 
 .folderName {

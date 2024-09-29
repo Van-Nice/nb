@@ -2,7 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-// import styles from '../styles/DocumentEditor.module.css'; 
+import MenuBar from "./MenuBar"
+import { FaFileAlt} from 'react-icons/fa';
+import styles from '../styles/DocumentEditor.module.css'
+import Account from './Account';
+
 
 function DocumentEditor() {
   const { id } = useParams(); // Get the document ID from the URL
@@ -47,8 +51,6 @@ function DocumentEditor() {
   }, []);
 
   useEffect(() => {
-    // You could load the document from the server based on the id here
-    // For now, let's simulate loading existing content
     const loadDocument = async () => {
       const savedContent = localStorage.getItem(`document-${id}`);
       if (savedContent) {
@@ -60,7 +62,7 @@ function DocumentEditor() {
 
   const handleContentChange = (value) => {
     setContent(value);
-    localStorage.setItem(`document-${id}`, value); // Save the content locally
+    localStorage.setItem(`document-${id}`, value);
 
     // Send the updated content to the server via WebSocket
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
@@ -68,16 +70,38 @@ function DocumentEditor() {
     }
   };
 
+  const handleMenuAction = (action) => {
+    if (action === 'Save') {
+      console.log('Saving document...');
+      // You can handle save action here
+    } else if (action === 'New') {
+      setContent('');
+      console.log('New document created');
+    } else if (action === 'Download') {
+      console.log('Download document');
+      // You can trigger a download action here
+    }
+  };
+
   return (
     <div>
-      <h3>{id}</h3>
-      <ReactQuill
-        value={content}
-        onChange={handleContentChange}
-        modules={DocumentEditor.modules}
-        formats={DocumentEditor.formats}
-        style={{ height: '500px' }}
-      />
+      <div className={styles.headerWrapper}>
+        <div className={styles.header}>
+          <FaFileAlt className={styles.documentIcon}/>
+          <h3>{id}</h3>
+        </div>
+        <Account className={styles.account}/>
+      </div>
+      <MenuBar onMenuAction={handleMenuAction} className={styles.menubar}/>
+      <div className={styles.editor}>
+        <ReactQuill
+          value={content}
+          onChange={handleContentChange}
+          modules={DocumentEditor.modules}
+          formats={DocumentEditor.formats}
+          style={{ height: '500px' }}
+        />
+      </div>
     </div>
   );
 }

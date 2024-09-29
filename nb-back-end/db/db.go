@@ -480,7 +480,11 @@ func BuildFolderTree(folders []Folder) []*FolderNode {
             rootFolders = append(rootFolders, folderMap[folder.ID])
         } else {
             // Sub-folder
-            parentFolderNode := folderMap[*folder.ParentFolderID]
+            parentFolderNode, exists := folderMap[*folder.ParentFolderID]
+            if !exists {
+                log.Printf("Parent folder with ID %v not found for folder %v", *folder.ParentFolderID, folder.ID)
+                continue
+            }
             parentFolderNode.SubFolders = append(parentFolderNode.SubFolders, folderMap[folder.ID])
         }
     }
