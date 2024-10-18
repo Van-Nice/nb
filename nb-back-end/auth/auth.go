@@ -7,6 +7,7 @@ import (
 	"log"
 	"nb-back-end/db"
 	"nb-back-end/emailer"
+
 	// "nb-back-end/settings"
 	"net/http"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -35,6 +37,12 @@ type CreateAccountRequest struct {
     Username  string `json:"username" binding:"required"`
     Password  string `json:"password" binding:"required"`
     BirthDate string `json:"birth_date" binding:"required"`
+}
+
+// CustomClaims defines the custom JWT claims
+type CustomClaims struct {
+    UserID int `json:"user_id"`
+    jwt.RegisteredClaims
 }
 
 // Create account
@@ -284,4 +292,24 @@ func HandleAccountData(c *gin.Context) {
     })
 }
 
+func ValidateToken(tokenString string) (int, error) {
+	// Parse the token
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		// Verify the signing method and return the secret key
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("invalid signing method")
+		}
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
 
+	if err != nil {
+		return 0, err
+	}
+
+	// Extract the user ID from the token claims
+	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+		return claims.UserID, nil
+	}
+
+	return 0, fmt.Errorf("invalid token")
+}

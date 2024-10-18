@@ -42,7 +42,7 @@ function DocumentEditor() {
         
         const data = await response.json();
         setFileName(data.file.FileName);
-        // setContent(data.file.Content || "")
+        setContent(data.file.Content || "")
         // Establish web socket connection here
       } catch (err) {
         console.error("Error fetching file content:", err);
@@ -58,30 +58,33 @@ function DocumentEditor() {
       console.error("No token found");
       return;
     }
-    
-    const socket = new WebSocket("ws://localhost:8080/protected/ws");
-    
+  
+    const socket = new WebSocket(`ws://localhost:8080/protected/ws?token=${token}`);
+  
     socket.onopen = () => {
       console.log("WebSocket connection established");
-      // Send the token as part of the initial message
-      socket.send(JSON.stringify({ type: "auth", token }));
     };
-    
+  
     socket.onmessage = (event) => {
-      console.log("Received message from server:", event.data);
+      const data = JSON.parse(event.data);
+      if (data.status === "ok") {
+        console.log("Acknowledgment received");
+      } else {
+        // Handle updates from other clients if broadcasting is implemented
+        setContent(data.content);
+      }
     };
-    
+  
     socket.onerror = (error) => {
       console.log("WebSocket error:", error);
     };
-    
+  
     socket.onclose = () => {
       console.log("WebSocket connection closed");
     };
-
+  
     ws.current = socket;
-
-    // Cleanup when component unmounts
+  
     return () => {
       socket.close();
     };

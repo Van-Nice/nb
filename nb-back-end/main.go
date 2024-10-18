@@ -13,6 +13,11 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+
+
+
+
+	
 )
 
 func main() {
@@ -38,6 +43,7 @@ func main() {
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+		AllowWebSockets: true,
 		MaxAge:           12 * time.Hour,
 	}))
 
@@ -49,6 +55,7 @@ func main() {
 	router.POST("/auth/create-account", auth.HandleCreateAccount)
 	router.GET("/email-confirmation", auth.HandleVerifyEmail)
 	router.POST("/auth/login", auth.HandleLogin)
+	router.GET("/protected/ws", websocket.HandleWebSocket)
 	// Protected routes
 	protected := router.Group("/protected")
 	protected.Use(auth.JWTAuthMiddleware())
@@ -59,7 +66,6 @@ func main() {
 		protected.GET("/home", auth.HandleHome)
 		protected.POST("/create-file", content.HandleCreateFile)
 		protected.POST("/create-folder", content.HandleCreateFolder)
-		protected.GET("/ws", websocket.HandleWebSocket)
 		protected.POST("/account-data", auth.HandleAccountData)
 		protected.POST("/folders", content.HandleGetFolderContents)
 		protected.POST("/move-item", content.HandleMoveItem)
