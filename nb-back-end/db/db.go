@@ -505,3 +505,31 @@ func GetFileByID(fileID primitive.ObjectID) (*File, error) {
 
     return &file, nil
 }
+
+func RenameFile(userID int, fileID primitive.ObjectID, newFileName string) error {
+    collection := ContentDB.Database("nbdb").Collection("files")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    filter := bson.M{
+        "_id":     fileID,
+        "user_id": userID, // Ensure the user owns the file
+    }
+
+    update := bson.M{
+        "$set": bson.M{
+            "file_name": newFileName,
+        },
+    }
+
+    result, err := collection.UpdateOne(ctx, filter, update)
+    if err != nil {
+        return err
+    }
+
+    if result.MatchedCount == 0 {
+        return fmt.Errorf("file not found or you do not have permission to rename it")
+    }
+
+    return nil
+}

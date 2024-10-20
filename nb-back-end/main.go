@@ -73,6 +73,7 @@ func main() {
 		protected.GET("/deleted-items", content.HandleGetDeletedItems)
 		protected.GET("/nested-folders", content.HandleGetNestedFolders)
 		protected.GET("/files", content.HandleGetFileName)
+		protected.POST("/rename-file", content.HandleRenameFile)
 	}
 
 	if err := router.Run(":8080"); err != nil {

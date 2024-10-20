@@ -392,3 +392,43 @@ func HandleGetFileName(c *gin.Context) {
 
     c.JSON(http.StatusOK, gin.H{"file": file})
 }
+
+func HandleRenameFile(c *gin.Context) {
+    // Retrieve userID from the context
+    userIDInterface, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return
+    }
+
+    userID, ok := userIDInterface.(int)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+        return
+    }
+
+    var input struct {
+        FileID      string `json:"fileID" binding:"required"`
+        NewFileName string `json:"newFileName" binding:"required"`
+    }
+
+    if err := c.ShouldBindJSON(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    fileID, err := primitive.ObjectIDFromHex(input.FileID)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file ID"})
+        return
+    }
+
+    // Update the file's name in the database
+    err = db.RenameFile(userID, fileID, input.NewFileName)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to rename file: %v", err)})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "File renamed successfully"})
+}

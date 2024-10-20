@@ -253,7 +253,7 @@ function DocumentEditor() {
 
       const data = await response.json();
       console.log('File renamed successfully:', data);
-      setFileName(newName); // Update the fileName state
+      setFileName(newName);
     } catch (error) {
       console.error('Error renaming file:', error);
     }
