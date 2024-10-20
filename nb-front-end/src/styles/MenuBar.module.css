@@ -1,33 +1,95 @@
+/* Wrapper for the entire menu bar */
 .menuWrapper {
     display: flex;
     gap: 1rem;
     margin: 1rem;
+    position: relative; /* Added to establish a positioning context */
 }
 
+/* Style for individual main menu items */
+.menuItem {
+    position: relative; /* Allows positioning of dropdown menus */
+    cursor: pointer;
+}
+
+/* Style for the dropdown menu */
 .dropdown {
-    display: flex;
+    display: none; /* Initially hidden */
     flex-direction: column;
-    justify-content: space-around;
     position: absolute;
+    top: 100%; /* Position below the menu item */
+    left: 0;
     background-color: #f0f0f0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    gap: 1rem;
     z-index: 1000;
     padding: 0.25rem 0;
-    width: 10rem;
+    min-width: 10rem;
 }
 
 /* Style for the individual dropdown items */
 .dropdownItem {
+    position: relative; /* Allows positioning of sub-dropdowns */
     padding: 0.5rem 1rem;
     cursor: pointer;
     background-color: #f0f0f0;
     transition: background-color 0.3s ease, color 0.3s ease;
     text-align: left;
+    display: flex;
+    align-items: center;
 }
 
 /* Hover effect for the dropdown items */
 .dropdownItem:hover {
     background-color: #007bff; /* Change background color on hover */
     color: white; /* Change text color on hover */
+}
+
+/* Style for the submenu arrow indicator */
+.submenuArrow {
+    margin-left: auto;
+    font-size: 0.8em;
+    opacity: 0.6;
+}
+
+/* Style for the sub-dropdown menu */
+.subDropdown {
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 100%; /* Position to the right of the parent dropdown item */
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    min-width: 10rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure sub-dropdown items inherit styles */
+.subDropdown .dropdownItem {
+    padding: 0.5rem 1rem;
+}
+
+/* Adjust hover effect for sub-dropdown items */
+.subDropdown .dropdownItem:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Optional: Style for menu item content to align arrow */
+.menuItemContent {
+    display: flex;
+    align-items: center;
+}
+
+/* Display dropdown when menu item is active */
+.menuItem:hover .dropdown,
+.menuItem:focus .dropdown {
+    display: flex;
+}
+
+/* Display sub-dropdown when dropdown item is active */
+.dropdownItem:hover .subDropdown,
+.dropdownItem:focus .subDropdown {
+    display: flex;
 }

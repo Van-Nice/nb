@@ -4,22 +4,32 @@ import styles from "../styles/MenuBar.module.css";
 // MenuBar Component
 const MenuBar = ({ onMenuAction }) => {
   const [activeMenu, setActiveMenu] = useState(null);
+  const [activeSubMenu, setActiveSubMenu] = useState(null);
+
 
   const handleMenuClick = (menuName) => {
     setActiveMenu(activeMenu === menuName ? null : menuName);
+    setActiveSubMenu(null); // Close any open submenus
   };
 
-  const handleMenuItemClick = (action) => {
-    onMenuAction(action);
-    setActiveMenu(null);
+  const handleMenuItemClick = (action, hasSubItems) => {
+    if (hasSubItems) {
+      setActiveSubMenu(activeSubMenu === action ? null : action);
+    } else {
+      onMenuAction(action);
+      setActiveMenu(null);
+      setActiveSubMenu(null);
+    }
   };
 
-  const handleMouseEnter = (menuName) => {
+  const handleMouseEnterMenu = (menuName) => {
     setActiveMenu(menuName); // Open the dropdown on hover
+    setActiveSubMenu(null);
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeaveMenu = () => {
     setActiveMenu(null); // Close the dropdown when mouse leaves the menu area
+    setActiveSubMenu(null);
   };
 
   // Define the menu structure
@@ -28,7 +38,16 @@ const MenuBar = ({ onMenuAction }) => {
       name: "File",
       items: [
         { action: "New", label: "New" },
-        { action: "Download", label: "Download" },
+        { action: "Download",
+          label: "Download",
+          subItems: [
+            {action: "DownloadTXT", label: "Plain Text (.txt)"},
+            { action: "DownloadHTML", label: "Web Page (.html)" },
+            { action: "DownloadMD", label: "Markdown (.md)" },
+            { action: "DownloadPDF", label: "PDF Document .pdf" },
+            { action: "DownloadDOCX", label: "Microsoft Word (.docx)" },
+          ] 
+        },
         { action: "Open", label: "Open" },
         { action: "Rename", label: "Rename" },
         { action: "Move", label: "Move" },
@@ -54,8 +73,8 @@ const MenuBar = ({ onMenuAction }) => {
         <div
           key={menu.name}
           className={styles.menuItem}
-          onMouseEnter={() => handleMouseEnter(menu.name)}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={() => handleMouseEnterMenu(menu.name)}
+          onMouseLeave={handleMouseLeaveMenu}
         >
           <span onClick={() => handleMenuClick(menu.name)}>{menu.name}</span>
           {activeMenu === menu.name && (
@@ -63,10 +82,34 @@ const MenuBar = ({ onMenuAction }) => {
               {menu.items.map((item) => (
                 <div
                   key={item.action}
-                  onClick={() => handleMenuItemClick(item.action)}
                   className={styles.dropdownItem}
+                  onClick={() =>
+                    handleMenuItemClick(item.action, item.subItems)
+                  }
+                  onMouseEnter={() =>
+                    item.subItems && setActiveSubMenu(item.action)
+                  }
+                  onMouseLeave={() =>
+                    item.subItems && setActiveSubMenu(null)
+                  }
                 >
                   {item.label}
+                  {item.subItems && (
+                    <span className={styles.submenuArrow}>▶</span>
+                  )}
+                  {activeSubMenu === item.action && item.subItems && (
+                    <div className={styles.subDropdown}>
+                      {item.subItems.map((subItem) => (
+                        <div
+                          key={subItem.action}
+                          className={styles.dropdownItem}
+                          onClick={() => handleMenuItemClick(subItem.action)}
+                        >
+                          {subItem.label}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

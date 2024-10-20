@@ -7,6 +7,10 @@ import { FaFileAlt } from "react-icons/fa";
 import styles from "../styles/DocumentEditor.module.css";
 import Account from "./Account";
 import FileNameModal from './FileNameModal';
+import TurndownService from 'turndown';
+import html2pdf from 'html2pdf.js';
+import { Document, Packer, Paragraph } from 'docx';
+import { saveAs } from 'file-saver';
 
 function DocumentEditor() {
   // const navigate = useNavigate();
@@ -103,14 +107,98 @@ function DocumentEditor() {
     }
   };
 
+  // Download actions for Download selection from menu bar
+  const downloadAsText = () => {
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      const text = quill.getText();
+      const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+      const fileNameWithExtension = `${fileName || 'document'}.txt`;
+      triggerDownload(blob, fileNameWithExtension)
+    }
+  };
+
+  const downloadAsHTML = () => {
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      const html = quill.root.innerHTML;
+      const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+      const fileNameWithExtension = `${fileName || 'document'}.html`;
+      triggerDownload(blob, fileNameWithExtension);
+    }
+  };
+
+  const downloadAsMarkdown = () => {
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      const html = quill.root.innerHTML;
+      const turndownService = new TurndownService();
+      const markdown = turndownService.turndown(html);
+      const blob = new Blob([markdown], {type: 'text/markdown;charset=utf-8'});
+      const fileNameWithExtension = `${fileName || 'document'}.md`;
+      triggerDownload(blob, fileNameWithExtension);
+    }
+  }
+
+  const downloadAsPDF = () => {
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      const html = quill.root.innerHTML;
+      const fileNameWithExtension = `${fileName || 'document'}.pdf`;
+      const options = {
+        margin: 1,
+        filename: fileNameWithExtension,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+      };
+      html2pdf().from(html).set(options).save();
+    }
+  };
+
+  const downloadAsDocx = async () => {
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      const text = quill.getText();
+      const doc = new Document({
+        sections: [
+          {
+            children: [new Paragraph(text)],
+          },
+        ],
+      });
+      const blob = await Packer.toBlob(doc);
+      const fileNameWithExtension = `${fileName || 'document'}.docx`;
+      saveAs(blob, fileNameWithExtension);
+    }
+  };
+
+  const triggerDownload = (blob, fileName) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const handleMenuAction = (action) => {
     if (action === "New") {
       if (fileNameModalRef.current) {
         fileNameModalRef.current.openModal();
       }
-    } else if (action === "Download") {
-      console.log("Download document");
-      // Implement download logic here
+    } else if (action === "DownloadTXT") {
+      downloadAsText();
+    } else if (action === "DownloadHTML") {
+      downloadAsHTML();
+    } else if (action === "DownloadMD") {
+      downloadAsMarkdown();
+    } else if (action === "DownloadPDF") {
+      downloadAsPDF();
+    } else if (action === "DownloadDOCX") {
+      downloadAsDocx();
     } else if (action === "Cut") {
       handleCut();
     } else if (action === "Copy") {
@@ -216,8 +304,6 @@ function DocumentEditor() {
     }
   };
   
-  
-
   return (
     <div>
       <div className={styles.headerWrapper}>
