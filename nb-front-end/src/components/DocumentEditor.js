@@ -13,8 +13,10 @@ function DocumentEditor() {
 
   const [fileName, setFileName] = useState("");
   const [content, setContent] = useState("");
+  const quillRef = useRef(null); // Quill editor reference
   const ws = useRef(null);
-  // TODO: Fetch file name and create a web socket connection
+
+  // Fetch file content and establish WebSocket connection
   useEffect(() => {
     const fetchFileContent = async () => {
       try {
@@ -42,8 +44,7 @@ function DocumentEditor() {
         
         const data = await response.json();
         setFileName(data.file.FileName);
-        setContent(data.file.Content || "")
-        // Establish web socket connection here
+        setContent(data.file.Content || "");
       } catch (err) {
         console.error("Error fetching file content:", err);
       }
@@ -70,7 +71,6 @@ function DocumentEditor() {
       if (data.status === "ok") {
         console.log("Acknowledgment received");
       } else {
-        // Handle updates from other clients if broadcasting is implemented
         setContent(data.content);
       }
     };
@@ -103,15 +103,93 @@ function DocumentEditor() {
   const handleMenuAction = (action) => {
     if (action === "Save") {
       console.log("Saving document...");
-      // You can handle save action here
+      // Implement save logic here
     } else if (action === "New") {
       setContent("");
       console.log("New document created");
     } else if (action === "Download") {
       console.log("Download document");
-      // You can trigger a download action here
+      // Implement download logic here
+    } else if (action === "Cut") {
+      handleCut();
+    } else if (action === "Copy") {
+      handleCopy();
+    } else if (action === "Paste") {
+      handlePaste();
     }
   };
+
+  // Clipboard actions for Quill editor
+  const handleCut = () => {
+    console.log("Cut operation initiated");
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      quill.focus(); // Ensure the editor is focused
+      const range = quill.getSelection();
+      console.log('Selection range:', range);
+      if (range && range.length > 0) {
+        const text = quill.getText(range.index, range.length);
+        console.log('Text to cut:', text);
+        navigator.clipboard.writeText(text).then(() => {
+          quill.deleteText(range.index, range.length);
+          console.log("Text cut to clipboard");
+        }).catch(err => {
+          console.error("Failed to write to clipboard:", err);
+        });
+      } else {
+        console.log("No text selected to cut");
+      }
+    } else {
+      console.error('Quill editor instance is not available');
+    }
+  };
+  
+  
+  const handleCopy = () => {
+    console.log("Copy operation initiated");
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      quill.focus();
+      const range = quill.getSelection();
+      console.log('Selection range:', range);
+      if (range && range.length > 0) {
+        const text = quill.getText(range.index, range.length);
+        console.log('Text to copy:', text);
+        navigator.clipboard.writeText(text).then(() => {
+          console.log("Text copied to clipboard");
+        }).catch(err => {
+          console.error("Failed to write to clipboard:", err);
+        });
+      } else {
+        console.log("No text selected to copy");
+      }
+    } else {
+      console.error('Quill editor instance is not available');
+    }
+  };
+  
+  
+  const handlePaste = () => {
+    console.log("Paste operation initiated");
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      quill.focus();
+      navigator.clipboard.readText().then((text) => {
+        const range = quill.getSelection(true); // 'true' to get the cursor position if no selection
+        console.log('Cursor position for paste:', range);
+        if (range) {
+          quill.insertText(range.index, text);
+          console.log("Text pasted from clipboard");
+        }
+      }).catch(err => {
+        console.error("Failed to read from clipboard:", err);
+      });
+    } else {
+      console.error('Quill editor instance is not available');
+    }
+  };
+  
+  
 
   return (
     <div>
@@ -125,6 +203,7 @@ function DocumentEditor() {
       <MenuBar onMenuAction={handleMenuAction} className={styles.menubar} />
       <div className={styles.editor}>
         <ReactQuill
+          ref={quillRef}
           value={content}
           onChange={handleContentChange}
           modules={DocumentEditor.modules}

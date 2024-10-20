@@ -17,10 +17,11 @@ import Suggested from "./components/Suggested";
 import "./App.css";
 
 // Road to MVP
-// TODO: Fully functioning menu bar
+// TODO: Fully functioning menu bar (in document)
 // - Night theme feature
 // - Mobile CSS queries for all features
 // - Improved document editor component styling
+// - Fully function search bar (home)
 
 function App() {
   return (
