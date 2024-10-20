@@ -5,13 +5,13 @@ import "react-quill/dist/quill.snow.css";
 import MenuBar from "./MenuBar";
 import Modal from './Modal';
 import MoveFileModal from "./MoveFileModal";
-import FileBrowser from './FileBrowser'; // Import the new FileBrowser component
+import FileBrowser from './FileBrowser';
 import { FaFileAlt } from "react-icons/fa";
 import styles from "../styles/DocumentEditor.module.css";
 import Account from "./Account";
 import FileNameModal from './FileNameModal';
 import TurndownService from 'turndown';
-import RenameFileModal from './RenameFileModal'; // Import the RenameFileModal
+import RenameFileModal from './RenameFileModal'; 
 import html2pdf from 'html2pdf.js';
 import { Document, Packer, Paragraph } from 'docx';
 import { saveAs } from 'file-saver';
@@ -215,6 +215,8 @@ function DocumentEditor() {
       moveFileModalRef.current.openModal();
     } else if (action === "Open") {
       setIsOpenModalOpen(true);
+    } else if (action === "Delete") {
+      handleDeleteFile();
     } else if (action === "Cut") {
       handleCut();
     } else if (action === "Copy") {
@@ -225,6 +227,43 @@ function DocumentEditor() {
       handleUndo();
     } else if (action === "Redo") {
       handleRedo();
+    }
+  };
+
+  // Delete file function
+  const handleDeleteFile = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
+      const response = await fetch('http://localhost:8080/protected/delete-item', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify({
+          itemID: id,
+          itemType: 'file',
+        }),
+      });
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error('Error response from server:', errorResponse);
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log('File deleted successfully:', data);
+
+      // Navigate to /home after successful deletion
+      navigate('/home');
+    } catch (error) {
+      console.error('Error deleting file:', error);
     }
   };
 
