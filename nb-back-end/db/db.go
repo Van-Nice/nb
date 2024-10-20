@@ -533,3 +533,120 @@ func RenameFile(userID int, fileID primitive.ObjectID, newFileName string) error
 
     return nil
 }
+
+// MoveFile moves a file to a new folder
+func MoveFile(userID int, fileID primitive.ObjectID, targetFolderID *primitive.ObjectID) error {
+    collection := ContentDB.Database("nbdb").Collection("files")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    // Ensure the user owns the file
+    filter := bson.M{
+        "_id":       fileID,
+        "user_id":   userID,
+        "is_deleted": false,
+    }
+
+    update := bson.M{
+        "$set": bson.M{
+            "parent_folder_id": targetFolderID,
+        },
+    }
+
+    result, err := collection.UpdateOne(ctx, filter, update)
+    if err != nil {
+        return fmt.Errorf("failed to move file: %v", err)
+    }
+
+    if result.MatchedCount == 0 {
+        return fmt.Errorf("file not found or you do not have permission to move it")
+    }
+
+    return nil
+}
+
+// MoveFolder moves a folder to a new parent folder
+func MoveFolder(userID int, folderID primitive.ObjectID, targetFolderID *primitive.ObjectID) error {
+    collection := ContentDB.Database("nbdb").Collection("folders")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    // Ensure the user owns the folder
+    filter := bson.M{
+        "_id":       folderID,
+        "user_id":   userID,
+        "is_deleted": false,
+    }
+
+    // Check for circular reference
+    if targetFolderID != nil {
+        isDescendant, err := IsDescendantFolder(folderID, *targetFolderID)
+        if err != nil {
+            return fmt.Errorf("failed to check folder hierarchy: %v", err)
+        }
+        if isDescendant {
+            return fmt.Errorf("cannot move a folder into one of its subfolders")
+        }
+    }
+
+    update := bson.M{
+        "$set": bson.M{
+            "parent_folder_id": targetFolderID,
+        },
+    }
+
+    result, err := collection.UpdateOne(ctx, filter, update)
+    if err != nil {
+        return fmt.Errorf("failed to move folder: %v", err)
+    }
+
+    if result.MatchedCount == 0 {
+        return fmt.Errorf("folder not found or you do not have permission to move it")
+    }
+
+    return nil
+}
+
+// FolderExistsAndOwnedByUser checks if a folder exists and is owned by the user
+func FolderExistsAndOwnedByUser(userID int, folderID primitive.ObjectID) (bool, error) {
+    collection := ContentDB.Database("nbdb").Collection("folders")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    count, err := collection.CountDocuments(ctx, bson.M{
+        "_id":       folderID,
+        "user_id":   userID,
+        "is_deleted": false,
+    })
+    if err != nil {
+        return false, err
+    }
+
+    return count > 0, nil
+}
+
+// IsDescendantFolder checks if potentialDescendantID is a descendant of folderID
+func IsDescendantFolder(folderID, potentialDescendantID primitive.ObjectID) (bool, error) {
+    if folderID == potentialDescendantID {
+        return true, nil
+    }
+
+    collection := ContentDB.Database("nbdb").Collection("folders")
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    var folder Folder
+    err := collection.FindOne(ctx, bson.M{"_id": potentialDescendantID}).Decode(&folder)
+    if err != nil {
+        if err == mongo.ErrNoDocuments {
+            return false, nil
+        }
+        return false, err
+    }
+
+    if folder.ParentFolderID == nil {
+        return false, nil
+    }
+
+    return IsDescendantFolder(folderID, *folder.ParentFolderID)
+}

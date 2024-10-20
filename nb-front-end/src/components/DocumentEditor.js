@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef, act } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import MenuBar from "./MenuBar";
 import Modal from './Modal';
+import MoveFileModal from "./MoveFileModal";
 import FileBrowser from './FileBrowser'; // Import the new FileBrowser component
 import { FaFileAlt } from "react-icons/fa";
 import styles from "../styles/DocumentEditor.module.css";
@@ -28,6 +29,7 @@ function DocumentEditor() {
   const ws = useRef(null);
   const fileNameModalRef = useRef(null);
   const renameFileModalRef = useRef(null); // Reference to RenameFileModal
+  const moveFileModalRef = useRef(null);
 
   // Fetch file content and establish WebSocket connection
   useEffect(() => {
@@ -209,6 +211,8 @@ function DocumentEditor() {
       if (renameFileModalRef.current) {
         renameFileModalRef.current.openModal();
       }
+    } else if (action === "Move") {
+      moveFileModalRef.current.openModal();
     } else if (action === "Open") {
       setIsOpenModalOpen(true);
     } else if (action === "Cut") {
@@ -221,6 +225,42 @@ function DocumentEditor() {
       handleUndo();
     } else if (action === "Redo") {
       handleRedo();
+    }
+  };
+
+  // Function to handle moving the file
+  const handleMoveFile = async (targetFolderID) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
+      const response = await fetch('http://localhost:8080/protected/move-item', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify({
+          itemID: id,
+          targetFolderID: targetFolderID || null,
+          itemType: 'file',
+        }),
+      });
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error('Error response from server:', errorResponse);
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log('File moved successfully:', data);
+      // Optionally, display a success message or update the UI
+    } catch (error) {
+      console.error('Error moving file:', error);
     }
   };
 
@@ -394,6 +434,10 @@ function DocumentEditor() {
         onRename={handleRenameFile}
       />
       <FileNameModal ref={fileNameModalRef} />
+      <MoveFileModal
+        ref={moveFileModalRef}
+        onMove={handleMoveFile}
+      />
     </div>
   );
 }

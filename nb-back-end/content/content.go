@@ -202,46 +202,78 @@ func HandleGetFolderContents(c *gin.Context) {
     })
 }
 
+// HandleMoveItem handles moving a file or folder to a new location
 func HandleMoveItem(c *gin.Context) {
+    // Retrieve userID from context
+    userIDInterface, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return
+    }
+
+    userID, ok := userIDInterface.(int)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+        return
+    }
+
     var input MoveItemInput
     if err := c.ShouldBindJSON(&input); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
-    } 
-    // Log the input for debugging
-    fmt.Printf("MoveItemInput: %+v\n", input)
-  
+    }
+
+    // Validate ItemID
     itemID, err := primitive.ObjectIDFromHex(input.ItemID)
     if err != nil {
-      c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid item ID"})
-      return
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid item ID"})
+        return
     }
-  
-    targetFolderID, err := primitive.ObjectIDFromHex(input.TargetFolderID)
-    if err != nil {
-      c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid target folder ID"})
-      return
+
+    // Handle TargetFolderID
+    var targetFolderID *primitive.ObjectID
+    if input.TargetFolderID != "" {
+        id, err := primitive.ObjectIDFromHex(input.TargetFolderID)
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid target folder ID"})
+            return
+        }
+        targetFolderID = &id
+    } else {
+        targetFolderID = nil // Move to root
     }
-  
+
+    // Validate TargetFolderID
+    if targetFolderID != nil {
+        exists, err := db.FolderExistsAndOwnedByUser(userID, *targetFolderID)
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate target folder"})
+            return
+        }
+        if !exists {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "Target folder does not exist or you do not have access"})
+            return
+        }
+    }
+
     // Move the file or folder based on the itemType
     if input.ItemType == "file" {
-      // Update the file's ParentFolderID
-      collection := db.ContentDB.Database("nbdb").Collection("files")
-      _, err := collection.UpdateOne(context.TODO(), bson.M{"_id": itemID}, bson.M{"$set": bson.M{"parent_folder_id": targetFolderID}})
-      if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to move file"})
-        return
-      }
+        err = db.MoveFile(userID, itemID, targetFolderID)
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to move file: %v", err)})
+            return
+        }
     } else if input.ItemType == "folder" {
-      // Update the folder's ParentFolderID
-      collection := db.ContentDB.Database("nbdb").Collection("folders")
-      _, err := collection.UpdateOne(context.TODO(), bson.M{"_id": itemID}, bson.M{"$set": bson.M{"parent_folder_id": targetFolderID}})
-      if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to move folder"})
+        err = db.MoveFolder(userID, itemID, targetFolderID)
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to move folder: %v", err)})
+            return
+        }
+    } else {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid item type"})
         return
-      }
     }
-  
+
     c.JSON(http.StatusOK, gin.H{"message": "Item moved successfully"})
 }
 

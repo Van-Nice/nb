@@ -1,0 +1,73 @@
+/* Modal overlay */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+  
+  /* Modal content */
+.modalContent {
+  position: relative;
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 8px;
+  z-index: 1001;
+}
+
+.error {
+  color: red;
+  margin-bottom: 10px;
+}
+
+.backButton,
+.moveButton,
+.cancelButton {
+  margin-top: 10px;
+  margin-right: 10px;
+  padding: 8px 16px;
+}
+
+.folderList {
+  display: flex;
+  flex-direction: column;
+}
+
+.folderItem {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin: 4px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.folderItem:hover {
+  background-color: #f0f0f0;
+}
+  
+.buttonGroup {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+  
+.buttonGroup button {
+  margin-left: 10px;
+  padding: 8px 16px;
+}
+
+.leftButton {
+  display: flex;
+}
+
+.rightButtons {
+  display: flex;
+}  
