@@ -28,7 +28,6 @@ const MenuBar = ({ onMenuAction }) => {
       name: "File",
       items: [
         { action: "New", label: "New" },
-        { action: "Save", label: "Save" },
         { action: "Download", label: "Download" },
         { action: "Open", label: "Open" },
         { action: "Rename", label: "Rename" },

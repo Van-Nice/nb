@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useOutletContext } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import MenuBar from "./MenuBar";
 import { FaFileAlt } from "react-icons/fa";
 import styles from "../styles/DocumentEditor.module.css";
 import Account from "./Account";
+import FileNameModal from './FileNameModal';
 
 function DocumentEditor() {
+  // const navigate = useNavigate();
   const { id } = useParams();
   const context = useOutletContext();
 
@@ -15,6 +17,7 @@ function DocumentEditor() {
   const [content, setContent] = useState("");
   const quillRef = useRef(null); // Quill editor reference
   const ws = useRef(null);
+  const fileNameModalRef = useRef(null);
 
   // Fetch file content and establish WebSocket connection
   useEffect(() => {
@@ -101,12 +104,10 @@ function DocumentEditor() {
   };
 
   const handleMenuAction = (action) => {
-    if (action === "Save") {
-      console.log("Saving document...");
-      // Implement save logic here
-    } else if (action === "New") {
-      setContent("");
-      console.log("New document created");
+    if (action === "New") {
+      if (fileNameModalRef.current) {
+        fileNameModalRef.current.openModal();
+      }
     } else if (action === "Download") {
       console.log("Download document");
       // Implement download logic here
@@ -236,6 +237,7 @@ function DocumentEditor() {
           formats={DocumentEditor.formats}
         />
       </div>
+      <FileNameModal ref={fileNameModalRef} />
     </div>
   );
 }
