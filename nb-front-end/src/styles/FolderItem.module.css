@@ -1,0 +1,10 @@
+.folderItem {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .folderIcon {
+    margin-right: 5px;
+  }
+  

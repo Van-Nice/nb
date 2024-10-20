@@ -1,13 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, act } from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import MenuBar from "./MenuBar";
+import Modal from './Modal';
+import FileBrowser from './FileBrowser'; // Import the new FileBrowser component
 import { FaFileAlt } from "react-icons/fa";
 import styles from "../styles/DocumentEditor.module.css";
 import Account from "./Account";
 import FileNameModal from './FileNameModal';
 import TurndownService from 'turndown';
+import RenameFileModal from './RenameFileModal'; // Import the RenameFileModal
 import html2pdf from 'html2pdf.js';
 import { Document, Packer, Paragraph } from 'docx';
 import { saveAs } from 'file-saver';
@@ -16,12 +19,15 @@ function DocumentEditor() {
   // const navigate = useNavigate();
   const { id } = useParams();
   const context = useOutletContext();
+  const navigate = useNavigate();
 
   const [fileName, setFileName] = useState("");
   const [content, setContent] = useState("");
+  const [isOpenModalOpen, setIsOpenModalOpen] = useState(false); // State for modal
   const quillRef = useRef(null); // Quill editor reference
   const ws = useRef(null);
   const fileNameModalRef = useRef(null);
+  const renameFileModalRef = useRef(null); // Reference to RenameFileModal
 
   // Fetch file content and establish WebSocket connection
   useEffect(() => {
@@ -199,6 +205,12 @@ function DocumentEditor() {
       downloadAsPDF();
     } else if (action === "DownloadDOCX") {
       downloadAsDocx();
+    } else if (action === "Rename") {
+      if (renameFileModalRef.current) {
+        renameFileModalRef.current.openModal();
+      }
+    } else if (action === "Open") {
+      setIsOpenModalOpen(true);
     } else if (action === "Cut") {
       handleCut();
     } else if (action === "Copy") {
@@ -209,6 +221,41 @@ function DocumentEditor() {
       handleUndo();
     } else if (action === "Redo") {
       handleRedo();
+    }
+  };
+
+  // Rename file function
+  const handleRenameFile = async (newName) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
+      const response = await fetch('http://localhost:8080/protected/rename-file', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify({
+          fileID: id,
+          newFileName: newName,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error('Error response from server:', errorResponse);
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log('File renamed successfully:', data);
+      setFileName(newName); // Update the fileName state
+    } catch (error) {
+      console.error('Error renaming file:', error);
     }
   };
 
@@ -303,9 +350,19 @@ function DocumentEditor() {
       console.error('Quill editor instance is not available');
     }
   };
+
+  const closeModal = () => {
+    setIsOpenModalOpen(false);
+  }
+
+  const handleFileSelect = (fileId) => {
+    setIsOpenModalOpen(false);
+    navigate(`/document/${fileId}`);
+  };
   
   return (
     <div>
+      {/* Header & MenuBar */}
       <div className={styles.headerWrapper}>
         <div className={styles.header}>
           <FaFileAlt className={styles.documentIcon} />
@@ -314,6 +371,8 @@ function DocumentEditor() {
         <Account className={styles.account} />
       </div>
       <MenuBar onMenuAction={handleMenuAction} className={styles.menubar} />
+
+      {/* Editor */}
       <div className={styles.editor}>
         <ReactQuill
           ref={quillRef}
@@ -323,6 +382,17 @@ function DocumentEditor() {
           formats={DocumentEditor.formats}
         />
       </div>
+      
+      {/* Modals */}
+      <Modal isOpen={isOpenModalOpen} onClose={closeModal}>
+        <h2>Select a Document to Open</h2>
+        <FileBrowser onFileSelect={handleFileSelect} />
+      </Modal>
+      <RenameFileModal
+        ref={renameFileModalRef}
+        currentFileName={fileName}
+        onRename={handleRenameFile}
+      />
       <FileNameModal ref={fileNameModalRef} />
     </div>
   );

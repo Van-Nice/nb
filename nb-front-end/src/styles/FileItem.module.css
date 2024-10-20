@@ -1,0 +1,10 @@
+.fileItem {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .fileIcon {
+    margin-right: 5px;
+  }
+  
