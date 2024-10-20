@@ -116,10 +116,36 @@ function DocumentEditor() {
       handleCopy();
     } else if (action === "Paste") {
       handlePaste();
+    } else if (action === "Undo") {
+      handleUndo();
+    } else if (action === "Redo") {
+      handleRedo();
     }
   };
 
   // Clipboard actions for Quill editor
+  const handleUndo = () => {
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      quill.history.undo();
+      quill.focus();
+      console.log("Undo action performed");
+    } else {
+      console.error("Quill editor instance is not available");
+    }
+  };
+  
+  const handleRedo = () => {
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      quill.history.redo();
+      quill.focus();
+      console.log("Redo action performed");
+    } else {
+      console.error("Quill editor instance is not available");
+    }
+  };
+
   const handleCut = () => {
     console.log("Cut operation initiated");
     if (quillRef.current) {
@@ -227,6 +253,11 @@ DocumentEditor.modules = {
     ["link", "image", "code-block"],
     ["clean"],
   ],
+  history: {
+    delay: 1000,
+    maxStack: 500,
+    userOnly: true,
+  },
 };
 
 // Quill formats configuration

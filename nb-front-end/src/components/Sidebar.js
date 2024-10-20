@@ -6,8 +6,6 @@ import New from "./New";
 import Trash from "./Trash";
 import FolderDropdownMenu from "./FolderDropdownMenu";
 
-// TODO: Add sidebar folder dropdown menu
-
 export default function Sidebar({ triggerRefresh }) {
   return (
     <div className={parentStyles.sidebar}>
