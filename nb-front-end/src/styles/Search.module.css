@@ -1,18 +1,21 @@
 .searchBarWrapper {
   display: flex;
   align-items: center;
-  background-color: var(--bg-color-light);
+  background-color: var(--search-bg-color);
+  border: 0.5px solid var(--search-border-color);
   border-radius: 24px;
   padding: 8px 16px;
   width: 100%;
   max-width: 500px;
-  box-shadow: var(--box-shadow-light);
+  position: relative;
+  transition: background-color 0.3s, border 0.3s, box-shadow 0.3s;
 }
 
 .searchIcon {
   font-size: 16px;
   margin-right: 8px;
-  color: var(--icon-color-light);
+  color: var(--search-icon-color);
+  transition: color 0.3s;
 }
 
 .searchInput {
@@ -20,29 +23,64 @@
   outline: none;
   background: transparent;
   font-size: 16px;
-  color: var(--text-color-light);
+  color: var(--search-text-color);
   width: 100%;
+  transition: color 0.3s;
 }
 
 .searchInput::placeholder {
-  color: var(--placeholder-color-light);
+  color: var(--search-placeholder-color);
+  transition: color 0.3s;
 }
 
-/* Dark mode styles (applied when body has 'dark' class) */
-body.dark .searchBarWrapper {
-  background-color: var(--bg-color-dark);
-  box-shadow: var(--box-shadow-dark);
-  border: 2px solid white; /* Border for dark mode */
+.searchResults {
+  margin-top: 16px;
 }
 
-body.dark .searchIcon {
-  color: var(--icon-color-dark);
+.resultItem {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
 }
 
-body.dark .searchInput {
-  color: var(--text-color-dark);
+.resultItem h3 {
+  margin: 0;
+  font-size: 18px;
 }
 
-body.dark .searchInput::placeholder {
-  color: var(--placeholder-color-dark);
+.resultItem p {
+  margin: 4px 0 0;
+  color: #666;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: var(--dropdown-bg-color);
+  border: 1px solid var(--dropdown-border-color);
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: var(--dropdown-hover-bg);
+}
+
+.icon {
+  margin-right: 8px;
+}
+
+.itemText {
+  color: var(--text-color);
 }

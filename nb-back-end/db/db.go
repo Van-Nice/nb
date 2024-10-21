@@ -650,3 +650,66 @@ func IsDescendantFolder(folderID, potentialDescendantID primitive.ObjectID) (boo
 
     return IsDescendantFolder(folderID, *folder.ParentFolderID)
 }
+
+func SearchFilesAndFolders(userID int, query string) ([]bson.M, error) {
+    var results []bson.M
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
+    // Prepare regex for case-insensitive search
+    searchRegex := bson.M{"$regex": query, "$options": "i"}
+
+    // Search in files
+    fileCollection := ContentDB.Database("nbdb").Collection("files")
+    fileFilter := bson.M{
+        "user_id": userID,
+        "$or": []bson.M{
+            {"file_name": searchRegex},
+            {"content": searchRegex},
+        },
+        "is_deleted": false,
+    }
+
+    // Use projection to exclude unwanted fields if necessary
+    fileOptions := options.Find()
+
+    fileCursor, err := fileCollection.Find(ctx, fileFilter, fileOptions)
+    if err != nil {
+        return nil, fmt.Errorf("failed to search files: %v", err)
+    }
+    defer fileCursor.Close(ctx)
+
+    for fileCursor.Next(ctx) {
+        var file bson.M
+        if err := fileCursor.Decode(&file); err != nil {
+            return nil, fmt.Errorf("failed to decode file: %v", err)
+        }
+        file["type"] = "file" // Add a type field to distinguish files and folders
+        results = append(results, file)
+    }
+
+    // Search in folders
+    folderCollection := ContentDB.Database("nbdb").Collection("folders")
+    folderFilter := bson.M{
+        "user_id":     userID,
+        "folder_name": searchRegex,
+        "is_deleted":  false,
+    }
+
+    folderCursor, err := folderCollection.Find(ctx, folderFilter)
+    if err != nil {
+        return nil, fmt.Errorf("failed to search folders: %v", err)
+    }
+    defer folderCursor.Close(ctx)
+
+    for folderCursor.Next(ctx) {
+        var folder bson.M
+        if err := folderCursor.Decode(&folder); err != nil {
+            return nil, fmt.Errorf("failed to decode folder: %v", err)
+        }
+        folder["type"] = "folder" // Add a type field
+        results = append(results, folder)
+    }
+
+    return results, nil
+}

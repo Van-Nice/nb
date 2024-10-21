@@ -464,3 +464,33 @@ func HandleRenameFile(c *gin.Context) {
 
     c.JSON(http.StatusOK, gin.H{"message": "File renamed successfully"})
 }
+
+func HandleSearch(c *gin.Context) {
+    // Retrieve userID from context
+    userIDInterface, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return
+    }
+
+    userID, ok := userIDInterface.(int)
+    if !ok {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+        return
+    }
+
+    query := c.Query("query")
+    if query == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Query parameter is required"})
+        return
+    }
+
+    // Perform search in the database
+    results, err := db.SearchFilesAndFolders(userID, query)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search"})
+        return
+    }
+
+    c.JSON(http.StatusOK, results)
+}

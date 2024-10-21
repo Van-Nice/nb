@@ -19,10 +19,9 @@ import "./App.css";
 
 
 // Road to MVP
-// TODO - Night theme feature
+// TODO: Fully function search bar (home)
 // - Mobile CSS queries for all features
 // - Improved document editor component styling
-// - Fully function search bar (home)
 
 function App() {
   return (

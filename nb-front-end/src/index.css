@@ -1,103 +1,115 @@
-/* html {
-  color-scheme: light dark;
-} */
-
+/* Light Mode Variables */
 :root {
   /* General Background & Text Colors */
-  --bg-color: #f0f0f0; /* General background color */
-  --text-color: black; /* General text color */
+  --bg-color: #f0f0f0;
+  --text-color: black;
   
-  /* Dropdown Menus (General) */
-  --dropdown-bg-color: white; /* Background for dropdown menus */
-  --dropdown-hover-bg: #e0e0e0; /* Hover background for dropdown items */
-  --dropdown-border-color: #dadce0; /* Border color for dropdown menus */
+  /* Dropdown Menus */
+  --dropdown-bg-color: white;
+  --dropdown-hover-bg: #e0e0e0;
+  --dropdown-border-color: #dadce0;
   
-  /* Icons (General) */
-  --icon-color: #4a4a4a; /* Icon color for light mode */
-  --icon-bg-color: #f5f7fa; /* Background color for icon wrappers */
-  --icon-hover-bg-color: #e0e0e0; /* Hover background for icon wrappers */
+  /* Icons */
+  --icon-color: #4a4a4a;
+  --icon-bg-color: #f5f7fa;
+  --icon-hover-bg: #e0e0e0;
 
-  /* New Button (New Component) */
-  --new-btn-bg-color: #fff; /* Background color for the new button */
-  --new-btn-hover-bg: #e6e6e6; /* Hover background for the new button */
+  /* New Button */
+  --new-btn-bg-color: #fff;
+  --new-btn-hover-bg: #e6e6e6;
 
-  /* Folders (Folder Component) */
-  --folder-hover-bg: #f1f3f4; /* Hover background for folders */
-  --hover-bg-color: #f0f0f0; /* General hover background color */
-  --over-bg-color: #d0d0d0; /* Drag-over background color */
+  /* Folders */
+  --folder-hover-bg: #f1f3f4;
+  --hover-bg-color: #f0f0f0;
+  --over-bg-color: #d0d0d0;
 
-  /* Modal Components */
-  --modal-bg-color: #fff; /* Background color for modals */
-  --close-btn-bg: #f5f7fa; /* Background color for the close button */
-  --close-btn-hover-bg: #e0e0e0; /* Hover background for the close button */
+  /* Modals */
+  --modal-bg-color: #fff;
+  --close-btn-bg: #f5f7fa;
+  --close-btn-hover-bg: #e0e0e0;
 
-  /* Editor (Document Editor Component) */
-  --editor-bg-color: #fff; /* Background color for the editor */
-  --editor-text-color: black; /* Text color for the editor */
+  /* Editor */
+  --editor-bg-color: #fff;
+  --editor-text-color: black;
 
-  /* File Items (Suggested Component) */
-  --file-item-bg-color: #fff; /* Background color for file items */
-  --file-item-hover-bg-color: #e0e0e0; /* Hover background for file items */
-  --selected-bg-color: #f0f0f0; /* Background color for selected items */
-  --drop-over-bg-color: #d0d0d0; /* Drag-over background color for files/folders */
+  /* File Items */
+  --file-item-bg-color: #fff;
+  --file-item-hover-bg-color: #e0e0e0;
+  --selected-bg-color: #f0f0f0;
+  --drop-over-bg-color: #d0d0d0;
 
-  /* MenuBar Component */
-  --menu-bg-color: #f0f0f0; /* Background color for the menu bar */
-  --dropdown-bg-color: #fff; /* Background color for dropdown menus in MenuBar */
-  --dropdown-item-hover-bg: #007bff; /* Hover background for dropdown items in MenuBar */
-  --dropdown-item-hover-text: #fff; /* Hover text color for dropdown items in MenuBar */
-  --submenu-border-color: #ccc; /* Border color for submenu items in MenuBar */
-  --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for dropdowns and modals */
+  /* MenuBar */
+  --menu-bg-color: #f0f0f0;
+  --dropdown-item-hover-bg: #007bff;
+  --dropdown-item-hover-text: #fff;
+  --submenu-border-color: #ccc;
+  --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  /* Search bar */
+  --search-bg-color: #f0f0f0;
+  --search-text-color: black;
+  --search-icon-color: #4a4a4a;
+  --search-placeholder-color: #a0a0a0;
+  --search-border-color: #ccc;
+  --search-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Dark mode styles */
+/* Dark Mode Variables */
 [data-theme='dark'] {
   /* General Background & Text Colors */
-  --bg-color: #282c34; /* General background color */
-  --text-color: white; /* General text color */
+  --bg-color: #282c34;
+  --text-color: white;
   
-  /* Dropdown Menus (General) */
-  --dropdown-bg-color: #444; /* Background for dropdown menus */
-  --dropdown-hover-bg: #555; /* Hover background for dropdown items */
-  --dropdown-border-color: #666; /* Border color for dropdown menus */
+  /* Dropdown Menus */
+  --dropdown-bg-color: #444;
+  --dropdown-hover-bg: #555;
+  --dropdown-border-color: #666;
   
-  /* Icons (General) */
-  --icon-color: white; /* Icon color for dark mode */
-  --icon-bg-color: #444; /* Background color for icon wrappers */
-  --icon-hover-bg-color: #555; /* Hover background for icon wrappers */
+  /* Icons */
+  --icon-color: #ccc;
+  --icon-bg-color: #444;
+  --icon-hover-bg: #555;
 
-  /* New Button (New Component) */
-  --new-btn-bg-color: #555; /* Background color for the new button */
-  --new-btn-hover-bg: #666; /* Hover background for the new button */
+  /* New Button */
+  --new-btn-bg-color: #555;
+  --new-btn-hover-bg: #666;
 
-  /* Folders (Folder Component) */
-  --folder-hover-bg: #555; /* Hover background for folders */
-  --hover-bg-color: #444; /* General hover background color */
-  --over-bg-color: #666; /* Drag-over background color */
+  /* Folders */
+  --folder-hover-bg: #555;
+  --hover-bg-color: #444;
+  --over-bg-color: #666;
 
-  /* Modal Components */
-  --modal-bg-color: #333; /* Background color for modals */
-  --close-btn-bg: #555; /* Background color for the close button */
-  --close-btn-hover-bg: #666; /* Hover background for the close button */
+  /* Modals */
+  --modal-bg-color: #333;
+  --close-btn-bg: #555;
+  --close-btn-hover-bg: #666;
 
-  /* Editor (Document Editor Component) */
-  --editor-bg-color: #444; /* Background color for the editor */
-  --editor-text-color: white; /* Text color for the editor */
+  /* Editor */
+  --editor-bg-color: #444;
+  --editor-text-color: white;
 
-  /* File Items (Suggested Component) */
-  --file-item-bg-color: #333; /* Background color for file items */
-  --file-item-hover-bg-color: #444; /* Hover background for file items */
-  --selected-bg-color: #3a3a3a; /* Background color for selected items */
-  --drop-over-bg-color: #666; /* Drag-over background color for files/folders */
+  /* File Items */
+  --file-item-bg-color: #333;
+  --file-item-hover-bg-color: #444;
+  --selected-bg-color: #3a3a3a;
+  --drop-over-bg-color: #666;
 
-  /* MenuBar Component */
-  --menu-bg-color: #333; /* Background color for the menu bar */
-  --dropdown-bg-color: #444; /* Background color for dropdown menus in MenuBar */
-  --dropdown-item-hover-bg: #007bff; /* Hover background for dropdown items in MenuBar */
-  --dropdown-item-hover-text: #fff; /* Hover text color for dropdown items in MenuBar */
-  --submenu-border-color: #666; /* Border color for submenu items in MenuBar */
-  --box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1); /* Box shadow for dropdowns and modals */
+  /* MenuBar */
+  --menu-bg-color: #333;
+  --dropdown-item-hover-bg: #007bff;
+  --dropdown-item-hover-text: #fff;
+  --submenu-border-color: #666;
+  --box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+
+  /* Search bar */
+  --search-bg-color: #444;
+  --search-text-color: white;
+  --search-icon-color: #ccc;
+  --search-placeholder-color: #888;
+  --search-border-color: #444;
+  --search-box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
 }
+
 
 body {
   margin: 0;

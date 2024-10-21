@@ -24,7 +24,7 @@ export default function Home() {
       <div className={`${styles.gridContainer} ${styles[theme]}`}>
       {/* First row + */}
         <Sidebar triggerRefresh={triggerRefresh}/>
-        <Search />
+        <Search triggerRefresh={triggerRefresh}/>
         <Settings/>
         <Account/>
         {/* Render child routes here */}
