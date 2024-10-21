@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { UserProvider } from "./UserContext";
+import { ThemeProvider } from "./ThemeContext";
 import Login from "./components/Login";
 import CreateAccount from "./components/CreateAccount";
 import Home from "./components/Home";
@@ -16,9 +17,9 @@ import DocumentEditor from "./components/DocumentEditor";
 import Suggested from "./components/Suggested";
 import "./App.css";
 
+
 // Road to MVP
-// TODO: Fully functioning menu bar (in document)
-// - Night theme feature
+// TODO - Night theme feature
 // - Mobile CSS queries for all features
 // - Improved document editor component styling
 // - Fully function search bar (home)
@@ -26,29 +27,31 @@ import "./App.css";
 function App() {
   return (
     <UserProvider>
-      <Router>
-        <div>
-          <Routes>
-            <Route path="/document/:id" element={<ProtectedRoute element={DocumentEditor} />}/>
-            <Route
-              path="/email-confirmation-instruction"
-              element={<EmailConfirmationInstruction />}
-            />
-            <Route path="/email-confirmation" element={<EmailConfirmation />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/create-account" element={<CreateAccount />} />
-            <Route path="/home" element={<ProtectedRoute element={Home} />}>
-              <Route index element={<Suggested />} /> {/* Default when /home is accessed */}
-              <Route path="folders/:folderID" element={<Suggested />} />
-              <Route path="trash/" element={<Suggested />} />
-            </Route>
-            <Route path="/" element={<Navigate to="/login" />} />
-          </Routes>
-          {/* <footer>
-            <p>&copy; 2024 Bungo</p>
-          </footer> */}
-        </div>
-      </Router>
+      <ThemeProvider>
+        <Router>
+          <div>
+            <Routes>
+              <Route path="/document/:id" element={<ProtectedRoute element={DocumentEditor} />}/>
+              <Route
+                path="/email-confirmation-instruction"
+                element={<EmailConfirmationInstruction />}
+              />
+              <Route path="/email-confirmation" element={<EmailConfirmation />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/create-account" element={<CreateAccount />} />
+              <Route path="/home" element={<ProtectedRoute element={Home} />}>
+                <Route index element={<Suggested />} /> {/* Default when /home is accessed */}
+                <Route path="folders/:folderID" element={<Suggested />} />
+                <Route path="trash/" element={<Suggested />} />
+              </Route>
+              <Route path="/" element={<Navigate to="/login" />} />
+            </Routes>
+            {/* <footer>
+              <p>&copy; 2024 Bungo</p>
+            </footer> */}
+          </div>
+        </Router>
+      </ThemeProvider>
 
     </UserProvider>
   );

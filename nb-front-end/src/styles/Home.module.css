@@ -1,3 +1,4 @@
+/* General Grid Container Styles */
 .gridContainer {
   display: grid;
   grid-template-columns: 1fr 3fr;
@@ -8,46 +9,82 @@
   gap: 10px;
   max-width: 1400px; /* Set the maximum width */
   margin: 0 auto; /* Center the grid horizontally */
+  transition: background-color 0.3s, color 0.3s;
 }
 
+/* Light Theme */
+.gridContainer.light {
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+.sidebar.light,
+.search.light,
+.settings.light,
+.suggested.light,
+.account.light {
+  background-color: #ffffff; /* Light background */
+  color: #000; /* Dark text */
+}
+
+/* Dark Theme */
+.gridContainer.dark {
+  background-color: #282c34;
+  color: #fff;
+}
+
+.sidebar.dark,
+.search.dark,
+.settings.dark,
+.suggested.dark,
+.account.dark {
+  background-color: #333; /* Darker background */
+  color: #fff; /* Light text */
+}
+
+/* Sidebar Styles */
 .sidebar {
-    grid-area: sidebar;
-    display: flex;
-    width: 100%; /* Set the width of the sidebar */
-    height: 100vh; /* Set the height of the sidebar to the full viewport height */
-    overflow: hidden; /* Ensure there is nothing below the sidebar */
-    /* border: 2px solid black;  */
-    margin-left: 20px;
-    margin-top: 30px;
+  grid-area: sidebar;
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  margin-left: 20px;
+  margin-top: 30px;
+  transition: background-color 0.3s, color 0.3s;
 }
 
+/* Search Bar Styles */
 .search {
   grid-area: search;
   display: flex;
-  /* justify-content: center; */
   align-items: center;
-  /* border: 2px solid black; */
+  transition: background-color 0.3s, color 0.3s;
 }
 
+/* Settings Styles */
 .settings {
   grid-area: settings;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* border: 2px solid black; */
+  transition: background-color 0.3s, color 0.3s;
 }
 
+/* Suggested Section Styles */
 .suggested {
   grid-area: suggested;
   display: flex;
-  background-color: #FFFFFF;
+  background-color: #fff; /* Light background by default */
+  transition: background-color 0.3s, color 0.3s;
 }
 
+/* Account Section Styles */
 .account {
   grid-area: account;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* border: 2px solid black; */
   margin-right: 20px;
+  transition: background-color 0.3s, color 0.3s;
 }

@@ -52,7 +52,6 @@ const MenuBar = ({ onMenuAction }) => {
         { action: "Rename", label: "Rename" },
         { action: "Move", label: "Move" },
         { action: "Delete", label: "Delete" },
-        { action: "Print", label: "Print" },
       ],
     },
     {

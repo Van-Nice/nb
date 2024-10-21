@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -15,20 +15,23 @@ import RenameFileModal from './RenameFileModal';
 import html2pdf from 'html2pdf.js';
 import { Document, Packer, Paragraph } from 'docx';
 import { saveAs } from 'file-saver';
+import { ThemeContext } from "../ThemeContext";
+ 
 
 function DocumentEditor() {
   // const navigate = useNavigate();
   const { id } = useParams();
   const context = useOutletContext();
   const navigate = useNavigate();
+  const {theme} = useContext(ThemeContext)
 
   const [fileName, setFileName] = useState("");
   const [content, setContent] = useState("");
-  const [isOpenModalOpen, setIsOpenModalOpen] = useState(false); // State for modal
-  const quillRef = useRef(null); // Quill editor reference
+  const [isOpenModalOpen, setIsOpenModalOpen] = useState(false);
+  const quillRef = useRef(null);
   const ws = useRef(null);
   const fileNameModalRef = useRef(null);
-  const renameFileModalRef = useRef(null); // Reference to RenameFileModal
+  const renameFileModalRef = useRef(null);
   const moveFileModalRef = useRef(null);
 
   // Fetch file content and establish WebSocket connection
@@ -229,6 +232,8 @@ function DocumentEditor() {
       handleRedo();
     }
   };
+
+
 
   // Delete file function
   const handleDeleteFile = async () => {
@@ -449,7 +454,7 @@ function DocumentEditor() {
         </div>
         <Account className={styles.account} />
       </div>
-      <MenuBar onMenuAction={handleMenuAction} className={styles.menubar} />
+      <MenuBar onMenuAction={handleMenuAction} className={styles.menuBar} />
 
       {/* Editor */}
       <div className={styles.editor}>
@@ -461,7 +466,7 @@ function DocumentEditor() {
           formats={DocumentEditor.formats}
         />
       </div>
-      
+
       {/* Modals */}
       <Modal isOpen={isOpenModalOpen} onClose={closeModal}>
         <h2>Select a Document to Open</h2>
@@ -473,10 +478,7 @@ function DocumentEditor() {
         onRename={handleRenameFile}
       />
       <FileNameModal ref={fileNameModalRef} />
-      <MoveFileModal
-        ref={moveFileModalRef}
-        onMove={handleMoveFile}
-      />
+      <MoveFileModal ref={moveFileModalRef} onMove={handleMoveFile} />
     </div>
   );
 }

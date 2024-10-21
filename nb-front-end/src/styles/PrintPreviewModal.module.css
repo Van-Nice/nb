@@ -1,0 +1,23 @@
+.modalContent {
+    padding: 20px;
+  }
+  
+  .previewArea {
+    border: 1px solid #ccc;
+    padding: 15px;
+    max-height: 60vh;
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+  
+  .buttonGroup {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .printButton,
+  .cancelButton {
+    padding: 10px 20px;
+    margin-left: 10px;
+  }
+  

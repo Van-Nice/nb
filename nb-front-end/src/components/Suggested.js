@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams, useLocation, useOutletContext } from 'react-router-dom';
 import styles from '../styles/Suggested.module.css';
 import DraggableFolder from "./DraggableFolder";
 import DraggableFile from "./DraggableFile";
+import { ThemeContext } from "../ThemeContext";
 
 export const ItemTypes = {
   FOLDER: 'folder',
@@ -19,6 +20,7 @@ export default function Suggested({selectedFile}) {
   const [dropEvent, setDropEvent] = useState(0);
   const location = useLocation();
   const { refreshKey } = useOutletContext();
+  const {theme} = useContext(ThemeContext);
 
   useEffect(() => {
     const fetchContents = async () => {
@@ -134,12 +136,12 @@ export default function Suggested({selectedFile}) {
   }
 
   return (
-    <div>
+    <div className={`${styles.suggestedContainer} ${styles[theme]}`}>
       {/* Display Folders */}
       {folders.length === 0 ? (
         <p>No folders found</p>
       ) : (
-        <ul className={styles.fileList}>
+        <ul className={`${styles.fileList} ${styles[theme]}`}>
           {folders.map((folder) => (
             <DraggableFolder
               key={folder.ID}
@@ -154,7 +156,7 @@ export default function Suggested({selectedFile}) {
       {files.length === 0 ? (
         <p>No files found</p>
       ) : (
-        <ul className={styles.fileList}>
+        <ul className={`${styles.fileList} ${styles[theme]}`}>
           {files.map((file) => (
             <DraggableFile
               key={file.ID}

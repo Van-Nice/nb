@@ -1,13 +1,26 @@
-import React, { useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { FaCog } from 'react-icons/fa';
 import styles from '../styles/Settings.module.css';
 import parentStyles from '../styles/Home.module.css';
 import { UserContext } from '../UserContext';
+import { ThemeContext } from '../ThemeContext';
 
 export default function Settings() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const {userID} = useContext(UserContext);
-  const [settings, setSettings] = useState("");
+  const { userID } = useContext(UserContext);
+  const { theme, setTheme } = useContext(ThemeContext);
+
+  // Load theme from local storage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+  }, [setTheme]);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -29,7 +42,10 @@ export default function Settings() {
             <h2>Settings</h2>
             {userID ? (
               <div>
-                <p><strong>Theme:</strong> {settings.theme}</p>
+                <p><strong>Theme:</strong> {theme}</p>
+                <button onClick={toggleTheme}>
+                  Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
+                </button>
               </div>
             ) : (
               <p>Loading settings...</p>
@@ -41,5 +57,5 @@ export default function Settings() {
         </div>
       )}
     </div>
-  )
+  );
 }
