@@ -12,10 +12,14 @@
   width: 100%;
   text-align: left;
   border-radius: 4px;
+  background-color: var(--bg-color);
+  color: var(--text-color); /* Use theme variable */
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 .icon {
   margin-right: 10px;
+  color: var(--icon-color); /* Use theme variable */
 }
 
 .text {
@@ -27,14 +31,14 @@
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: white;
-  border: 1px solid #dadce0;
+  background-color: var(--dropdown-bg-color); /* Use theme variable */
+  border: 1px solid var(--dropdown-border-color); /* Use theme variable */
   width: 100%;
   max-height: 300px;
   overflow-y: auto;
   z-index: 1000;
   border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(60,64,67,0.3), 0 4px 8px rgba(60,64,67,0.15);
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3), 0 4px 8px rgba(60, 64, 67, 0.15);
 }
 
 .folderList {
@@ -54,12 +58,12 @@
 }
 
 .folderRow:hover {
-  background-color: #f1f3f4;
+  background-color: var(--folder-hover-bg); /* Use theme variable */
 }
 
 .folderIcon {
   margin-right: 8px;
-  color: #5f6368;
+  color: var(--icon-color); /* Use theme variable */
 }
 
 .folderIconPlaceholder {
@@ -70,7 +74,7 @@
   flex-grow: 1;
   display: flex;
   align-items: center;
-  color: #202124;
+  color: var(--text-color); /* Use theme variable */
 }
 
 .folderName:hover {

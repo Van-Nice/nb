@@ -1,47 +1,10 @@
 .suggestedContainer {
   padding: 20px;
+  background-color: var(--bg-color); /* Dynamic background color */
+  color: var(--text-color); /* Dynamic text color */
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* Light Theme */
-.suggestedContainer.light {
-  background-color: #f0f0f0;
-  color: #000;
-}
-
-.fileList.light .fileItem {
-  background-color: #fff;
-  color: #000;
-}
-
-.fileItem.light:hover {
-  background-color: #e0e0e0;
-}
-
-.selected.light {
-  background-color: #f0f0f0;
-}
-
-/* Dark Theme */
-.suggestedContainer.dark {
-  background-color: #282c34;
-  color: #fff;
-}
-
-.fileList.dark .fileItem {
-  background-color: #333;
-  color: #fff;
-}
-
-.fileItem.dark:hover {
-  background-color: #444;
-}
-
-.selected.dark {
-  background-color: #3a3a3a;
-}
-
-/* General Styles */
 .fileList {
   list-style: none;
   padding: 0;
@@ -53,7 +16,17 @@
   padding: 10px;
   display: flex;
   align-items: center;
+  background-color: var(--bg-color); /* Dynamic item background */
+  color: var(--text-color); /* Dynamic text color */
   transition: background-color 0.3s, color 0.3s;
+}
+
+.fileItem:hover {
+  background-color: var(--file-item-hover-bg-color); /* Dynamic hover color */
+}
+
+.selected {
+  background-color: var(--selected-bg-color); /* Dynamic selected color */
 }
 
 .dragging {
@@ -61,14 +34,10 @@
 }
 
 .over {
-  background-color: #d0d0d0;
+  background-color: var(--drop-over-bg-color); /* Dynamic drop-over color */
 }
 
 .icon {
   margin-right: 8px;
-  color: #555;
-}
-
-.selected {
-  background-color: #f0f0f0;
+  color: var(--icon-color); /* Dynamic icon color */
 }

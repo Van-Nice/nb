@@ -1,3 +1,104 @@
+/* html {
+  color-scheme: light dark;
+} */
+
+:root {
+  /* General Background & Text Colors */
+  --bg-color: #f0f0f0; /* General background color */
+  --text-color: black; /* General text color */
+  
+  /* Dropdown Menus (General) */
+  --dropdown-bg-color: white; /* Background for dropdown menus */
+  --dropdown-hover-bg: #e0e0e0; /* Hover background for dropdown items */
+  --dropdown-border-color: #dadce0; /* Border color for dropdown menus */
+  
+  /* Icons (General) */
+  --icon-color: #4a4a4a; /* Icon color for light mode */
+  --icon-bg-color: #f5f7fa; /* Background color for icon wrappers */
+  --icon-hover-bg-color: #e0e0e0; /* Hover background for icon wrappers */
+
+  /* New Button (New Component) */
+  --new-btn-bg-color: #fff; /* Background color for the new button */
+  --new-btn-hover-bg: #e6e6e6; /* Hover background for the new button */
+
+  /* Folders (Folder Component) */
+  --folder-hover-bg: #f1f3f4; /* Hover background for folders */
+  --hover-bg-color: #f0f0f0; /* General hover background color */
+  --over-bg-color: #d0d0d0; /* Drag-over background color */
+
+  /* Modal Components */
+  --modal-bg-color: #fff; /* Background color for modals */
+  --close-btn-bg: #f5f7fa; /* Background color for the close button */
+  --close-btn-hover-bg: #e0e0e0; /* Hover background for the close button */
+
+  /* Editor (Document Editor Component) */
+  --editor-bg-color: #fff; /* Background color for the editor */
+  --editor-text-color: black; /* Text color for the editor */
+
+  /* File Items (Suggested Component) */
+  --file-item-bg-color: #fff; /* Background color for file items */
+  --file-item-hover-bg-color: #e0e0e0; /* Hover background for file items */
+  --selected-bg-color: #f0f0f0; /* Background color for selected items */
+  --drop-over-bg-color: #d0d0d0; /* Drag-over background color for files/folders */
+
+  /* MenuBar Component */
+  --menu-bg-color: #f0f0f0; /* Background color for the menu bar */
+  --dropdown-bg-color: #fff; /* Background color for dropdown menus in MenuBar */
+  --dropdown-item-hover-bg: #007bff; /* Hover background for dropdown items in MenuBar */
+  --dropdown-item-hover-text: #fff; /* Hover text color for dropdown items in MenuBar */
+  --submenu-border-color: #ccc; /* Border color for submenu items in MenuBar */
+  --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for dropdowns and modals */
+}
+
+/* Dark mode styles */
+[data-theme='dark'] {
+  /* General Background & Text Colors */
+  --bg-color: #282c34; /* General background color */
+  --text-color: white; /* General text color */
+  
+  /* Dropdown Menus (General) */
+  --dropdown-bg-color: #444; /* Background for dropdown menus */
+  --dropdown-hover-bg: #555; /* Hover background for dropdown items */
+  --dropdown-border-color: #666; /* Border color for dropdown menus */
+  
+  /* Icons (General) */
+  --icon-color: white; /* Icon color for dark mode */
+  --icon-bg-color: #444; /* Background color for icon wrappers */
+  --icon-hover-bg-color: #555; /* Hover background for icon wrappers */
+
+  /* New Button (New Component) */
+  --new-btn-bg-color: #555; /* Background color for the new button */
+  --new-btn-hover-bg: #666; /* Hover background for the new button */
+
+  /* Folders (Folder Component) */
+  --folder-hover-bg: #555; /* Hover background for folders */
+  --hover-bg-color: #444; /* General hover background color */
+  --over-bg-color: #666; /* Drag-over background color */
+
+  /* Modal Components */
+  --modal-bg-color: #333; /* Background color for modals */
+  --close-btn-bg: #555; /* Background color for the close button */
+  --close-btn-hover-bg: #666; /* Hover background for the close button */
+
+  /* Editor (Document Editor Component) */
+  --editor-bg-color: #444; /* Background color for the editor */
+  --editor-text-color: white; /* Text color for the editor */
+
+  /* File Items (Suggested Component) */
+  --file-item-bg-color: #333; /* Background color for file items */
+  --file-item-hover-bg-color: #444; /* Hover background for file items */
+  --selected-bg-color: #3a3a3a; /* Background color for selected items */
+  --drop-over-bg-color: #666; /* Drag-over background color for files/folders */
+
+  /* MenuBar Component */
+  --menu-bg-color: #333; /* Background color for the menu bar */
+  --dropdown-bg-color: #444; /* Background color for dropdown menus in MenuBar */
+  --dropdown-item-hover-bg: #007bff; /* Hover background for dropdown items in MenuBar */
+  --dropdown-item-hover-text: #fff; /* Hover text color for dropdown items in MenuBar */
+  --submenu-border-color: #666; /* Border color for submenu items in MenuBar */
+  --box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1); /* Box shadow for dropdowns and modals */
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,7 +106,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f0f0f0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 code {

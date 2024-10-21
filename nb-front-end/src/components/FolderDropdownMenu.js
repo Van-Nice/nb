@@ -96,21 +96,21 @@ export default function FolderDropdownMenu({ triggerRefresh }) {
   };
 
   return (
-    <div className={styles.dropdownWrapper}>
-      <button className={styles.buttonWrapper} onClick={toggleDropdown}>
-        <span className={styles.icon}><FolderIcon /></span>
-        <span className={styles.text}>Root</span>
-      </button>
+  <div className={styles.dropdownWrapper}>
+    <button className={styles.buttonWrapper} onClick={toggleDropdown}>
+      <span className={styles.icon}><FolderIcon /></span>
+      <span className={styles.text}>Root</span>
+    </button>
 
-      {isDropdownOpen && (
-        <div className={styles.dropdownMenu}>
-          {folders.length === 0 ? (
-            <p>No folders found</p>
-          ) : (
-            renderFolders(folders)
-          )}
-        </div>
-      )}
-    </div>
+    {isDropdownOpen && (
+      <div className={styles.dropdownMenu}>
+        {folders.length === 0 ? (
+          <p>No folders found</p>
+        ) : (
+          renderFolders(folders)
+        )}
+      </div>
+    )}
+  </div>
   );
 }

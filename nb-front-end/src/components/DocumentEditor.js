@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { useParams, useOutletContext, useNavigate } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate, Link } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import MenuBar from "./MenuBar";
@@ -449,7 +449,9 @@ function DocumentEditor() {
       {/* Header & MenuBar */}
       <div className={styles.headerWrapper}>
         <div className={styles.header}>
-          <FaFileAlt className={styles.documentIcon} />
+          <Link to="/home" className={styles.iconLink}>
+            <FaFileAlt className={styles.documentIcon} />
+          </Link>
           <h3>{fileName || id}</h3>
         </div>
         <Account className={styles.account} />

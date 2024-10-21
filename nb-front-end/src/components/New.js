@@ -1,27 +1,32 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import { FaFileAlt, FaFolder } from "react-icons/fa";
 import styles from "../styles/New.module.css";
 import FileNameModal from "./FileNameModal";
 import FolderNameModal from "./FolderNameModal";
+import { ThemeContext } from '../ThemeContext';
 
-export default function New({triggerRefresh}) {
+export default function New({ triggerRefresh }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const fileNameModalRef = useRef();
   const folderNameModalRef = useRef();
+  const { theme } = useContext(ThemeContext);
+
+  // Set data-theme attribute when theme changes
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   const handleCreateFile = () => {
-    toggleDropdown()
-    // Open the FileNameModal
+    toggleDropdown();
     fileNameModalRef.current.openModal();
   };
 
   const handleCreateFolder = () => {
-    toggleDropdown()
-    // Eventually: Create new folder and route user to it - using dynamic url within home screen
+    toggleDropdown();
     folderNameModalRef.current.openModal();
   };
 
@@ -34,24 +39,19 @@ export default function New({triggerRefresh}) {
 
       {isDropdownOpen && (
         <div className={styles.dropdownMenu}>
-          {/* Handle file */}
           <div className={styles.dropdownItem} onClick={handleCreateFile}>
             <FaFileAlt className={styles.dropdownIcon} />
             <span>Create Document</span>
           </div>
-          {/* Handle folder */}
           <div className={styles.dropdownItem} onClick={handleCreateFolder}>
-            <FaFolder
-              className={styles.dropdownIcon}
-            />
+            <FaFolder className={styles.dropdownIcon} />
             <span>Create Folder</span>
           </div>
         </div>
       )}
 
-      {/* Include the FileNameModal component */}
-      <FileNameModal ref={fileNameModalRef} triggerRefresh={triggerRefresh}/>
-      <FolderNameModal ref={folderNameModalRef} triggerRefresh={triggerRefresh}/>
+      <FileNameModal ref={fileNameModalRef} triggerRefresh={triggerRefresh} />
+      <FolderNameModal ref={folderNameModalRef} triggerRefresh={triggerRefresh} />
     </div>
   );
 }

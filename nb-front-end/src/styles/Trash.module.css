@@ -1,37 +1,37 @@
 .container {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .icon {
-    font-size: 18px;
-    margin-right: 8px;
-  }
-  
-  .label {
-    font-size: 14px;
-  }
-  
-  .unselected {
-    /* background-color: #fff; */
-    color: #4a4a4a;
-  }
-  
-  .selected {
-    background-color: #e0e0e0;
-    color: #333;
-  }
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: var(--bg-color); /* Use theme variable */
+  color: var(--text-color); /* Use theme variable */
+}
 
-  .over {
-    background-color: #d0d0d0; /* Change this color as needed */
-  }
-  
-  /* Add hover state */
-  .container:hover {
-    background-color: #f0f0f0; /* Highlight color on hover */
-  }
-  
+.icon {
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+.label {
+  font-size: 14px;
+}
+
+.unselected {
+  color: var(--text-color); /* Use theme variable */
+}
+
+.selected {
+  background-color: var(--selected-bg-color); /* Use theme variable */
+  color: var(--selected-text-color); /* Use theme variable */
+}
+
+.over {
+  background-color: var(--over-bg-color); /* Use theme variable */
+}
+
+/* Add hover state */
+.container:hover {
+  background-color: var(--hover-bg-color); /* Use theme variable */
+}

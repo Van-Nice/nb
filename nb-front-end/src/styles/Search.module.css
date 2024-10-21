@@ -1,29 +1,48 @@
 .searchBarWrapper {
-    display: flex;
-    align-items: center;
-    background-color: #f5f7fa;
-    border-radius: 24px;
-    padding: 8px 16px;
-    width: 100%;
-    max-width: 500px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .searchIcon {
-    font-size: 16px;
-    margin-right: 8px;
-    color: #70757a;
-  }
-  
-  .searchInput {
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 16px;
-    color: #333;
-    width: 100%;
-  }
-  
-  .searchInput::placeholder {
-    color: #70757a;
-  }
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-color-light);
+  border-radius: 24px;
+  padding: 8px 16px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: var(--box-shadow-light);
+}
+
+.searchIcon {
+  font-size: 16px;
+  margin-right: 8px;
+  color: var(--icon-color-light);
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--text-color-light);
+  width: 100%;
+}
+
+.searchInput::placeholder {
+  color: var(--placeholder-color-light);
+}
+
+/* Dark mode styles (applied when body has 'dark' class) */
+body.dark .searchBarWrapper {
+  background-color: var(--bg-color-dark);
+  box-shadow: var(--box-shadow-dark);
+  border: 2px solid white; /* Border for dark mode */
+}
+
+body.dark .searchIcon {
+  color: var(--icon-color-dark);
+}
+
+body.dark .searchInput {
+  color: var(--text-color-dark);
+}
+
+body.dark .searchInput::placeholder {
+  color: var(--placeholder-color-dark);
+}

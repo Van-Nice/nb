@@ -1,12 +1,14 @@
 .documentIcon {
-  width: 3rem; /* Set the desired width in rem */
-  height: 3rem; /* Set the desired height in rem */
-  color: #555;
+  width: 3rem;
+  height: 3rem;
+  color: var(--document-icon-color); /* Use theme variable */
 }
 
 .headerWrapper {
   display: flex;
   justify-content: space-between;
+  background-color: var(--bg-color); /* Adjust to theme */
+  color: var(--text-color); /* Adjust to theme */
 }
 
 .header {
@@ -23,8 +25,27 @@
 .editor {
   display: flex;
   justify-content: center;
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--bg-color);
+}
+
+.ql-container {
+  background-color: var(--editor-bg-color); /* Editor background */
+  max-width: 100%;
+  width: 100%;
+}
+
+.ql-editor {
+  min-height: 500px; /* Ensure enough space for content */
+  color: var(--text-color); /* Adjust text color */
 }
 
 .account {
   margin-left: auto;
+}
+
+.iconLink {
+  color: inherit; /* Inherit the color from the parent element */
+  text-decoration: none; /* Remove underline */
 }
