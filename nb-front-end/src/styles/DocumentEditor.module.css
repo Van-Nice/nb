@@ -1,14 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+}
+
 .documentIcon {
   width: 3rem;
   height: 3rem;
-  color: var(--document-icon-color); /* Use theme variable */
+  color: var(--document-icon-color);
 }
 
 .headerWrapper {
   display: flex;
   justify-content: space-between;
-  background-color: var(--bg-color); /* Adjust to theme */
-  color: var(--text-color); /* Adjust to theme */
+  background-color: var(--bg-color); 
+  color: var(--text-color); 
 }
 
 .header {
@@ -24,21 +31,23 @@
 
 .editor {
   display: flex;
+  flex-grow: 1;
   justify-content: center;
-  width: 100%;
+  align-self: center;
+  /* width: 100%;
   padding: 1rem;
-  background-color: var(--bg-color);
+  background-color: var(--bg-color); */
 }
 
 .ql-container {
-  background-color: var(--editor-bg-color); /* Editor background */
+  background-color: var(--editor-bg-color); 
   max-width: 100%;
   width: 100%;
 }
 
 .ql-editor {
-  min-height: 500px; /* Ensure enough space for content */
-  color: var(--text-color); /* Adjust text color */
+  min-height: 500px; 
+  color: var(--text-color); 
 }
 
 .account {
@@ -46,6 +55,6 @@
 }
 
 .iconLink {
-  color: inherit; /* Inherit the color from the parent element */
-  text-decoration: none; /* Remove underline */
+  color: inherit; 
+  text-decoration: none;
 }

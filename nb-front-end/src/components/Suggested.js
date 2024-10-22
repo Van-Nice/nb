@@ -21,6 +21,7 @@ export default function Suggested({selectedFile}) {
   const location = useLocation();
   const { refreshKey } = useOutletContext();
   const {theme} = useContext(ThemeContext);
+  const isTrashView = location.pathname === '/home/trash';
 
   useEffect(() => {
     const fetchContents = async () => {
@@ -148,6 +149,7 @@ export default function Suggested({selectedFile}) {
               folder={folder}
               onClick={() => navigate(`/home/folders/${folder.ID}`)}
               onDrop={handleDrop}
+              isTrashView={isTrashView}
             />
           ))}
         </ul>
@@ -165,6 +167,7 @@ export default function Suggested({selectedFile}) {
                 setSelectedFileId(file.ID);
                 navigate(`/document/${file.ID}`);
               }}
+              isTrashView={isTrashView}
             />
           ))}
         </ul>

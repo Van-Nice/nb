@@ -19,9 +19,8 @@ import "./App.css";
 
 
 // Road to MVP
-// TODO: Fully function search bar (home)
+// TODO: Improve document editor component styling
 // - Mobile CSS queries for all features
-// - Improved document editor component styling
 
 function App() {
   return (
@@ -45,9 +44,6 @@ function App() {
               </Route>
               <Route path="/" element={<Navigate to="/login" />} />
             </Routes>
-            {/* <footer>
-              <p>&copy; 2024 Bungo</p>
-            </footer> */}
           </div>
         </Router>
       </ThemeProvider>

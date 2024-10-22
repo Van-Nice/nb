@@ -8,7 +8,7 @@ export default function Search() {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const searchContainerRef = useRef(null); // Ref for the search container
+  const searchContainerRef = useRef(null);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {

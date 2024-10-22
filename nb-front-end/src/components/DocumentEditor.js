@@ -15,15 +15,10 @@ import RenameFileModal from './RenameFileModal';
 import html2pdf from 'html2pdf.js';
 import { Document, Packer, Paragraph } from 'docx';
 import { saveAs } from 'file-saver';
-import { ThemeContext } from "../ThemeContext";
- 
 
-function DocumentEditor() {
-  // const navigate = useNavigate();
+export default function DocumentEditor() {
   const { id } = useParams();
-  const context = useOutletContext();
   const navigate = useNavigate();
-  const {theme} = useContext(ThemeContext)
 
   const [fileName, setFileName] = useState("");
   const [content, setContent] = useState("");
@@ -445,7 +440,7 @@ function DocumentEditor() {
   };
   
   return (
-    <div>
+    <div className={styles.container}>
       {/* Header & MenuBar */}
       <div className={styles.headerWrapper}>
         <div className={styles.header}>
@@ -526,5 +521,3 @@ DocumentEditor.formats = [
   "image",
   "code-block",
 ];
-
-export default DocumentEditor;

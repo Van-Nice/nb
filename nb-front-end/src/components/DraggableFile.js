@@ -5,13 +5,14 @@ import styles from '../styles/Suggested.module.css';
 import { FaFileAlt } from 'react-icons/fa';
 
 
-export default function DraggableFile({ file, onClick }) {
+export default function DraggableFile({ file, onClick, isTrashView }) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.FILE,
     item: { id: file.ID, type: 'file' }, // Add type here
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
+    canDrag: !isTrashView,
   }));
 
   return (
