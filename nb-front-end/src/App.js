@@ -17,10 +17,7 @@ import DocumentEditor from "./components/DocumentEditor";
 import Suggested from "./components/Suggested";
 import "./App.css";
 
-
-// Road to MVP
-// TODO: Improve document editor component styling
-// - Mobile CSS queries for all features
+// This is the frontend for the development branch for bungo text editor
 
 function App() {
   return (

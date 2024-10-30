@@ -1,5 +1,7 @@
 package main
 
+// This is the development backend for the bungo text editor
+
 import (
 	"log"
 	"time"
