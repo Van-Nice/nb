@@ -193,7 +193,7 @@ export default function CreateAccount() {
       
 
       try { // POST request successful
-        const response = await fetch('http://localhost:8080/auth/create-account', {
+        const response = await fetch('https://api.bungo.rocks/auth/create-account', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

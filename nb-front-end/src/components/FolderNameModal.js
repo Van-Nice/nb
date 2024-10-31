@@ -41,7 +41,7 @@ const FolderNameModal = forwardRef(({ triggerRefresh }, ref) => {
       }
 
       const response = await fetch(
-        "http://localhost:8080/protected/create-folder",
+        "https://api.bungo.rocks/protected/create-folder",
         {
           method: "POST",
           headers: {

@@ -33,7 +33,7 @@ const FileNameModal = forwardRef(({triggerRefresh}, ref) => {
         throw new Error('No token found');
       }
 
-      const response = await fetch('http://localhost:8080/protected/create-file', {
+      const response = await fetch('https://api.bungo.rocks/protected/create-file', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

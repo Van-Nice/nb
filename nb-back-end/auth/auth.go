@@ -136,7 +136,7 @@ func HandleCreateAccount(c *gin.Context) {
     err = emailService.SendConfirmationEmail(
         form.Email,
         form.Username,
-        "http://localhost:3000/email-confirmation?token=" + token,
+        "https://bungo.rocks/email-confirmation?token=" + token,
     )
     if err != nil {
         log.Printf("Error sending confirmation email: %v", err)

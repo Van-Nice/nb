@@ -20,7 +20,7 @@ export default function Account() {
         }
 
         const response = await fetch(
-          "http://localhost:8080/protected/account-data",
+          "https://api.bungo.rocks/protected/account-data",
           {
             method: "POST",
             headers: {

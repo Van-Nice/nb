@@ -35,7 +35,7 @@ export default function Suggested({selectedFile}) {
         console.log(folderID);
         if (location.pathname === '/home/trash') {
           // Fetch deleted items
-          response = await fetch("http://localhost:8080/protected/deleted-items", {
+          response = await fetch("https://api.bungo.rocks/protected/deleted-items", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export default function Suggested({selectedFile}) {
           });
         } else {
           // Fetch normal folder contents
-          response = await fetch("http://localhost:8080/protected/folders", {
+          response = await fetch("https://api.bungo.rocks/protected/folders", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export default function Suggested({selectedFile}) {
         itemType: item.type,
       });
   
-      const response = await fetch('http://localhost:8080/protected/move-item', {
+      const response = await fetch('https://api.bungo.rocks/protected/move-item', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

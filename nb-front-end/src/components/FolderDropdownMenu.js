@@ -17,7 +17,7 @@ export default function FolderDropdownMenu({ triggerRefresh }) {
           throw new Error("No token found");
         }
 
-        const response = await fetch("http://localhost:8080/protected/nested-folders", {
+        const response = await fetch("https://api.bungo.rocks/protected/nested-folders", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

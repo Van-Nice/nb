@@ -39,7 +39,7 @@ export default function DocumentEditor() {
           return;
         }
         const response = await fetch(
-          `http://localhost:8080/protected/files?id=${id}`,
+          `https://api.bungo.rocks/protected/files?id=${id}`,
           {
             method: "GET",
             headers: {
@@ -73,7 +73,7 @@ export default function DocumentEditor() {
       return;
     }
   
-    const socket = new WebSocket(`ws://localhost:8080/protected/ws?token=${token}`);
+    const socket = new WebSocket(`ws://api.bungo.rocks/protected/ws?token=${token}`);
   
     socket.onopen = () => {
       console.log("WebSocket connection established");
@@ -239,7 +239,7 @@ export default function DocumentEditor() {
         return;
       }
 
-      const response = await fetch('http://localhost:8080/protected/delete-item', {
+      const response = await fetch('https://api.bungo.rocks/protected/delete-item', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -276,7 +276,7 @@ export default function DocumentEditor() {
         return;
       }
 
-      const response = await fetch('http://localhost:8080/protected/move-item', {
+      const response = await fetch('https://api.bungo.rocks/protected/move-item', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -312,7 +312,7 @@ export default function DocumentEditor() {
         return;
       }
 
-      const response = await fetch('http://localhost:8080/protected/rename-file', {
+      const response = await fetch('https://api.bungo.rocks/protected/rename-file', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

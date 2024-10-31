@@ -25,7 +25,7 @@ const MoveFileModal = forwardRef(({ onMove }, ref) => {
           throw new Error('No token found');
         }
 
-        const response = await fetch('http://localhost:8080/protected/folders', {
+        const response = await fetch('https://api.bungo.rocks/protected/folders', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

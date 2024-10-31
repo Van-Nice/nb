@@ -29,7 +29,7 @@ export default function Trash({onDropComplete}) {
       if (!token) {
         throw new Error("No token found");
       }
-      const response = await fetch("http://localhost:8080/protected/delete-item", {
+      const response = await fetch("https://api.bungo.rocks/protected/delete-item", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

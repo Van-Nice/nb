@@ -19,7 +19,7 @@ export default function EmailConfirmation() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/email-confirmation?token=${token}`, {
+        const response = await fetch(`https://api.bungo.rocks/email-confirmation?token=${token}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

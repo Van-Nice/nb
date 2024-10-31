@@ -25,7 +25,7 @@ export default function Search() {
       }
 
       const response = await fetch(
-        `http://localhost:8080/protected/search?query=${searchTerm}`,
+        `https://api.bungo.rocks/protected/search?query=${searchTerm}`,
         {
           method: "GET",
           headers: {
