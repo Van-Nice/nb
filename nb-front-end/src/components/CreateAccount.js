@@ -183,12 +183,12 @@ export default function CreateAccount() {
     // Check if all inputs are valid
     if (isFirstNameValid && isLastNameValid && isEmailValid && isUsernameValid && isPasswordValid && isConfirmPasswordValid && isBirthDateValid) { // Form is valid
       const form = {
-        firstName,
-        lastName,
-        email,
-        username,
-        password,
-        birthDate
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        username: username,
+        password: password,
+        birth_date: birthDate
       }
       
 
