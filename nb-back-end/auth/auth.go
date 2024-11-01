@@ -209,6 +209,8 @@ func HandleLogin(c *gin.Context) {
         return
     }
 
+    log.Printf("Received login request from: %s", c.ClientIP())
+
     // Check for user in db based on email
     userID, firstName, lastName, username, password, createdAt, err := db.GetUserByEmail(login.Email)
     if err != nil {

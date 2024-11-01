@@ -8,7 +8,7 @@ import {UserContext} from "../UserContext.js";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(false);
   const navigate = useNavigate();
   const {setUserID} = useContext(UserContext)
@@ -29,43 +29,35 @@ export default function Login() {
     event.preventDefault();
     setError("");
 
-    if (email === "") {
-      setError("Email is required");
-      return;
-    }
-
-    if (password === "") {
-      setError("Password is required");
-      return;
-    }
-
-    const login = {
-      email,
-      password,
-    };
-
     try {
-      const response = await fetch("https://api.bungo.rocks/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(login),
-      });
+        console.log("Attempting login with:", { email, password });
+        const response = await fetch("https://api.bungo.rocks/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+        });
+        
+        console.log("Response status:", response.status);
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Login error:", errorData);
+            setError(errorData.message || "Invalid login credentials");
+            return;
+        }
 
-      if (!response.ok) {
-        setError(true);
-        throw new Error("Invalid login credentials");
-      }
-
-      const data = await response.json();
-      const user = new User(data.id, data.name, data.email, data.token, data.settings);
-      setUserID(data.id);
-      localStorage.setItem("authToken", data.token);
-      localStorage.setItem("userID", data.id)
-      navigate("/home", {state: {user}});
+        const data = await response.json();
+        console.log("Login successful:", data);
+        const user = new User(data.id, data.name, data.email, data.token, data.settings);
+        setUserID(data.id);
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("userID", data.id)
+        navigate("/home", {state: {user}});
     } catch (error) {
-      setError(error.message);
+        console.error("Login error:", error);
+        setError(error.message || "An error occurred during login");
     }
   };
 

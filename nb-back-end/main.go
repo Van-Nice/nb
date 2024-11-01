@@ -35,18 +35,25 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://bungo.rocks"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		AllowWebSockets: true,
-		MaxAge:           12 * time.Hour,
+			AllowCredentials: true,
+			AllowWebSockets: true,
+			MaxAge:           12 * time.Hour,
 	}))
 
 	router.Use(func(c *gin.Context) {
 		c.Set("mongoClient", db.ContentDB)
 		c.Next()
+	})
+
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status": "ok",
+			"time": time.Now(),
+		})
 	})
 
 	router.POST("/auth/create-account", auth.HandleCreateAccount)
