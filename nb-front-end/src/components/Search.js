@@ -3,6 +3,7 @@ import { FaSearch, FaFolder, FaFile } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/Search.module.css";
 import parentStyles from "../styles/Home.module.css";
+import { config } from "../config/config";
 
 export default function Search() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,7 +26,7 @@ export default function Search() {
       }
 
       const response = await fetch(
-        `https://api.bungo.rocks/protected/search?query=${searchTerm}`,
+        `${config.apiUrl}/protected/search?query=${searchTerm}`,
         {
           method: "GET",
           headers: {

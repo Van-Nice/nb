@@ -4,6 +4,7 @@ import styles from "../styles/Login.module.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import User from '../models/User';
 import {UserContext} from "../UserContext.js";
+import { config } from '../config/config.js';
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -31,7 +32,7 @@ export default function Login() {
 
     try {
         console.log("Attempting login with:", { email, password });
-        const response = await fetch("https://api.bungo.rocks/auth/login", {
+        const response = await fetch(`${config.apiUrl}/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

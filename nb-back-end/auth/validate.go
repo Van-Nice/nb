@@ -11,7 +11,7 @@ func validateName(name string) (bool, bool) {
     minLength := len(name) >= 2
     isAlphabetic := true
     for _, char := range name {
-        if !unicode.IsLetter(char) {
+        if !unicode.IsLetter(char) && !unicode.IsSpace(char) {
             isAlphabetic = false
             break
         }

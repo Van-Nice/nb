@@ -15,6 +15,7 @@ import RenameFileModal from './RenameFileModal';
 import html2pdf from 'html2pdf.js';
 import { Document, Packer, Paragraph } from 'docx';
 import { saveAs } from 'file-saver';
+import { config } from '../config/config';
 
 export default function DocumentEditor() {
   const { id } = useParams();
@@ -39,7 +40,7 @@ export default function DocumentEditor() {
           return;
         }
         const response = await fetch(
-          `https://api.bungo.rocks/protected/files?id=${id}`,
+          `${config.apiUrl}/protected/files?id=${id}`,
           {
             method: "GET",
             headers: {
@@ -73,7 +74,7 @@ export default function DocumentEditor() {
       return;
     }
   
-    const socket = new WebSocket(`ws://api.bungo.rocks/protected/ws?token=${token}`);
+    const socket = new WebSocket(`${config.wsUrl}/protected/ws?token=${token}`);
   
     socket.onopen = () => {
       console.log("WebSocket connection established");

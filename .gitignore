@@ -17,3 +17,4 @@ nb-back-end/launch.json
 nb-front-end/launch.json
 nb-front-end/EC2RSAKeyPair.pem
 nb-back-end/RSABungoBackend.pem
+start-project.sh

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import styles from "../styles/CreateAccount.module.css";
+import { config } from "../config/config";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
@@ -193,7 +194,7 @@ export default function CreateAccount() {
       
 
       try { // POST request successful
-        const response = await fetch('https://api.bungo.rocks/auth/create-account', {
+        const response = await fetch(`${config.apiUrl}/auth/create-account`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
