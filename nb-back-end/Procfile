@@ -1,1 +1,1 @@
-web: go build -o bin/nb-back-end && bin/nb-back-end
+web: bin/nb-back-end
