@@ -4,23 +4,25 @@ package main
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"nb-back-end/auth"
-	"nb-back-end/settings"
-	"nb-back-end/db"
 	"nb-back-end/content"
+	"nb-back-end/db"
+	"nb-back-end/settings"
 	"nb-back-end/websocket"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"	
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+	// Load .env file if it exists
+	if err := godotenv.Load(".env"); err != nil {
+		// Instead of fatal, just log the error
+		log.Println("No .env file found - using environment variables")
 	}
 
 	// Connect to Postgres database
@@ -81,7 +83,12 @@ func main() {
 		protected.GET("/search", content.HandleSearch)
 	}
 
-	if err := router.Run(":8080"); err != nil {
+	port := os.Getenv("PORT") // Heroku provides the port
+	if port == "" {
+		port = "8080" // Default port if not set
+	}
+
+	if err := router.Run(":" + port); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }
