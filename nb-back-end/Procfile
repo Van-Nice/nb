@@ -1,1 +1,1 @@
-web: bin/nb-back-end
+web: go run main.go 
