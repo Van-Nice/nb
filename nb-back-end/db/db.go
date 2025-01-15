@@ -10,6 +10,8 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 
+	// "github.com/jackc/pgx/v5"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -60,11 +62,26 @@ func InitAuthDB() {
         os.Getenv("POSTGRES_DB_PORT"),
         os.Getenv("POSTGRES_DB_NAME"), // Switch to toggle in and out of test db
     )
-    authDB, err = pgxpool.Connect(context.Background(), connStr)
+
+    // Configure connection pool settings
+    config, err := pgxpool.ParseConfig(connStr)
+    if err != nil {
+        log.Fatalf("Unable to parse connection string: %v\n", err)
+    }
+
+    // Optional: Configure pool settings
+    config.MaxConns = 10                    // Maximum number of connections
+    config.MinConns = 2                     // Minimum number of connections
+    config.MaxConnLifetime = 1 * time.Hour  // Maximum connection lifetime
+    config.MaxConnIdleTime = 30 * time.Minute // Maximum idle time
+
+    // Connect to the database using the pool
+    authDB, err = pgxpool.ConnectConfig(context.Background(), config)
     if err != nil {
         log.Fatalf("Unable to connect to database: %v\n", err)
     }
-    fmt.Println("Connected to: authDB")
+    
+    fmt.Println("Connected to: Supabase Postgres via connection pooler")
 }
 
 func CloseAuthDB() {

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"log"
 	"os"
 	"testing"
@@ -8,65 +9,68 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func TestDBConnections (t *testing.T) {
-    err := godotenv.Load("../.env")
-    if err != nil {
-        log.Fatalf("Error loading .env file: %v", err)
-    }
-    // Run all auth db tests
-    InitAuthDB()
-    defer CloseAuthDB()
-
-    // Run all content db tests
-    InitContentDB()
-    defer CloseContentDB()
+func TestDBConnections(t *testing.T) {
+	err := godotenv.Load("../.env.test")
+	if err != nil {
+		log.Fatalf("Error loading .env.test file: %v", err)
+	}
+	
+	InitAuthDB()
+	defer CloseAuthDB()
+	
+	// Test the connection
+	ctx := context.Background()
+	err = authDB.Ping(ctx)
+	if err != nil {
+		t.Fatalf("Failed to ping database: %v", err)
+	}
 }
 
 func TestExec(t *testing.T) {
-    err := godotenv.Load("../.env")
-    if err != nil {
-        log.Fatalf("Error loading .env file: %v", err)
-    }
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
 
-    InitAuthDB()
-    defer CloseAuthDB()
+	InitAuthDB()
+	defer CloseAuthDB()
 
-    // Create a test table
-    createTableSQL := `
-    CREATE TABLE IF NOT EXISTS test_table (
-        id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL
-    );`
-    err = Exec(createTableSQL)
-    if err != nil {
-        t.Fatalf("Failed to create test table: %v", err)
-    }
+	// Create a test table
+	createTableSQL := `
+	CREATE TABLE IF NOT EXISTS test_table (
+		id SERIAL PRIMARY KEY,
+		name TEXT NOT NULL
+	);`
+	err = Exec(createTableSQL)
+	if err != nil {
+		t.Fatalf("Failed to create test table: %v", err)
+	}
 
-    // Insert a test record
-    insertSQL := `INSERT INTO test_table (name) VALUES ($1);`
-    err = Exec(insertSQL, "test_name")
-    if err != nil {
-        t.Fatalf("Failed to insert test record: %v", err)
-    }
+	// Insert a test record
+	insertSQL := `INSERT INTO test_table (name) VALUES ($1);`
+	err = Exec(insertSQL, "test_name")
+	if err != nil {
+		t.Fatalf("Failed to insert test record: %v", err)
+	}
 
-    // Clean up: Drop the test table
-    dropTableSQL := `DROP TABLE IF EXISTS test_table;`
-    err = Exec(dropTableSQL)
-    if err != nil {
-        t.Fatalf("Failed to drop test table: %v", err)
-    }
+	// Clean up: Drop the test table
+	dropTableSQL := `DROP TABLE IF EXISTS test_table;`
+	err = Exec(dropTableSQL)
+	if err != nil {
+		t.Fatalf("Failed to drop test table: %v", err)
+	}
 }
 
-func TestGetUserByEmail(t * testing.T) {
-    err := godotenv.Load("../.env")
-    if err != nil {
-        log.Fatalf("Error loading .env file: %v", err)
-    }
+func TestGetUserByEmail(t *testing.T) {
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
 
-    InitAuthDB()
-    defer CloseAuthDB()
+	InitAuthDB()
+	defer CloseAuthDB()
 
-    testEmail := os.Getenv("TEST_EMAIL")
+	testEmail := os.Getenv("TEST_EMAIL")
 
     // Check for user in db based on email
     userID, firstName, lastName, username, password, createdAt, err := GetUserByEmail(testEmail)

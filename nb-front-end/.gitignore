@@ -28,3 +28,4 @@ yarn-error.log*
 .env.production
 .env.example
 nb-back-end/bungo-server
+.vercel
