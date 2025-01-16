@@ -8,6 +8,7 @@ export default function FolderDropdownMenu({ triggerRefresh }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState({});
   const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchFolders = async () => {
@@ -17,7 +18,7 @@ export default function FolderDropdownMenu({ triggerRefresh }) {
           throw new Error("No token found");
         }
 
-        const response = await fetch("http://localhost:8080/protected/nested-folders", {
+        const response = await fetch(`${apiUrl}/api/protected/nested-folders`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

@@ -24,6 +24,7 @@ export default function CreateAccount() {
   });
   const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const validateForm = () => {
     const isPasswordValid = passwordValidation.minLength &&
@@ -131,7 +132,7 @@ export default function CreateAccount() {
     setPasswordError("");
 
     try {
-      const response = await fetch("http://localhost:8000/create-account", {
+      const response = await fetch(`${apiUrl}/api/create-account`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

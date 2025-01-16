@@ -10,6 +10,7 @@ export default function Account() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState("");
   const [error, setError] = useState("");
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const handleGetUserAccount = async () => {
@@ -20,7 +21,7 @@ export default function Account() {
         }
 
         const response = await fetch(
-          "http://localhost:8080/protected/account-data",
+          `${apiUrl}/api/protected/account-data`,
           {
             method: "POST",
             headers: {

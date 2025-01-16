@@ -8,6 +8,7 @@ import { ItemTypes } from './Suggested';
 export default function Trash({onDropComplete}) {
   const [isSelected, setIsSelected] = useState(false);
   const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleClick = () => {
     setIsSelected(!isSelected);
@@ -29,7 +30,7 @@ export default function Trash({onDropComplete}) {
       if (!token) {
         throw new Error("No token found");
       }
-      const response = await fetch("http://localhost:8080/protected/delete-item", {
+      const response = await fetch(`${apiUrl}/api/protected/delete-item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

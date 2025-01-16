@@ -35,7 +35,7 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -49,29 +49,32 @@ func main() {
 		c.Next()
 	})
 
-	router.POST("/auth/create-account", auth.HandleCreateAccount)
-	router.GET("/email-confirmation", auth.HandleVerifyEmail)
-	router.POST("/auth/login", auth.HandleLogin)
-	router.GET("/protected/ws", websocket.HandleWebSocket)
-	// Protected routes
-	protected := router.Group("/protected")
-	protected.Use(auth.JWTAuthMiddleware())
-	{	
-		protected.GET("/")
-		protected.POST("/")
-		protected.GET("/user-settings", settings.HandleUserSettings)
-		protected.GET("/home", auth.HandleHome)
-		protected.POST("/create-file", content.HandleCreateFile)
-		protected.POST("/create-folder", content.HandleCreateFolder)
-		protected.POST("/account-data", auth.HandleAccountData)
-		protected.POST("/folders", content.HandleGetFolderContents)
-		protected.POST("/move-item", content.HandleMoveItem)
-		protected.POST("/delete-item", content.HandleDeleteItem)
-		protected.GET("/deleted-items", content.HandleGetDeletedItems)
-		protected.GET("/nested-folders", content.HandleGetNestedFolders)
-		protected.GET("/files", content.HandleGetFileName)
-		protected.POST("/rename-file", content.HandleRenameFile)
-		protected.GET("/search", content.HandleSearch)
+	api := router.Group("/api")
+	{
+		api.POST("/auth/create-account", auth.HandleCreateAccount)
+		api.GET("/email-confirmation", auth.HandleVerifyEmail)
+		api.POST("/auth/login", auth.HandleLogin)
+		api.GET("/protected/ws", websocket.HandleWebSocket)
+		// Protected routes
+		protected := api.Group("/protected")
+		protected.Use(auth.JWTAuthMiddleware())
+		{	
+			protected.GET("/")
+			protected.POST("/")
+			protected.GET("/user-settings", settings.HandleUserSettings)
+			protected.GET("/home", auth.HandleHome)
+			protected.POST("/create-file", content.HandleCreateFile)
+			protected.POST("/create-folder", content.HandleCreateFolder)
+			protected.POST("/account-data", auth.HandleAccountData)
+			protected.POST("/folders", content.HandleGetFolderContents)
+			protected.POST("/move-item", content.HandleMoveItem)
+			protected.POST("/delete-item", content.HandleDeleteItem)
+			protected.GET("/deleted-items", content.HandleGetDeletedItems)
+			protected.GET("/nested-folders", content.HandleGetNestedFolders)
+			protected.GET("/files", content.HandleGetFileName)
+			protected.POST("/rename-file", content.HandleRenameFile)
+			protected.GET("/search", content.HandleSearch)
+		}
 	}
 
 	if err := router.Run(":8080"); err != nil {

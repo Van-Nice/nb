@@ -5,6 +5,7 @@ import styles from "../styles/CreateAccount.module.css";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   // Name
   const validateName = (name) => {
@@ -193,7 +194,7 @@ export default function CreateAccount() {
       
 
       try { // POST request successful
-        const response = await fetch('http://localhost:8080/auth/create-account', {
+        const response = await fetch(`${apiUrl}/api/auth/create-account`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

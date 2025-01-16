@@ -10,6 +10,7 @@ export default function Search() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const searchContainerRef = useRef(null);
   const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleInputChange = (e) => {
     setSearchTerm(e.target.value);
@@ -25,7 +26,7 @@ export default function Search() {
       }
 
       const response = await fetch(
-        `http://localhost:8080/protected/search?query=${searchTerm}`,
+        `${apiUrl}/api/protected/search?query=${searchTerm}`,
         {
           method: "GET",
           headers: {

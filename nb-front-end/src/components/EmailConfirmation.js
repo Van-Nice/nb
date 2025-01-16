@@ -5,6 +5,7 @@ export default function EmailConfirmation() {
   const [confirmationStatus, setConfirmationStatus] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const confirmEmail = async () => {
@@ -19,7 +20,7 @@ export default function EmailConfirmation() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/email-confirmation?token=${token}`, {
+        const response = await fetch(`${apiUrl}/api/email-confirmation?token=${token}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

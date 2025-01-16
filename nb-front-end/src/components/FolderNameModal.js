@@ -11,6 +11,7 @@ const FolderNameModal = forwardRef(({ triggerRefresh }, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const { userID } = useContext(UserContext);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useImperativeHandle(ref, () => ({
     openModal() {
@@ -41,7 +42,7 @@ const FolderNameModal = forwardRef(({ triggerRefresh }, ref) => {
       }
 
       const response = await fetch(
-        "http://localhost:8080/protected/create-folder",
+        `${apiUrl}/api/protected/create-folder`,
         {
           method: "POST",
           headers: {

@@ -13,6 +13,7 @@ const FileBrowser = ({ onFileSelect, onFolderSelect }) => {
   const [currentFolderID, setCurrentFolderID] = useState(null);
   const [history, setHistory] = useState([]); // Navigation history state
   const [error, setError] = useState('');
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchContents = async () => {
@@ -22,7 +23,7 @@ const FileBrowser = ({ onFileSelect, onFolderSelect }) => {
           throw new Error('No token found');
         }
 
-        const response = await fetch('http://localhost:8080/protected/folders', {
+        const response = await fetch(`${apiUrl}/api/protected/folders`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

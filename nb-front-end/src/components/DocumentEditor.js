@@ -28,6 +28,7 @@ export default function DocumentEditor() {
   const fileNameModalRef = useRef(null);
   const renameFileModalRef = useRef(null);
   const moveFileModalRef = useRef(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   // Fetch file content and establish WebSocket connection
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function DocumentEditor() {
           return;
         }
         const response = await fetch(
-          `http://localhost:8080/protected/files?id=${id}`,
+          `${apiUrl}/api/protected/files?id=${id}`,
           {
             method: "GET",
             headers: {
@@ -239,7 +240,7 @@ export default function DocumentEditor() {
         return;
       }
 
-      const response = await fetch('http://localhost:8080/protected/delete-item', {
+      const response = await fetch(`${apiUrl}/api/protected/delete-item`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -276,7 +277,7 @@ export default function DocumentEditor() {
         return;
       }
 
-      const response = await fetch('http://localhost:8080/protected/move-item', {
+      const response = await fetch(`${apiUrl}/api/protected/move-item`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -312,7 +313,7 @@ export default function DocumentEditor() {
         return;
       }
 
-      const response = await fetch('http://localhost:8080/protected/rename-file', {
+      const response = await fetch(`${apiUrl}/api/protected/rename-file`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -8,6 +8,7 @@ const MoveFileModal = forwardRef(({ onMove }, ref) => {
   const [currentFolderID, setCurrentFolderID] = useState(null);
   const [history, setHistory] = useState([]);
   const [error, setError] = useState('');
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useImperativeHandle(ref, () => ({
     openModal() {
@@ -25,7 +26,7 @@ const MoveFileModal = forwardRef(({ onMove }, ref) => {
           throw new Error('No token found');
         }
 
-        const response = await fetch('http://localhost:8080/protected/folders', {
+        const response = await fetch(`${apiUrl}/api/protected/folders`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

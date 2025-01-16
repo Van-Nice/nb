@@ -8,6 +8,7 @@ const FileNameModal = forwardRef(({triggerRefresh}, ref) => {
   const [fileName, setFileName] = useState("");
   const navigate = useNavigate(); // Get the navigate function
   const {userID} = useContext(UserContext);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useImperativeHandle(ref, () => ({
     openModal() {
@@ -33,7 +34,7 @@ const FileNameModal = forwardRef(({triggerRefresh}, ref) => {
         throw new Error('No token found');
       }
 
-      const response = await fetch('http://localhost:8080/protected/create-file', {
+      const response = await fetch(`${apiUrl}/protected/create-file`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

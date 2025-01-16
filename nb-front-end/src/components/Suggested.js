@@ -22,6 +22,7 @@ export default function Suggested({selectedFile}) {
   const { refreshKey } = useOutletContext();
   const {theme} = useContext(ThemeContext);
   const isTrashView = location.pathname === '/home/trash';
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchContents = async () => {
@@ -35,7 +36,7 @@ export default function Suggested({selectedFile}) {
         console.log(folderID);
         if (location.pathname === '/home/trash') {
           // Fetch deleted items
-          response = await fetch("http://localhost:8080/protected/deleted-items", {
+          response = await fetch(`${apiUrl}/api/protected/deleted-items`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -44,7 +45,7 @@ export default function Suggested({selectedFile}) {
           });
         } else {
           // Fetch normal folder contents
-          response = await fetch("http://localhost:8080/protected/folders", {
+          response = await fetch(`${apiUrl}/api/protected/folders`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -96,7 +97,7 @@ export default function Suggested({selectedFile}) {
         itemType: item.type,
       });
   
-      const response = await fetch('http://localhost:8080/protected/move-item', {
+      const response = await fetch(`${apiUrl}/api/protected/move-item`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
