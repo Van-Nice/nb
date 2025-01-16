@@ -1,9 +1,10 @@
 export const isAuthenticated = async () => {
   const token = localStorage.getItem("authToken");
   if (!token) return false;
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   try {
-      const response = await fetch("http://localhost:8080/protected/", {
+      const response = await fetch(`${apiUrl}/api/protected/`, {
           method: "GET",
           headers: {
               "Authorization": token,

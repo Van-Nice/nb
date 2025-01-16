@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"nb-back-end/db"
 	"nb-back-end/auth"
+	"nb-back-end/db"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +24,21 @@ var upgrader = websocket.Upgrader{
 }
 
 func HandleWebSocket(c *gin.Context) {
+	// Get token from query parameter
+	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token is required"})
+		return
+	}
+
+	// Validate the token
+	claims, err := auth.ValidateJWT(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		return
+	}
+
+	// Upgrade the connection
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		fmt.Println("Failed to upgrade to WebSocket:", err)
@@ -31,25 +46,11 @@ func HandleWebSocket(c *gin.Context) {
 	}
 	defer conn.Close()
 
-	// Extract token from query parameters
-	token := c.Query("token")
-	if token == "" {
-		fmt.Println("Token not provided")
-		conn.WriteMessage(websocket.TextMessage, []byte("Unauthorized: Token not provided"))
-		conn.Close()
-		return
-	}
+	// Set user info in context
+	c.Set("userID", claims.UserID)
+	c.Set("email", claims.Email)
 
-	// Validate the token
-	userID, err := auth.ValidateToken(token)
-	if err != nil {
-		fmt.Println("Invalid token:", err)
-		conn.WriteMessage(websocket.TextMessage, []byte("Unauthorized: Invalid token"))
-		conn.Close()
-		return
-	}
-
-	fmt.Println("User authenticated with ID:", userID)
+	fmt.Println("User authenticated with ID:", claims.UserID)
 
 	// Inside your message handling loop
 	for {
@@ -81,7 +82,7 @@ func HandleWebSocket(c *gin.Context) {
 		collection := db.ContentDB.Database("nbdb").Collection("files")
 		filter := bson.M{
 			"_id":     fileID,
-			"user_id": userID, // Ensure the user owns the file
+			"user_id": claims.UserID, // Ensure the user owns the file
 		}
 		update := bson.M{"$set": bson.M{"content": message.Content}}
 

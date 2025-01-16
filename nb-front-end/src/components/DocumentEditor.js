@@ -29,6 +29,7 @@ export default function DocumentEditor() {
   const renameFileModalRef = useRef(null);
   const moveFileModalRef = useRef(null);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const websocketUrl = process.env.REACT_APP_WS_URL;
 
   // Fetch file content and establish WebSocket connection
   useEffect(() => {
@@ -74,7 +75,7 @@ export default function DocumentEditor() {
       return;
     }
   
-    const socket = new WebSocket(`ws://localhost:8080/protected/ws?token=${token}`);
+    const socket = new WebSocket(`${websocketUrl}/api/ws?token=${token}`);
   
     socket.onopen = () => {
       console.log("WebSocket connection established");

@@ -34,7 +34,7 @@ const FileNameModal = forwardRef(({triggerRefresh}, ref) => {
         throw new Error('No token found');
       }
 
-      const response = await fetch(`${apiUrl}/protected/create-file`, {
+      const response = await fetch(`${apiUrl}/api/protected/create-file`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

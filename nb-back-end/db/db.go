@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"time"
 
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -48,34 +49,97 @@ type UserSettings struct {
     WordWrapColumn        int    `json:"word_wrap_column"`
 }
 
-var authDB *pgxpool.Pool
+var (
+    authDB *pgxpool.Pool
+    authOnce sync.Once
+    authMutex sync.RWMutex
+)
 
-func InitAuthDB() {
-    var err error
-    connStr := fmt.Sprintf(
-        "postgres://%s:%s@%s:%s/%s",
-        os.Getenv("POSTGRES_DB_USER"),
-        os.Getenv("POSTGRES_DB_PASSWORD"),
-        os.Getenv("POSTGRES_DB_HOST"),
-        os.Getenv("POSTGRES_DB_PORT"),
-        os.Getenv("POSTGRES_DB_NAME"), // Switch to toggle in and out of test db
-    )
-    authDB, err = pgxpool.Connect(context.Background(), connStr)
-    if err != nil {
-        log.Fatalf("Unable to connect to database: %v\n", err)
-    }
-    fmt.Println("Connected to: authDB")
+// InitAuthDB initializes the database connection pool if it hasn't been initialized
+func InitAuthDB() error {
+    var initErr error
+    authOnce.Do(func() {
+        connStr := fmt.Sprintf(
+            "postgres://%s:%s@%s:%s/%s",
+            os.Getenv("POSTGRES_DB_USER"),
+            os.Getenv("POSTGRES_DB_PASSWORD"),
+            os.Getenv("POSTGRES_DB_HOST"),
+            os.Getenv("POSTGRES_DB_PORT"),
+            os.Getenv("POSTGRES_DB_NAME"),
+        )
+
+        // Configure the connection pool
+        config, err := pgxpool.ParseConfig(connStr)
+        if err != nil {
+            initErr = fmt.Errorf("unable to parse database config: %v", err)
+            return
+        }
+
+        // Set reasonable pool limits
+        config.MaxConns = 25
+        config.MinConns = 5
+        config.MaxConnLifetime = time.Hour
+        config.MaxConnIdleTime = 30 * time.Minute
+
+        // Initialize the connection pool with simple protocol
+        config.ConnConfig.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
+
+        // Initialize the connection pool
+        pool, err := pgxpool.NewWithConfig(context.Background(), config)
+        if err != nil {
+            initErr = fmt.Errorf("unable to create connection pool: %v", err)
+            return
+        }
+
+        // Test the connection
+        if err := pool.Ping(context.Background()); err != nil {
+            initErr = fmt.Errorf("unable to ping database: %v", err)
+            return
+        }
+
+        authDB = pool
+        fmt.Println("Connected to: authDB")
+    })
+
+    return initErr
 }
 
+// GetAuthDB returns the database connection pool
+func GetAuthDB() *pgxpool.Pool {
+    authMutex.RLock()
+    defer authMutex.RUnlock()
+    
+    if authDB == nil {
+        // Initialize if not already done
+        if err := InitAuthDB(); err != nil {
+            log.Printf("Failed to initialize auth DB: %v", err)
+            return nil
+        }
+    }
+    return authDB
+}
+
+// CloseAuthDB safely closes the database connection pool
 func CloseAuthDB() {
-    authDB.Close()
-    log.Printf("Disconnected from: authDB")
+    authMutex.Lock()
+    defer authMutex.Unlock()
+    
+    if authDB != nil {
+        authDB.Close()
+        authDB = nil
+        log.Printf("Disconnected from: authDB")
+    }
 }
 
 // Exec executes a given SQL statement with arguments and returns an error if any.
 func Exec(sql string, args ...interface{}) error {
+    db := GetAuthDB()
+    if db == nil {
+        return fmt.Errorf("database connection not initialized")
+    }
+
     ctx := context.Background()
-    _, err := authDB.Exec(ctx, sql, args...)
+    _, err := db.Exec(ctx, sql, args...)
     if err != nil {
         return fmt.Errorf("Exec failed: %v", err)
     }
@@ -97,13 +161,17 @@ func GetUserByToken(token string) (int, time.Time, error) {
 }
 
 func GetUserByEmail(email string) (int, string, string, string, string, time.Time, error) {
+    db := GetAuthDB()
+    if db == nil {
+        return 0, "", "", "", "", time.Time{}, fmt.Errorf("database connection not initialized")
+    }
+
     var userID int
     var firstName, lastName, username, password string
     var createdAt time.Time
     var emailValidated bool
 
-    // Execute the query to retrieve the user details by email
-    err := authDB.QueryRow(context.Background(), 
+    err := db.QueryRow(context.Background(), 
         "SELECT user_id, first_name, last_name, username, password, created_at, email_validated FROM users WHERE email = $1", 
         email).Scan(&userID, &firstName, &lastName, &username, &password, &createdAt, &emailValidated)
     
@@ -112,7 +180,6 @@ func GetUserByEmail(email string) (int, string, string, string, string, time.Tim
         return 0, "", "", "", "", time.Time{}, fmt.Errorf("QueryRow failed: %v", err)
     }
 
-    // Check if email is validated
     if !emailValidated {
         return 0, "", "", "", "", time.Time{}, fmt.Errorf("email not validated")
     }

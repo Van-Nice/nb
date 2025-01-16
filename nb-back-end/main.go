@@ -7,14 +7,14 @@ import (
 	"time"
 
 	"nb-back-end/auth"
-	"nb-back-end/settings"
-	"nb-back-end/db"
 	"nb-back-end/content"
+	"nb-back-end/db"
+	"nb-back-end/settings"
 	"nb-back-end/websocket"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"	
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 
 	// Connect to Mongo database
 	db.InitContentDB()
-	defer db.InitContentDB()
+	defer db.CloseContentDB()
 
 	gin.SetMode(gin.ReleaseMode)
 
@@ -54,7 +54,6 @@ func main() {
 		api.POST("/auth/create-account", auth.HandleCreateAccount)
 		api.GET("/email-confirmation", auth.HandleVerifyEmail)
 		api.POST("/auth/login", auth.HandleLogin)
-		api.GET("/protected/ws", websocket.HandleWebSocket)
 		// Protected routes
 		protected := api.Group("/protected")
 		protected.Use(auth.JWTAuthMiddleware())
@@ -75,6 +74,7 @@ func main() {
 			protected.POST("/rename-file", content.HandleRenameFile)
 			protected.GET("/search", content.HandleSearch)
 		}
+		api.GET("/ws", websocket.HandleWebSocket)
 	}
 
 	if err := router.Run(":8080"); err != nil {
